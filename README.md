@@ -173,9 +173,12 @@ use Novay\MiniOS\Facades\MiniOS;
 MiniOS::routes();
 ```
 
-### 4. Laravel Fortify Integration (Optional)
+### 4. Laravel Fortify Integration & Email Verification
 
-Jika menggunakan Laravel Fortify, cukup daftarkan tampilan autentikasi MiniOS di `app/Providers/FortifyServiceProvider.php`:
+MiniOS menyertakan antarmuka autentikasi desktop bawaan bergaya modern (Login, Register, Forgot Password, Reset Password, Confirm Password, Two-Factor Challenge, dan **Verify Email**).
+
+#### A. Registrasi Tampilan Autentikasi
+Daftarkan tampilan autentikasi MiniOS di `app/Providers/FortifyServiceProvider.php`:
 
 ```php
 use Novay\MiniOS\Facades\MiniOS;
@@ -186,6 +189,37 @@ public function boot(): void
     MiniOS::fortify();
 }
 ```
+
+#### B. Mengatasi Pengalihan ke Verifikasi Email (`/email/verify`)
+
+Ketika pengguna baru mendaftar atau login, sistem secara default mengarahkan pengguna ke halaman verifikasi email. Anda dapat menyesuaikannya sesuai kebutuhan:
+
+- **Opsi 1: Menonaktifkan Verifikasi Email (Akses Langsung ke Desktop)**  
+  Jika Anda mengembangkan aplikasi internal / development dan ingin pengguna langsung masuk ke Desktop tanpa verifikasi email:
+  1. Di `config/fortify.php`, komentari fitur `emailVerification`:
+     ```php
+     'features' => [
+         Features::registration(),
+         Features::resetPasswords(),
+         // Features::emailVerification(), // <-- Nonaktifkan baris ini
+         // ...
+     ],
+     ```
+  2. Di `config/minios.php`, atur middleware tanpa `verified`:
+     ```php
+     'middleware' => ['web', 'auth'],
+     ```
+
+- **Opsi 2: Menggunakan Verifikasi Email (Production / Mail Driver Aktif)**  
+  MiniOS telah menyediakan tampilan verifikasi email desktop (`minios::auth.verify-email`):
+  1. Pastikan mail driver terkonfigurasi di `.env` (misal `MAIL_MAILER=log` untuk development lokal agar tautan verifikasi tercatat di `storage/logs/laravel.log`, atau gunakan Mailpit / SMTP / Resend).
+  2. Klik tautan verifikasi yang dikirimkan, dan pengguna akan otomatis diarahkan masuk ke Desktop MiniOS.
+
+- **Opsi 3: Tandai User Terverifikasi Secara Instan via Tinker (Quick Test)**  
+  Untuk memverifikasi akun pengguna yang sudah ada melalui terminal:
+  ```bash
+  php artisan tinker --execute "App\Models\User::first()->markEmailAsVerified();"
+  ```
 
 ---
 

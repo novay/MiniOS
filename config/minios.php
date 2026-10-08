@@ -18,6 +18,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Desktop Routes Middleware
+    |--------------------------------------------------------------------------
+    |
+    | Define the middleware stack applied to desktop workspace routes.
+    | Set to null to dynamically apply Fortify email verification if enabled,
+    | or define explicitly (e.g. ['web', 'auth']) to disable email verification requirement.
+    |
+    */
+
+    'middleware' => null,
+
+    /*
+    |--------------------------------------------------------------------------
     | Default Desktop Settings
     |--------------------------------------------------------------------------
     |
