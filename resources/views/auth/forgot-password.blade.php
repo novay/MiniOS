@@ -1,0 +1,44 @@
+<x-layouts::minios.auth :title="__('Forgot password')">
+    <div class="flex w-full flex-col items-center text-center">
+        {{-- Key Avatar Icon --}}
+        <div class="relative flex size-28 items-center justify-center rounded-full shadow-2xl ring-3 ring-white/10">
+            <img src="{{ asset('minios/images/logo.png') }}" alt="Logo MiniOS">
+        </div>
+
+        {{-- Title & Subtitle --}}
+        <h2 class="mt-6 text-xl font-bold tracking-tight text-white sm:text-2xl">
+            {{ __('Forgot Password') }}
+        </h2>
+        <p class="mt-1 text-sm text-white/60">
+            {{ __('Enter your email to receive a password reset link') }}
+        </p>
+
+        <!-- Session Status -->
+        <x-auth-session-status class="mt-3 text-center text-xs font-medium text-emerald-400" :status="session('status')" />
+
+        <form method="POST" action="{{ route('password.email') }}" class="mt-6 w-full space-y-4 text-left">
+            @csrf
+
+            <!-- Email Address -->
+            <div class="flex flex-col space-y-1">
+                <flux:input
+                    name="email"
+                    :placeholder="__('Email address')"
+                    type="email"
+                />
+                <x-minios::error name="email" />
+            </div>
+
+            <div class="pt-2">
+                <flux:button variant="primary" type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-3 rounded shadow-sm shadow-indigo-600/30 transition-all duration-200" data-test="email-password-reset-link-button">
+                    {{ __('Email password reset link') }}
+                </flux:button>
+            </div>
+        </form>
+
+        <div class="mt-6 text-sm text-white/60">
+            <span>{{ __('Remember your password?') }}</span>
+            <flux:link :href="route('login')" wire:navigate class="text-indigo-300 hover:text-indigo-200 font-medium ml-1">{{ __('Log in') }}</flux:link>
+        </div>
+    </div>
+</x-layouts::minios.auth>
