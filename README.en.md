@@ -85,7 +85,41 @@ mini-os/
 
 ---
 
-## ⚡ Quick Start (3 Simple Steps)
+## ⚡ Installation & Quick Start
+
+MiniOS can be integrated into existing Laravel applications or installed in a brand new project.
+
+### 🆕 Option 1: Fresh Laravel Project Installation
+
+If you are starting from scratch, create a new Laravel project using the official installer:
+
+```bash
+laravel new example
+```
+
+Select the interactive prompts in your terminal as follows:
+```text
+Do you want to use a starter kit? [Yes]
+Which frontend stack should your starter kit use? [Livewire]
+Which authentication provider do you prefer? [Laravel's built-in authentication]
+Would you like to use single-file Livewire components? [Any]
+Would you like to add teams support to your application? [Any]
+
+Waiting...
+
+Which authentication features would you like to enable? [Any]
+
+Finished.
+```
+
+Once completed, navigate into your project directory:
+```bash
+cd example
+```
+
+---
+
+### 📦 Option 2 / Next: Install MiniOS Package
 
 ### 1. Require Package via Composer
 ```bash
@@ -202,6 +236,27 @@ This is standard Fortify behavior when email verification is enabled but mail se
    ```bash
    php artisan tinker --execute "App\Models\User::first()->markEmailAsVerified();"
    ```
+
+---
+
+### ❓ "Will installing MiniOS disrupt my existing Laravel application?"
+
+**Short answer: Absolutely not. It is completely safe.**
+
+Here is why:
+
+1. **Existing Routes Remain Untouched:**
+   Always place `MiniOS::routes();` at the **very bottom** of your `routes/web.php`. All of your existing application routes (e.g. `/admin`, `/api`, `/checkout`, `/blog`) are matched and handled first by Laravel.
+   *(Note: The root `/` URL points to the MiniOS desktop by default. If you want to keep your existing public homepage at `/`, define that route prior to `MiniOS::routes()`)*.
+
+2. **Database Integrity:**
+   MiniOS migrations only add 1 new standalone table (`desktop_settings`) and 1 nullable column (`locked_at`) to the existing `users` table. None of your business data or existing schemas are touched.
+
+3. **Authentication Flexibility:**
+   MiniOS relies on standard Laravel authentication (`auth`). If your project already uses an authentication solution (Breeze, Jetstream, Filament, or custom controllers), you **do not** need to call `MiniOS::fortify()`. Authenticated users can access the desktop directly through your existing login session!
+
+4. **Assets & Bundling Safety:**
+   `minios:install` merely appends module aliases and non-destructive CSS/JS imports. Your existing Tailwind styling and JavaScript components continue to function normally.
 
 ---
 

@@ -87,7 +87,39 @@ mini-os/
 
 ## ⚡ Cara Pasang (3 Menit Beres)
 
-Gak usah banyak cingcong, ikutin langkah ini:
+MiniOS bisa dipasang di aplikasi Laravel yang sudah berjalan maupun proyek baru dari nol.
+
+### 🆕 Opsi 1: Mulai dari Fresh Install Laravel (Proyek Baru)
+
+Kalo lu mau bikin dari kosongan, buat project Laravel baru pake installer resmi:
+
+```bash
+laravel new example
+```
+
+Pilih opsi di prompt interaktif terminal seperti ini:
+```text
+Do you want to use a starter kit? [Yes]
+Which frontend stack should your starter kit use? [Livewire]
+Which authentication provider do you prefer? [Laravel's built-in authentication]
+Would you like to use single-file Livewire components? [Bebas]
+Would you like to add teams support to your application? [Bebas]
+
+Tunggu...
+
+Which authentication features would you like to enable? [Bebas]
+
+Selesai.
+```
+
+Begitu instalasi Laravel beres, masuk ke direktori proyek:
+```bash
+cd example
+```
+
+---
+
+### 📦 Opsi 2 / Lanjutan: Pasang Package MiniOS
 
 ### 1. Tarik Package via Composer
 ```bash
@@ -204,6 +236,27 @@ Santai, itu kelakuan bawaan Fortify kalau fitur verifikasi email-nya nyala tapi 
    ```bash
    php artisan tinker --execute "App\Models\User::first()->markEmailAsVerified();"
    ```
+
+---
+
+### ❓ "Kalo dipasang di aplikasi Laravel yang sudah berjalan (Existing Project), bakal ngeganggu/ngerusak gak?"
+
+**Jawaban singkat: AMAN BANGET, GAK AKAN NGERUSAK.**
+
+Tapi pahami 4 poin to the point ini:
+
+1. **Rute Lama Gak Bakal Bentrok:**
+   Pastikan selalu menaruh baris `MiniOS::routes();` di baris **paling bawah** `routes/web.php`. Rute-rute aplikasi lu yang sudah ada (seperti `/admin`, `/api`, `/checkout`, `/dashboard`, `/blog`) akan tetap diproses lebih dulu oleh Laravel tanpa terganggu sama sekali.
+   *(Catatan: Halaman root `/` secara default bakal diarahkan ke Desktop MiniOS. Kalo homepage publik lama lu mau tetap di `/`, deklarasikan rute homepage lama sebelum baris `MiniOS::routes()`)*.
+
+2. **Database 100% Aman:**
+   Migrasi MiniOS cuma nambah 1 tabel baru `desktop_settings` dan 1 kolom nullable `locked_at` di tabel `users`. Gak ada tabel lama yang diubah paksa atau dihapus.
+
+3. **Autentikasi Fleksibel:**
+   MiniOS cuma butuh session login bawaan Laravel (`auth`). Kalo aplikasi lu udah punya sistem login sendiri (Breeze, Jetstream, Filament, atau custom auth), lu **gak wajib** panggil `MiniOS::fortify()`. User yang sudah login lewat auth lama lu bisa langsung membuka desktop MiniOS!
+
+4. **Vite & Aset Aman:**
+   Script `minios:install` cuma nambah alias di `vite.config.js` dan mengimpor CSS/JS pelengkap di `app.css` & `app.js`. Style Tailwind dan script yang sudah ada sebelumnya tetap berjalan normal.
 
 ---
 
