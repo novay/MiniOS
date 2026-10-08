@@ -1,11 +1,11 @@
-# MiniOS - Web Desktop Environment for Laravel
+# MiniOS - Web Desktop OS buat Laravel
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/novay/minios/main/resources/img/images/logo.png" alt="MiniOS Logo" width="160" />
 </p>
 
 <p align="center">
-  <strong>Transform your Laravel application into an interactive, multi-window Web Desktop OS.</strong>
+  <strong>Sulap web Laravel lu jadi OS desktop multi-window. Gak pake ribet, sat-set langsung jalan.</strong>
 </p>
 
 <p align="center">
@@ -17,84 +17,85 @@
   <a href="https://tailwindcss.com"><img src="https://img.shields.io/badge/TailwindCSS-v4-38B2AC.svg?style=flat-square&logo=tailwind-css" alt="Tailwind CSS"></a>
 </p>
 
----
-
-## 🌟 Overview
-
-**MiniOS** is a modern, modular Web Desktop Environment designed for Laravel. It lets you build powerful multi-window applications with a familiar desktop operating system interface—complete with floating windows, a macOS/Ubuntu-inspired dock, top menu bar, application launcher, lock screen, and deep URL state management.
-
-MiniOS is powered by **Laravel**, **Livewire**, **Alpine.js**, **Tailwind CSS v4**, and **Vite**.
+<p align="center">
+  <strong>Bahasa:</strong>
+  <a href="README.md"><strong>Bahasa Indonesia</strong></a> |
+  <a href="README.en.md">English</a>
+</p>
 
 ---
 
-## 🏛️ Architecture
+## 🥱 Ngapain Bikin Dashboard yang Gitu-Gitu Aja?
 
-MiniOS is structured modularly:
-- **Core Package (`Novay\MiniOS`)**: Manages the Window Manager, Desktop Workspace, Top Bar, Dock, App Launcher, Context Menus, Lock Screen, Setting Service (`os_setting`), and Asset Pipeline.
-- **Built-in System Applications**: Browser, Files, Terminal, Settings, Calculator, Activity Monitor, Control Panel, and About MiniOS.
-- **Custom Applications**: Your isolated modules located in `app/MiniOS/{AppName}/` with templates directly in `resources/views/apps/`.
+Jujur aja, dashboard admin jaman now ngebosenin parah: sidebar item di kiri, navbar di atas, isinya tabel putih polosan. 
+
+**MiniOS** nyulap aplikasi Laravel lu jadi Web Desktop OS interaktif berasa pake macOS atau Windows. Jendelanya bisa digeser (*draggable*), di-resize, di-minimize ke dock, ada task manager, terminal interaktif, sampe fitur pasang aplikasi baru tinggal lempar file `.zip`.
+
+Ditenagai langsung sama **Laravel**, **Livewire**, **Alpine.js**, **Tailwind CSS v4**, dan **Vite**. Enteng, reaktif, gak ada dependensi framework JS ribet.
+
+---
+
+## 💥 Fitur (Bukan Kaleng-Kaleng)
+
+- 🖥️ **Desktop Workspace Beneran**: Jendela ngambang bisa digeser, resize, snap tepi layar, minimize ke dock, maximize, dan z-index otomatis rapi.
+- 🎛️ **Control Panel & App Installer**:
+  - Pasang aplikasi baru semudah upload file `.zip`.
+  - Migrasi database langsung jalan otomatis.
+  - Cek dependensi Composer (ada tombol sakti **"Install via Composer"** langsung lewat modal GUI terminal realtime).
+  - Uninstall bersih plus opsi rollback tabel database.
+- 🛠️ **Aplikasi Bawaan Siap Tempur**:
+  - 🌐 **Browser**: Peramban web mini dengan histori dan kontrol navigasi.
+  - 📁 **Files**: File explorer penyimpanan lokal / S3 / BunnyCDN (grid & list view).
+  - ⌨️ **Terminal**: Shell interaktif buat eksekusi perintah Artisan langsung di browser.
+  - ⚙️ **Settings**: Atur wallpaper, dark/light mode, aksen warna, blur, dan posisi dock.
+  - 📊 **Activity Monitor**: Task manager pantau RAM, disk, sama load server.
+  - 🧮 **Calculator** & ℹ️ **About MiniOS**.
+- 🔒 **Login & Lockscreen**: Terintegrasi penuh sama Laravel Fortify, support Passkey & Lock Screen interaktif.
+- 🔗 **Deep-linking URL**: Buka aplikasi di jendela desktop otomatis update URL browser tanpa reload halaman.
+- 🤖 **AI Agent Ready**: Pas diinstall langsung nyediain skill di `.agents/`, jadi AI assistant lu (Cursor, Windsurf, Antigravity, Copilot) langsung khatam cara bikinin lu aplikasi MiniOS.
+
+---
+
+## 🏛️ Struktur Folder
+
+MiniOS itu modular abis. Aplikasi buatan lu cukup ngumpul di `app/MiniOS/{NamaApp}/`:
 
 ```
 mini-os/
 ├── app/
 │   └── MiniOS/
-│       ├── Todo/                     <-- Custom App Module
-│       │   ├── TodoApp.php           <-- Manifest Contract (DesktopApp)
+│       ├── Todo/                     <-- Modul Aplikasi Kustom Lu
+│       │   ├── TodoApp.php           <-- Manifest / Kontrak Aplikasi
 │       │   └── Livewire/
-│       │       └── Todo.php          <-- Livewire Component
-│       └── Contact/                  <-- Multi-Route / CRUD Module
-│           ├── ContactApp.php        <-- Manifest Contract
+│       │       └── Todo.php          <-- Komponen Livewire
+│       └── Kasir/                    <-- Contoh Aplikasi Lainnya
+│           ├── KasirApp.php
 │           └── Livewire/
-│               ├── Contact.php       <-- Shell Router Component
-│               ├── ContactList.php   <-- /contacts Livewire Component
-│               └── ContactCreate.php <-- /contacts/create Livewire Component
+│               └── Kasir.php
 ├── config/
-│   └── minios.php                    <-- Configuration & App Registry
+│   └── minios.php                    <-- Konfigurasi & Registrasi
 ├── resources/
 │   └── views/
-│       └── apps/                     <-- Blade Templates for Custom Apps
+│       └── apps/                     <-- Tampilan Blade Aplikasi
 │           ├── todo.blade.php
-│           └── contact/
-│               ├── contact-list.blade.php
-│               └── contact-create.blade.php
+│           └── kasir.blade.php
 └── routes/
-    └── web.php                       <-- Application Routing
+    └── web.php                       <-- Cukup panggil MiniOS::routes()
 ```
 
 ---
 
-## ✨ Features
+## ⚡ Cara Pasang (3 Menit Beres)
 
-- 🖥️ **Full Desktop Workspace**: Multi-window management with drag, resize, minimize, maximize, snap, and z-index ordering.
-- 🚀 **Built-in System Applications**:
-  - 🌐 **Browser**: Embedded web browser with history and navigation controls.
-  - 📁 **Files**: Storage explorer with grid/list view and file previews.
-  - ⌨️ **Terminal**: Interactive shell supporting Artisan commands and built-in utilities.
-  - ⚙️ **Settings**: Themes, dynamic accents (Zinc, Indigo, Emerald, Sky, Amber, Rose, Violet), wallpapers, dock positions, and window behaviors.
-  - 🎛️ **Control Panel**: App marketplace & manager: install `.zip` packages, inspect database migrations & models, check composer dependencies, install packages via built-in GUI terminal runner, and safely uninstall with migration rollback.
-  - 🧮 **Calculator**: Standard desktop calculator utility.
-  - 📊 **Activity Monitor**: Real-time memory, storage, and PHP engine resource statistics.
-  - ℹ️ **About MiniOS**: System specifications and version overview.
-- 🧩 **Modular Custom App System**: Easily create and register custom applications using your existing Livewire components.
-- 🔒 **Security & Authentication**: Built-in Lock Screen, Fortify authentication, and Passkeys support.
-- 🎨 **Modern Aesthetics**: Glassmorphic panels, dark mode, smooth micro-animations, and dynamic wallpaper gradients.
-- 🔗 **Deep-linking & URL Sync**: Opening applications dynamically synchronizes browser URLs without page reloads.
+Gak usah banyak cingcong, ikutin langkah ini:
 
----
-
-## 📦 Installation & Setup
-
-### 1. Require Package
-
-Require the package via Composer:
-
+### 1. Tarik Package via Composer
 ```bash
 composer require novay/minios
 ```
 
-### 2. Run Installer & Migrations
-
-Jalankan installer MiniOS:
+### 2. Eksekusi Installer & Migrasi
+Gak perlu ngedit file ini-itu satu per satu, perintah ini otomatis nyiapin config, migrasi, aset, skill AI, sekaligus nyuntik alias di `vite.config.js`, `app.css`, dan `app.js`:
 
 ```bash
 php artisan minios:install
@@ -102,17 +103,14 @@ php artisan migrate
 npm run build
 ```
 
-> ⚡ **Otomatis & Siap Pakai**: Perintah `php artisan minios:install` secara otomatis mempublikasikan konfigurasi, migrasi database, wallpaper/aset, skill AI agent, serta **langsung menyematkan konfigurasi di `vite.config.js`**, **`resources/css/app.css`**, dan **`resources/js/app.js`** untuk Anda!
-
 <details>
-<summary><strong>🔍 Konfigurasi Frontend Manual (Opsional / Troubleshooting)</strong></summary>
+<summary><strong>🛠️ Apes Pas Install Otomatis? Nih Cara Manualnya (Frontend)</strong></summary>
 
 <br>
 
-> *Catatan: Langkah di bawah ini **sudah ditangani secara otomatis** saat menjalankan `php artisan minios:install`. Anda hanya perlu membukanya jika instalasi otomatis mengalami kendala atau menggunakan arsitektur build khusus.*
+> *Catatan: Bagian ini udah ditangani otomatis sama `minios:install`. Buka cuma kalau lu pake bundler kustom atau instalasinya gagal.*
 
-#### 1. Path Aliases di `vite.config.js`:
-
+**1. Pasang Alias di `vite.config.js`:**
 ```javascript
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -130,8 +128,7 @@ export default defineConfig({
 });
 ```
 
-#### 2. Registrasi Alpine di `resources/js/app.js`:
-
+**2. Daftarin Alpine di `resources/js/app.js`:**
 ```javascript
 import minios from '@minios/minios';
 
@@ -144,8 +141,7 @@ if (window.Alpine) {
 }
 ```
 
-#### 3. Stylesheet & View Scanning di `resources/css/app.css`:
-
+**3. Impor Stylesheet di `resources/css/app.css`:**
 ```css
 @import 'tailwindcss';
 @import '../../vendor/livewire/flux/dist/flux.css';
@@ -154,31 +150,27 @@ if (window.Alpine) {
 @source '../views';
 @source '../../vendor/novay/minios/resources/views/**/*.blade.php';
 ```
-
 </details>
 
 ---
 
-### 3. Register Desktop Routes
-
-Register `MiniOS::routes()` at the bottom of `routes/web.php` to handle desktop workspace routing and deep linking:
+### 3. Daftarin Rute Desktop
+Buka `routes/web.php`, taruh baris sakti ini di baris paling bawah:
 
 ```php
-use Illuminate\Support\Facades\Route;
 use Novay\MiniOS\Facades\MiniOS;
 
-// Your custom routes (if any)...
+// Rute kustom lu yang lain (kalo ada)...
 
-// MiniOS Desktop routes (catch-all at bottom)
+// Tangkap semua rute desktop MiniOS
 MiniOS::routes();
 ```
 
-### 4. Laravel Fortify Integration & Email Verification
+---
 
-MiniOS menyertakan antarmuka autentikasi desktop bawaan bergaya modern (Login, Register, Forgot Password, Reset Password, Confirm Password, Two-Factor Challenge, dan **Verify Email**).
+### 4. Setup Autentikasi (Laravel Fortify)
 
-#### A. Registrasi Tampilan Autentikasi
-Daftarkan tampilan autentikasi MiniOS di `app/Providers/FortifyServiceProvider.php`:
+MiniOS udah nyediain UI login, register, reset password, dan lockscreen siap pakai. Tinggal daftarin di `app/Providers/FortifyServiceProvider.php`:
 
 ```php
 use Novay\MiniOS\Facades\MiniOS;
@@ -190,63 +182,68 @@ public function boot(): void
 }
 ```
 
-#### B. Mengatasi Pengalihan ke Verifikasi Email (`/email/verify`)
+#### ⚠️ "Woi, kok abis register/login malah mentok di `/email/verify`?"
+Santai, itu kelakuan bawaan Fortify kalau fitur verifikasi email-nya nyala tapi SMTP mailer lu belum diset. Pilih salah satu solusinya:
 
-Ketika pengguna baru mendaftar atau login, sistem secara default mengarahkan pengguna ke halaman verifikasi email. Anda dapat menyesuaikannya sesuai kebutuhan:
-
-- **Opsi 1: Menonaktifkan Verifikasi Email (Akses Langsung ke Desktop)**  
-  Jika Anda mengembangkan aplikasi internal / development dan ingin pengguna langsung masuk ke Desktop tanpa verifikasi email:
-  1. Di `config/fortify.php`, komentari fitur `emailVerification`:
+1. **Jalur Santai / Dev Lokal (Matiin Verifikasi):**
+   - Buka `config/fortify.php`, matiin (komentari) baris ini:
      ```php
-     'features' => [
-         Features::registration(),
-         Features::resetPasswords(),
-         // Features::emailVerification(), // <-- Nonaktifkan baris ini
-         // ...
-     ],
+     // Features::emailVerification(),
      ```
-  2. Di `config/minios.php`, atur middleware tanpa `verified`:
+   - Buka `config/minios.php`, pastiin middleware-nya gak maksa `verified`:
      ```php
      'middleware' => ['web', 'auth'],
      ```
+   *Beres! Abis login langsung nyelonong masuk desktop tanpa hambatan.*
 
-- **Opsi 2: Menggunakan Verifikasi Email (Production / Mail Driver Aktif)**  
-  MiniOS telah menyediakan tampilan verifikasi email desktop (`minios::auth.verify-email`):
-  1. Pastikan mail driver terkonfigurasi di `.env` (misal `MAIL_MAILER=log` untuk development lokal agar tautan verifikasi tercatat di `storage/logs/laravel.log`, atau gunakan Mailpit / SMTP / Resend).
-  2. Klik tautan verifikasi yang dikirimkan, dan pengguna akan otomatis diarahkan masuk ke Desktop MiniOS.
+2. **Jalur Beneran / Production (Pake Email Asli):**
+   - Set config email di `.env` lu (atau set `MAIL_MAILER=log` pas testing lokal, link verifikasinya tinggal lu intip di `storage/logs/laravel.log`).
+   - Begitu link diklik, otomatis langsung landing di desktop MiniOS (`/?verified=1`).
 
-- **Opsi 3: Tandai User Terverifikasi Secara Instan via Tinker (Quick Test)**  
-  Untuk memverifikasi akun pengguna yang sudah ada melalui terminal:
-  ```bash
-  php artisan tinker --execute "App\Models\User::first()->markEmailAsVerified();"
-  ```
+3. **Jalur Barbar (Verifikasi via Terminal):**
+   ```bash
+   php artisan tinker --execute "App\Models\User::first()->markEmailAsVerified();"
+   ```
 
 ---
 
-## 🛠️ Creating Custom Applications
+## 🔨 Cara Bikin Aplikasi Sendiri
 
-### Method 1: Using the Artisan Generator (Fast)
+Ada 3 opsi, pilih yang paling cocok sama gaya lu:
 
-Generate a new application skeleton in seconds:
-
+### Cara 1: Pake Artisan Generator (Paling Sat-Set)
+Tinggal ketik:
 ```bash
-php artisan minios:make-app Notes --icon=document-text --pinned
+php artisan minios:make-app Kasir --icon=shopping-cart --pinned
 ```
-
-This automatically generates:
-1. **Manifest Contract**: `app/MiniOS/Notes/NotesApp.php`
-2. **Livewire Component**: `app/MiniOS/Notes/Livewire/Notes.php`
-3. **Blade Template**: `resources/views/apps/notes.blade.php`
+Bum! Langsung brojol 3 file:
+1. `app/MiniOS/Kasir/KasirApp.php` (Manifest aplikasi)
+2. `app/MiniOS/Kasir/Livewire/Kasir.php` (Komponen Livewire)
+3. `resources/views/apps/kasir.blade.php` (Tampilan Blade)
 
 ---
 
-### Method 2: Manual Creation (Step-by-Step)
+### Cara 2: Suruh AI Kerja Rodi (Paling Enak & Cepet)
+Karena perintah `minios:install` tadi otomatis nyelipin skill panduan ke `.agents/skills/minios-app-development/`, AI coding assistant lu (**Google Antigravity**, **Cursor**, **Windsurf**, **Claude Code**, atau **Copilot**) udah paham jeroan arsitektur MiniOS.
 
-#### Step 1: Create Livewire Component
-Create your Livewire component inside `app/MiniOS/{AppName}/Livewire/`:
+Tinggal suruh pake prompt santai begini:
 
+> *"Bro, buatin aplikasi Kasir (POS) di MiniOS. Ada keranjang belanja, pencarian barang, sama modal cetak struk."*
+
+**Yang bakal dikerjain otomatis sama AI:**
+- Bikin kerangka file via `minios:make-app`.
+- Buatin migrasi database + Model Eloquent + jalanin migrasinya.
+- Ngoding logic reaktif Livewire-nya.
+- Mendesain UI Blade ala desktop yang clean, responsif, dan support mode gelap.
+- Nulis testing Pest-nya sekalian!
+
+---
+
+### Cara 3: Bikin Manual (Kalo Lu Gabut & Doyan Ngetik)
+
+#### 1. Bikin Komponen Livewire
+Buat file di `app/MiniOS/Todo/Livewire/Todo.php`:
 ```php
-// app/MiniOS/Todo/Livewire/Todo.php
 namespace App\MiniOS\Todo\Livewire;
 
 use Livewire\Component;
@@ -271,24 +268,19 @@ class Todo extends Component
 }
 ```
 
-Create its Blade template directly in `resources/views/apps/`:
-
+Bikin tampilannya di `resources/views/apps/todo.blade.php`:
 ```blade
-{{-- resources/views/apps/todo.blade.php --}}
 <div class="h-full flex flex-col bg-neutral-900 text-white p-4">
     <div class="flex gap-2 mb-4">
         <input 
             type="text" 
             wire:model="newTask" 
             wire:keydown.enter="addTask" 
-            placeholder="Write a task..." 
+            placeholder="Tulis catatan..." 
             class="flex-1 bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
         />
-        <button 
-            wire:click="addTask" 
-            class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition"
-        >
-            Add
+        <button wire:click="addTask" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition">
+            Tambah
         </button>
     </div>
 
@@ -298,20 +290,15 @@ Create its Blade template directly in `resources/views/apps/`:
                 <span>{{ $task }}</span>
             </li>
         @empty
-            <li class="text-neutral-500 text-sm italic text-center py-8">No tasks yet.</li>
+            <li class="text-neutral-500 text-sm italic text-center py-8">Belum ada tugas. Santai dulu gak sih?</li>
         @endforelse
     </ul>
 </div>
 ```
 
----
-
-#### Step 2: Implement the Manifest Contract (`DesktopApp`)
-
-Create the application manifest implementing `Novay\MiniOS\Contracts\DesktopApp`:
-
+#### 2. Bikin Manifest Aplikasi (`DesktopApp`)
+Buat file di `app/MiniOS/Todo/TodoApp.php`:
 ```php
-// app/MiniOS/Todo/TodoApp.php
 namespace App\MiniOS\Todo;
 
 use App\MiniOS\Todo\Livewire\Todo;
@@ -320,259 +307,137 @@ use Novay\MiniOS\Support\WindowConfig;
 
 class TodoApp implements DesktopApp
 {
-    /**
-     * Unique application ID (kebab-case).
-     */
     public function id(): string
     {
         return 'todo';
     }
 
-    /**
-     * Display name in Desktop, Dock, and App Launcher.
-     */
     public function name(): string
     {
-        return 'Todo List';
+        return 'Catatan Tugas';
     }
 
-    /**
-     * App icon (Heroicon name or full image URL: .png, .webp, .svg).
-     */
     public function icon(): string
     {
-        return 'queue-list';
+        return 'queue-list'; // Nama icon heroicon atau URL gambar
     }
 
-    /**
-     * Initial entry URL when opened.
-     */
     public function entry(): string
     {
         return '/todo';
     }
 
-    /**
-     * Recognized route URLs for this application.
-     */
     public function routes(): array
     {
-        return [
-            '/todo',
-            '/todo/today',
-            '/todo/plans',
-        ];
+        return ['/todo'];
     }
 
-    /**
-     * Whether the application is pinned to the dock by default.
-     */
     public function isPinned(): bool
     {
-        return true;
+        return true; // Pin ke dock bawah
     }
 
-    /**
-     * Livewire component class (FQCN) or registered alias.
-     */
     public function component(): ?string
     {
         return Todo::class;
     }
 
-    /**
-     * Initial and constraint geometry configuration for the window.
-     */
     public function window(): WindowConfig
     {
         return WindowConfig::make()
-            ->size(850, 550)      // Default width, height
-            ->min(500, 350)       // Minimum width, height
-            ->max(1400, 900);     // Optional maximum width, height
+            ->size(850, 550)  // Ukuran default
+            ->min(500, 350)   // Minimal resize
+            ->max(1400, 900); // Maksimal resize
     }
 }
 ```
 
----
-
-#### Step 3: Register in `config/minios.php`
-
-Add the manifest class to the `apps` array in `config/minios.php`:
-
-```php
-return [
-    'apps' => [
-        \App\MiniOS\Todo\TodoApp::class,
-    ],
-];
-```
-
-Your app is now fully functional!
-- Desktop & Dock icons are active with launch notifications.
-- Windows are draggable, resizable, minimizable, and maximizable.
-- URL state (`/todo`) syncs seamlessly without browser page reloads.
+*Selesai! MiniOS otomatis nemuin dan nampilin aplikasi lu di desktop.*
 
 ---
 
-### Method 3: Using AI Coding Agent (Zero-Boilerplate Prompting)
+## 🔀 Pola Routing & Komponen
 
-MiniOS includes official skill definitions in `.agents/skills/minios-app-development/` that are automatically installed with `php artisan minios:install`.
+### Pola A: Native Desktop App (Rekomendasi)
+Gak perlu bikin route manual di `routes/web.php`. Daftarin aja URL-nya di `DesktopApp::routes()`, MiniOS yang bakal nangkep dan ngebuka jendelanya secara dinamis.
 
-AI coding assistants (such as **Google Antigravity**, **Cursor**, **Windsurf**, **Claude Code**, or **GitHub Copilot**) will automatically activate this skill and know all MiniOS contracts, architectural patterns, window geometry constraints, Livewire reactivity, and desktop aesthetics.
-
-You can simply prompt your AI assistant:
-
-```text
-Buatkan aplikasi Kasir (POS) di MiniOS lengkap dengan keranjang belanja, 
-pencarian produk, dan dialog struk pembayaran.
-```
-
-*(Or in English)*:
-```text
-Create an Invoice Manager application in MiniOS with customer selection, 
-line items calculation, and printable invoice preview.
-```
-
-#### What the Agent Automatically Handles:
-1. **Scaffolding**: Runs `php artisan minios:make-app {Name} --icon={icon} --pinned`.
-2. **Database & Migrations**: Generates migrations, Eloquent models, and runs `php artisan migrate`.
-3. **Reactive Livewire UI**: Builds the desktop component in `app/MiniOS/{Name}/Livewire/{Name}.php`.
-4. **Desktop Aesthetics**: Creates a modern Windows 11-styled responsive window view in `resources/views/apps/{name}.blade.php` with dark mode support.
-5. **Quality Assurance**: Adds automated Pest feature tests in `tests/Feature/Apps/{Name}AppTest.php` and formats code with Laravel Pint.
-
----
-
-## 🔀 Application Routing & Component Patterns
-
-### Pattern A: Native Desktop App (Recommended)
-You do **not** need to define separate web routes in `routes/web.php`. MiniOS catches all URLs declared in `DesktopApp::routes()` through its desktop route handler and opens the application window dynamically.
-
-### Pattern B: Multi-Route & Decoupled CRUD Components
-When an application has distinct pages (such as `/contacts` for listing and `/contacts/create` for creating new records), you can decouple the UI into dedicated Livewire components:
-
+### Pola B: Multi-Route & Decoupled CRUD Components
+Kalo aplikasi lu punya beberapa halaman (misal: `/contacts` buat daftar, dan `/contacts/create` buat form baru):
 1. **Manifest (`ContactApp.php`)**:
    ```php
    public function routes(): array
    {
-       return [
-           '/contacts',
-           '/contacts/create',
-           '/contacts/edit',
-       ];
+       return ['/contacts', '/contacts/create'];
    }
    ```
-2. **Dedicated Components**:
-   - `app/MiniOS/Contact/Livewire/ContactList.php` (`/contacts`)
-   - `app/MiniOS/Contact/Livewire/ContactCreate.php` (`/contacts/create`)
-3. **Shell Switcher (`resources/views/apps/contact.blade.php`)**:
+2. **Pisahin Komponen Livewire**:
+   - `app/MiniOS/Contact/Livewire/ContactList.php`
+   - `app/MiniOS/Contact/Livewire/ContactCreate.php`
+3. **Switcher View (`resources/views/apps/contact.blade.php`)**:
    ```blade
    <div class="h-full w-full overflow-hidden">
        @if ($view === 'create')
-           <livewire:dynamic-component :is="\App\MiniOS\Contact\Livewire\ContactCreate::class" wire:key="contact-create-component" />
+           <livewire:dynamic-component :is="\App\MiniOS\Contact\Livewire\ContactCreate::class" wire:key="contact-create" />
        @else
-           <livewire:dynamic-component :is="\App\MiniOS\Contact\Livewire\ContactList::class" :selected-id="$selectedId" wire:key="contact-list-component" />
+           <livewire:dynamic-component :is="\App\MiniOS\Contact\Livewire\ContactList::class" wire:key="contact-list" />
        @endif
    </div>
    ```
 
-### Pattern C: Hybrid Standalone Page
-If you also want an application accessible as a standalone full-page view without the desktop frame:
-```php
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::livewire('todo', \App\MiniOS\Todo\Livewire\Todo::class)->name('todo.index');
-});
+---
 
-// MiniOS fallback at the bottom
-MiniOS::routes();
+## 📦 Distribusi App via ZIP & Control Panel
+
+Punya modul aplikasi yang mau lu bagiin ke temen atau pindah server? Bungkus aja jadi `.zip` dengan susunan begini:
+
 ```
+aplikasi-kasir.zip
+├── manifest.json              <-- Metadata (id, nama, icon, versi, dependensi composer)
+├── app/                       <-- Berisi KasirApp.php & Livewire/Kasir.php
+├── resources/views/           <-- Berisi template apps/kasir.blade.php
+├── database/migrations/       <-- File migrasi (opsional, otomatis dijalankan)
+└── models/                    <-- File model Eloquent (opsional)
+```
+
+Tinggal buka **Control Panel** di desktop MiniOS (`/control-panel`), klik **Pasang Aplikasi (.zip)**, lalu upload:
+- Otomatis diekstrak ke direktori yang pas.
+- Migrasi database langsung dieksekusi di background.
+- Kalo butuh package luar (misal: `spatie/laravel-backup`), Control Panel bakal nampilin tombol **[Pasang via Composer]** lengkap sama terminal interaktif realtime!
 
 ---
 
-## 🎛️ App Packaging & Control Panel
+## ⚙️ Helper Pengaturan (`os_setting`)
 
-MiniOS provides an integrated **Control Panel** (`/control-panel`) for managing desktop applications:
-
-### 1. App Distribution via `.zip`
-Applications can be packaged and distributed as a single `.zip` archive containing:
-```
-my-app.zip
-├── manifest.json              <-- Metadata (id, name, icon, entry, version, author, dependencies)
-├── app/                       <-- Manifest & Livewire components
-│   └── Todo/
-│       ├── TodoApp.php
-│       └── Livewire/Todo.php
-├── resources/views/           <-- Blade templates
-│   └── apps/todo.blade.php
-├── database/migrations/       <-- Optional migrations (auto-executed upon install)
-└── models/                    <-- Optional Eloquent models
-```
-
-Upload `.zip` packages directly via the **Control Panel** UI or via CLI:
-- Auto-extracts to `app/MiniOS/{AppName}/` and `resources/views/apps/`
-- Validates the `manifest.json` and `DesktopApp` contract
-- Automatically runs migrations and registers the application in `config/minios.php`
-- Clean uninstaller with automatic migration rollback and file removal
-
-### 2. Dependency Management & GUI Terminal Runner
-If an app specifies Composer dependencies in its manifest:
-```json
-{
-  "dependencies": {
-    "composer": [
-      "spatie/laravel-backup"
-    ]
-  }
-}
-```
-- **Control Panel Accordion**: Displays detailed app info, migration status, associated models, and package dependencies (with clear installed / missing badges).
-- **One-Click Terminal Modal**: If a package is missing, an **"Install via Composer"** button opens a real-time terminal modal in the desktop environment, streaming `composer require` execution logs with instant feedback.
-- **Missing Dependency Guard**: If a user attempts to launch an app before installing required packages, MiniOS displays an elegant in-window setup guide explaining what packages are missing and how to install them.
-
----
-
-## ⚙️ Persistent Settings (`os_setting`)
-
-MiniOS includes a database-persisted, user-scoped setting service with caching:
+MiniOS nyediain helper pengaturan database per-user dengan cache otomatis:
 
 ```php
-// Retrieve a setting with default fallback
+// Ambil setting (plus nilai default kalo belum ada)
 $theme = os_setting('appearance.theme', 'dark');
-$wallpaper = os_setting('appearance.wallpaper', 'wall-1');
 
-// Save a setting for the authenticated user
+// Simpan setting buat user yang lagi login
 os_setting()->set('appearance.accent_color', 'emerald');
-
-// Retrieve an entire category array
-$dock = os_setting()->getCategory('dock');
-```
-
-In frontend JavaScript / Alpine:
-```javascript
-window.addEventListener('os-setting-updated', (event) => {
-    console.log('Setting updated:', event.detail);
-});
 ```
 
 ---
 
-## 🧪 Testing & Code Quality
+## 🧪 Testing & Code Style
 
-Run Pest tests:
+Biar gak ada drama bug di production:
+
 ```bash
+# Tes fitur
 php artisan test --compact
-```
 
-Run Laravel Pint to format code:
-```bash
+# Rapihin format kode
 vendor/bin/pint --format agent
 ```
 
 ---
 
-## 📄 License
+## 📄 Lisensi
 
-MiniOS is open-sourced software licensed under the [MIT license](LICENSE).
+MiniOS adalah software open-source berlisensi [MIT License](LICENSE). Bebas lu pake, acak-acak, dan kembangin buat project pribadi maupun komersial.
 
-## 👤 Author
+## 👤 Pembuat
 
-Developed by **[Novianto Rahmadi](https://github.com/novay)** ([novay@btekno.id](mailto:novay@btekno.id)).
+Dibuat dengan kopi dan cinta oleh **[Novianto Rahmadi](https://github.com/novay)** ([novay@btekno.id](mailto:novay@btekno.id)). Kalo ngebantu kerjaan lu, jangan lupa lempar ⭐ Star di GitHub ya cuy!
