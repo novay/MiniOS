@@ -128,17 +128,17 @@ export default defineConfig({
 });
 ```
 
-**2. Daftarin Alpine di `resources/js/app.js`:**
+**2. Daftarin Livewire & Alpine di `resources/js/app.js`:**
 ```javascript
+import {
+    Livewire,
+    Alpine,
+} from '../../vendor/livewire/livewire/dist/livewire.esm';
 import minios from '@minios/minios';
 
-if (window.Alpine) {
-    Alpine.data('minios', minios);
-} else {
-    document.addEventListener('alpine:init', () => {
-        Alpine.data('minios', minios);
-    });
-}
+Alpine.data('minios', minios);
+
+Livewire.start();
 ```
 
 **3. Impor Stylesheet di `resources/css/app.css`:**

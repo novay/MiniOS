@@ -142,7 +142,7 @@ class InstallCommand extends Command
     }
 
     /**
-     * Inject MiniOS Alpine store registration into resources/js/app.js.
+     * Inject MiniOS Livewire & Alpine registration into resources/js/app.js.
      */
     protected function configureAppJs(): void
     {
@@ -152,16 +152,25 @@ class InstallCommand extends Command
         }
 
         $content = File::get($jsPath);
-        if (str_contains($content, 'minios')) {
-            $this->line('  <info>✓</info> resources/js/app.js already registers MiniOS Alpine data.');
+        if (str_contains($content, 'Livewire.start()') && str_contains($content, 'minios')) {
+            $this->line('  <info>✓</info> resources/js/app.js already configures Livewire and MiniOS.');
 
             return;
         }
 
-        $registration = "\nimport minios from '@minios/minios';\n\nif (window.Alpine) {\n    Alpine.data('minios', minios);\n} else {\n    document.addEventListener('alpine:init', () => {\n        Alpine.data('minios', minios);\n    });\n}\n";
+        // If app.js already has the old partial registration without Livewire.start(), clean it up
+        if (str_contains($content, 'minios') && ! str_contains($content, 'Livewire.start()')) {
+            $content = preg_replace(
+                '/\n?import\s+minios\s+from\s+[\'"]@minios\/minios[\'"];[\s\S]*?(?:}\n|(?=\n\S|\z))/',
+                '',
+                $content
+            ) ?? $content;
+        }
 
-        $content .= $registration;
+        $registration = "\nimport {\n    Livewire,\n    Alpine,\n} from '../../vendor/livewire/livewire/dist/livewire.esm';\nimport minios from '@minios/minios';\n\nAlpine.data('minios', minios);\n\nLivewire.start();\n";
+
+        $content = rtrim($content)."\n".$registration;
         File::put($jsPath, $content);
-        $this->line('  <info>✓</info> resources/js/app.js updated with MiniOS Alpine store registration.');
+        $this->line('  <info>✓</info> resources/js/app.js updated with MiniOS Livewire & Alpine setup.');
     }
 }
