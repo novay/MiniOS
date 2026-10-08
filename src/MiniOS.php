@@ -120,6 +120,10 @@ class MiniOS
      */
     public static function fortify(): void
     {
+        if (! config('minios.fortify_views', true)) {
+            return;
+        }
+
         if (class_exists(Fortify::class)) {
             $view = fn (string $name) => view("minios::auth.{$name}");
 

@@ -53,6 +53,8 @@ class InstallCommand extends Command
         ]);
 
         $this->configureFrontend();
+        $this->configureRoutes();
+        $this->configureFortify();
 
         $this->info('MiniOS has been successfully installed!');
 
@@ -172,5 +174,78 @@ class InstallCommand extends Command
         $content = rtrim($content)."\n".$registration;
         File::put($jsPath, $content);
         $this->line('  <info>✓</info> resources/js/app.js updated with MiniOS Livewire & Alpine setup.');
+    }
+
+    /**
+     * Inject MiniOS::routes() catch-all at the bottom of routes/web.php.
+     */
+    protected function configureRoutes(): void
+    {
+        $routePath = base_path('routes/web.php');
+        if (! File::exists($routePath)) {
+            return;
+        }
+
+        $content = File::get($routePath);
+        if (str_contains($content, 'MiniOS::routes()')) {
+            $this->line('  <info>✓</info> routes/web.php already registers MiniOS routes.');
+
+            return;
+        }
+
+        $import = str_contains($content, 'use Novay\MiniOS\Facades\MiniOS;')
+            ? ''
+            : "use Novay\MiniOS\Facades\MiniOS;\n\n";
+
+        $snippet = "\n// MiniOS Desktop Routes\n".$import."MiniOS::routes();\n";
+
+        File::append($routePath, $snippet);
+        $this->line('  <info>✓</info> routes/web.php updated with MiniOS::routes() at the bottom.');
+    }
+
+    /**
+     * Configure Laravel Fortify with MiniOS authentication views if Fortify is detected.
+     */
+    protected function configureFortify(): void
+    {
+        $fortifyPath = app_path('Providers/FortifyServiceProvider.php');
+        if (! File::exists($fortifyPath)) {
+            $this->line('  <comment>i</comment> FortifyServiceProvider not detected (using existing application authentication).');
+
+            return;
+        }
+
+        $content = File::get($fortifyPath);
+        if (str_contains($content, 'MiniOS::fortify()')) {
+            $this->line('  <info>✓</info> FortifyServiceProvider already configures MiniOS authentication.');
+
+            return;
+        }
+
+        // Add import if missing
+        if (! str_contains($content, 'use Novay\MiniOS\Facades\MiniOS;')) {
+            if (preg_match('/(namespace\s+App\\\\Providers;)/', $content)) {
+                $content = preg_replace(
+                    '/(namespace\s+App\\\\Providers;)/',
+                    "$1\n\nuse Novay\MiniOS\Facades\MiniOS;",
+                    $content,
+                    1
+                );
+            }
+        }
+
+        // Inject MiniOS::fortify() into boot()
+        if (preg_match('/(public\s+function\s+boot\s*\([^)]*\)\s*:\s*void\s*\{)/', $content)) {
+            $content = preg_replace(
+                '/(public\s+function\s+boot\s*\([^)]*\)\s*:\s*void\s*\{)/',
+                "$1\n        MiniOS::fortify();",
+                $content,
+                1
+            );
+            File::put($fortifyPath, $content);
+            $this->line('  <info>✓</info> FortifyServiceProvider.php updated with MiniOS authentication views.');
+        } else {
+            $this->line('  <comment>!</comment> Could not find boot() in FortifyServiceProvider.php. Add MiniOS::fortify() manually.');
+        }
     }
 }

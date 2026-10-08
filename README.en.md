@@ -186,23 +186,29 @@ Livewire.start();
 
 ---
 
-### 3. Register Desktop Routes
-In your `routes/web.php`, add this line at the very bottom:
+### 3. Desktop Routes & Authentication (Fully Automated!)
+
+Good news: `php artisan minios:install` **automatically handles both**:
+- Appending `MiniOS::routes();` at the **very bottom** of `routes/web.php`.
+- Appending `MiniOS::fortify();` inside `boot()` in `app/Providers/FortifyServiceProvider.php` (if Laravel Fortify is installed).
+
+No manual edits needed! If you wish to inspect or customize them:
+
+<details>
+<summary><strong>🔍 Inspect Routes in <code>routes/web.php</code></strong></summary>
 
 ```php
 use Novay\MiniOS\Facades\MiniOS;
 
-// Your existing custom routes (if any)...
+// Your custom routes...
 
-// Register MiniOS desktop catch-all routes
+// Catch-all MiniOS desktop routes (must be at the very bottom!)
 MiniOS::routes();
 ```
+</details>
 
----
-
-### 4. Setup Authentication (Laravel Fortify)
-
-MiniOS includes pre-styled login, registration, password reset, and lockscreen views. Register them in `app/Providers/FortifyServiceProvider.php`:
+<details>
+<summary><strong>🔍 Inspect Provider in <code>app/Providers/FortifyServiceProvider.php</code></strong></summary>
 
 ```php
 use Novay\MiniOS\Facades\MiniOS;
@@ -213,6 +219,27 @@ public function boot(): void
     MiniOS::fortify();
 }
 ```
+</details>
+
+---
+
+### 🛑 Disabling MiniOS Authentication Views
+
+If you want to keep your application's existing login interface (Breeze, Jetstream, Filament, or custom auth) and **not** use the MiniOS desktop auth views:
+
+- **Method 1: Via Configuration (Recommended)**
+  In `config/minios.php`, set:
+  ```php
+  'fortify_views' => false,
+  ```
+
+- **Method 2: Via Service Provider**
+  In `app/Providers/FortifyServiceProvider.php`, remove or comment out:
+  ```php
+  // MiniOS::fortify();
+  ```
+
+*The MiniOS desktop will seamlessly recognize and read your existing login sessions!*
 
 #### ⚠️ "Why am I redirected to `/email/verify` after registering or logging in?"
 This is standard Fortify behavior when email verification is enabled but mail sending isn't configured. Choose the solution that fits your environment:

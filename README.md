@@ -186,23 +186,29 @@ Livewire.start();
 
 ---
 
-### 3. Daftarin Rute Desktop
-Buka `routes/web.php`, taruh baris sakti ini di baris paling bawah:
+### 3. Rute Desktop & Autentikasi (Semuanya Udah Otomatis!)
+
+Kabar gembira: perintah `php artisan minios:install` tadi udah **otomatis**:
+- Menaruh `MiniOS::routes();` di baris **paling bawah** `routes/web.php`.
+- Menaruh `MiniOS::fortify();` di dalam `boot()` pada `app/Providers/FortifyServiceProvider.php` (kalo Laravel Fortify terpasang).
+
+Lu gak wajib ngetik apa-apa lagi! Tapi kalo mau cek manual atau butuh kustomisasi:
+
+<details>
+<summary><strong>🔍 Cek Rute di <code>routes/web.php</code></strong></summary>
 
 ```php
 use Novay\MiniOS\Facades\MiniOS;
 
-// Rute kustom lu yang lain (kalo ada)...
+// Rute kustom lu yang lain...
 
-// Tangkap semua rute desktop MiniOS
+// Tangkap semua rute desktop MiniOS (harus di paling bawah!)
 MiniOS::routes();
 ```
+</details>
 
----
-
-### 4. Setup Autentikasi (Laravel Fortify)
-
-MiniOS udah nyediain UI login, register, reset password, dan lockscreen siap pakai. Tinggal daftarin di `app/Providers/FortifyServiceProvider.php`:
+<details>
+<summary><strong>🔍 Cek Provider di <code>app/Providers/FortifyServiceProvider.php</code></strong></summary>
 
 ```php
 use Novay\MiniOS\Facades\MiniOS;
@@ -213,6 +219,27 @@ public function boot(): void
     MiniOS::fortify();
 }
 ```
+</details>
+
+---
+
+### 🛑 Mau Nonaktifkan (Disable) UI Autentikasi MiniOS?
+
+Kalo aplikasi lu mau tetap pake tampilan login bawaan lama (Breeze, Jetstream, Filament, atau custom auth) dan **gak mau** pake UI auth MiniOS:
+
+- **Cara 1: Lewat Config (Rekomendasi)**
+  Buka `config/minios.php`, set:
+  ```php
+  'fortify_views' => false,
+  ```
+
+- **Cara 2: Lewat Provider**
+  Buka `app/Providers/FortifyServiceProvider.php`, hapus atau komentari baris:
+  ```php
+  // MiniOS::fortify();
+  ```
+
+*Desktop MiniOS bakal tetap jalan lancar jaya membaca sesi login lama lu tanpa masalah!*
 
 #### ⚠️ "Woi, kok abis register/login malah mentok di `/email/verify`?"
 Santai, itu kelakuan bawaan Fortify kalau fitur verifikasi email-nya nyala tapi SMTP mailer lu belum diset. Pilih salah satu solusinya:

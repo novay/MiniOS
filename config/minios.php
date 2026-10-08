@@ -31,6 +31,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | MiniOS Fortify Views
+    |--------------------------------------------------------------------------
+    |
+    | When enabled, MiniOS will override Fortify authentication views with
+    | its own desktop-styled views (login, register, forgot-password, etc).
+    | Set to false if you want to use Fortify's default or custom views.
+    |
+    */
+
+    'fortify_views' => true,
+
+    /*
+    |--------------------------------------------------------------------------
     | Default Desktop Settings
     |--------------------------------------------------------------------------
     |
