@@ -216,7 +216,26 @@ class InstallCommand extends Command
         }
 
         $content = File::get($fortifyPath);
+
+        // If MiniOS::fortify() is already present, ensure it sits AFTER configureViews()
         if (str_contains($content, 'MiniOS::fortify()')) {
+            if (str_contains($content, '$this->configureViews();')) {
+                $posFortify = strpos($content, 'MiniOS::fortify()');
+                $posViews = strpos($content, '$this->configureViews()');
+                if ($posFortify !== false && $posViews !== false && $posFortify < $posViews) {
+                    $content = preg_replace('/\s*MiniOS::fortify\(\);/', '', $content);
+                    $content = str_replace(
+                        '$this->configureViews();',
+                        "\$this->configureViews();\n        MiniOS::fortify();",
+                        $content
+                    );
+                    File::put($fortifyPath, $content);
+                    $this->line('  <info>✓</info> Repositioned MiniOS::fortify() after configureViews() in FortifyServiceProvider.php.');
+
+                    return;
+                }
+            }
+
             $this->line('  <info>✓</info> FortifyServiceProvider already configures MiniOS authentication.');
 
             return;
@@ -234,11 +253,19 @@ class InstallCommand extends Command
             }
         }
 
-        // Inject MiniOS::fortify() into boot()
-        if (preg_match('/(public\s+function\s+boot\s*\([^)]*\)\s*:\s*void\s*\{)/', $content)) {
+        // Inject MiniOS::fortify() after $this->configureViews() or at the bottom of boot()
+        if (str_contains($content, '$this->configureViews();')) {
+            $content = str_replace(
+                '$this->configureViews();',
+                "\$this->configureViews();\n        MiniOS::fortify();",
+                $content
+            );
+            File::put($fortifyPath, $content);
+            $this->line('  <info>✓</info> FortifyServiceProvider.php updated with MiniOS::fortify() after configureViews().');
+        } elseif (preg_match('/(public\s+function\s+boot\s*\([^)]*\)\s*:\s*void\s*\{[\s\S]*?)(\n\s*\})/', $content)) {
             $content = preg_replace(
-                '/(public\s+function\s+boot\s*\([^)]*\)\s*:\s*void\s*\{)/',
-                "$1\n        MiniOS::fortify();",
+                '/(public\s+function\s+boot\s*\([^)]*\)\s*:\s*void\s*\{[\s\S]*?)(\n\s*\})/',
+                "$1\n        MiniOS::fortify();$2",
                 $content,
                 1
             );

@@ -215,8 +215,10 @@ use Novay\MiniOS\Facades\MiniOS;
 
 public function boot(): void
 {
-    // ...
-    MiniOS::fortify();
+    $this->configureActions();
+    $this->configureViews();
+    MiniOS::fortify(); // Wajib ditaruh SETELAH configureViews() agar me-override view bawaan
+    $this->configureRateLimiting();
 }
 ```
 </details>
