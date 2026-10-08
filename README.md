@@ -104,13 +104,14 @@ npm run build
 
 > ⚡ **Otomatis & Siap Pakai**: Perintah `php artisan minios:install` secara otomatis mempublikasikan konfigurasi, migrasi database, wallpaper/aset, skill AI agent, serta **langsung menyematkan konfigurasi di `vite.config.js`**, **`resources/css/app.css`**, dan **`resources/js/app.js`** untuk Anda!
 
----
+<details>
+<summary><strong>🔍 Konfigurasi Frontend Manual (Opsional / Troubleshooting)</strong></summary>
 
-### 3. Konfigurasi Frontend Manual (Opsional / Referensi)
+<br>
 
-Jika Anda ingin menyesuaikan secara manual atau menggunakan arsitektur frontend khusus, pastikan integrasi berikut telah terpasang:
+> *Catatan: Langkah di bawah ini **sudah ditangani secara otomatis** saat menjalankan `php artisan minios:install`. Anda hanya perlu membukanya jika instalasi otomatis mengalami kendala atau menggunakan arsitektur build khusus.*
 
-1. **Path Aliases di `vite.config.js`**:
+#### 1. Path Aliases di `vite.config.js`:
 
 ```javascript
 import path from 'node:path';
@@ -129,7 +130,7 @@ export default defineConfig({
 });
 ```
 
-2. **Registrasi Alpine di `resources/js/app.js`**:
+#### 2. Registrasi Alpine di `resources/js/app.js`:
 
 ```javascript
 import minios from '@minios/minios';
@@ -143,7 +144,7 @@ if (window.Alpine) {
 }
 ```
 
-3. **Stylesheet & View Scanning di `resources/css/app.css`**:
+#### 3. Stylesheet & View Scanning di `resources/css/app.css`:
 
 ```css
 @import 'tailwindcss';
@@ -154,15 +155,11 @@ if (window.Alpine) {
 @source '../../vendor/novay/minios/resources/views/**/*.blade.php';
 ```
 
-4. **Kompilasi Aset**:
+</details>
 
-```bash
-npm run build
-# atau development server
-npm run dev
-```
+---
 
-### 4. Register Desktop Routes
+### 3. Register Desktop Routes
 
 Register `MiniOS::routes()` at the bottom of `routes/web.php` to handle desktop workspace routing and deep linking:
 
@@ -176,7 +173,7 @@ use Novay\MiniOS\Facades\MiniOS;
 MiniOS::routes();
 ```
 
-### 5. Laravel Fortify Integration (Optional)
+### 4. Laravel Fortify Integration (Optional)
 
 Jika menggunakan Laravel Fortify, cukup daftarkan tampilan autentikasi MiniOS di `app/Providers/FortifyServiceProvider.php`:
 
