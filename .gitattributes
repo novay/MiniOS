@@ -1,6 +1,5 @@
 * text=auto eol=lf
 
-.agents export-ignore
 .github export-ignore
 .gitignore export-ignore
 .editorconfig export-ignore

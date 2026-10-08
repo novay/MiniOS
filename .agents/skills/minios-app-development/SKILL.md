@@ -16,11 +16,11 @@ When a developer asks to build, package, or create an application in MiniOS, fol
 
 ## 🏛️ Application Anatomy
 
-Every MiniOS application is structured in `app/Apps/{AppName}/`:
+Every MiniOS application is structured in `app/MiniOS/{AppName}/`:
 
 ```
 app/
-└── Apps/
+└── MiniOS/
     └── {AppName}/
         ├── {AppName}App.php          <-- Manifest Contract (DesktopApp)
         ├── Livewire/
@@ -32,7 +32,7 @@ resources/
         └── {kebab-name}.blade.php    <-- Desktop Window Blade View
 ```
 
-MiniOS automatically auto-discovers and registers any `{AppName}App` in `app/Apps/` that implements `Novay\MiniOS\Contracts\DesktopApp`. No manual configuration in `config/minios.php` is necessary.
+MiniOS automatically auto-discovers and registers any `{AppName}App` in `app/MiniOS/` (and backwards-compatible with `app/Apps/`) that implements `Novay\MiniOS\Contracts\DesktopApp`. No manual configuration in `config/minios.php` is necessary.
 
 ---
 
@@ -50,8 +50,8 @@ php artisan minios:make-app {Name} --icon={icon-name} --pinned
 - `--pinned`: Add `--pinned` if the app should appear in the dock by default. Omit if it should only appear in the full-screen App Launcher.
 
 This command generates:
-1. `app/Apps/{Name}/{Name}App.php` (Manifest)
-2. `app/Apps/{Name}/Livewire/{Name}.php` (Component)
+1. `app/MiniOS/{Name}/{Name}App.php` (Manifest)
+2. `app/MiniOS/{Name}/Livewire/{Name}.php` (Component)
 3. `resources/views/apps/{kebab-name}.blade.php` (Blade View)
 
 ---
@@ -63,9 +63,9 @@ The manifest must implement `Novay\MiniOS\Contracts\DesktopApp`.
 ```php
 <?php
 
-namespace App\Apps\Notes;
+namespace App\MiniOS\Notes;
 
-use App\Apps\Notes\Livewire\Notes;
+use App\MiniOS\Notes\Livewire\Notes;
 use Novay\MiniOS\Contracts\DesktopApp;
 use Novay\MiniOS\Support\WindowConfig;
 
@@ -267,12 +267,37 @@ MiniOS supports installing custom applications via `.zip` archive upload in **Co
 ### Automatic Installer Behaviors (`ControlPanel::installZip`):
 1. **Security**: Zip-Slip & Path Traversal protection.
 2. **Extraction**:
-   - Manifest & Livewire diletakkan di `app/Apps/{AppName}/`.
+   - Manifest & Livewire diletakkan di `app/MiniOS/{AppName}/`.
    - `views/` dimirror ke `resources/views/apps/{kebab-name}.blade.php`.
    - `Models/` dimirror ke `app/Models/{AppName}/`.
    - `migrations/` dimirror ke `database/migrations/`.
 3. **Auto-Migrate**: Jika arsip membawa file migration, `Artisan::call('migrate', ['--force' => true])` dijalankan secara otomatis.
-4. **Runtime Registration**: `MiniOS::register($fullClass)` dipanggil langsung saat itu juga sehingga aplikasi langsung muncul tanpa perlu refresh.
+4. **Dependency Detection**: Mendeteksi dependensi eksternal dari method `packages()` atau file `composer.json`. Jika ada paket yang belum terpasang, accordion aplikasi akan otomatis dibuka dan menampilkan panduan serta tombol **Pasang via GUI**.
+5. **Runtime Registration**: `MiniOS::register($fullClass)` dipanggil langsung saat itu juga sehingga aplikasi langsung muncul tanpa perlu refresh.
+
+---
+
+## 📦 7. Penanganan Dependensi Composer & GUI Runner
+
+Jika aplikasi membutuhkan library pihak ketiga (misalnya `spatie/laravel-backup`), deklarasikan di Manifest:
+
+```php
+public function packages(): array
+{
+    return [
+        'spatie/laravel-backup',
+    ];
+}
+```
+
+### Dua Lapis Pengamanan Dependensi:
+1. **Di Control Panel (GUI Terminal Runner)**:
+   - Accordion detail aplikasi menampilkan daftar dependensi dengan status `Terpasang` atau `Belum Terpasang`.
+   - Tersedia tombol **[⚡ Pasang via GUI]** yang akan membuka modal terminal interaktif.
+   - Modal mengeksekusi `composer require {package} --no-interaction` secara langsung dengan log proses konsol realtime.
+2. **Saat Aplikasi Dibuka di Window Desktop**:
+   - Jika dependensi belum terpasang, MiniOS otomatis mencegah render komponen yang berpotensi error dan menampilkan layar setup **`<x-minios.missing-dependencies>`**.
+   - Layar ini memuat info paket yang kurang, perintah terminal yang siap disalin (`composer require ...`), serta pintasan langsung untuk membuka Control Panel.
 
 ---
 
@@ -283,9 +308,9 @@ Bagaimana MiniOS mengenali dan meregistrasikan aplikasi kustom?
 1. **Saat Pasang ZIP (Runtime)**:
    - Sesaat setelah ZIP diekstrak, `ControlPanel::installZip()` memanggil `MiniOS::register($fullClass)`. Aplikasi langsung aktif di in-memory desktop registry dan event `app-installed` dikirim ke frontend.
 2. **Setiap Request / Booting Laravel**:
-   - Di `Novay\MiniOS\MiniOSServiceProvider::boot()`, method `discoverCustomApps()` memindai direktori `app/Apps/*/*App.php`.
+   - Di `Novay\MiniOS\MiniOSServiceProvider::boot()`, method `discoverCustomApps()` memindai direktori `app/MiniOS/*/*App.php` (serta fallback kompatibilitas di `app/Apps/*/*App.php`).
    - Setiap kelas yang mengimplementasikan `DesktopApp` otomatis didaftarkan ke `MiniOS::registry()`.
-   - **Developer tidak perlu mengubah `AppServiceProvider` atau `config/minios.php` manual**. Penambahan file di `app/Apps/{AppName}/` otomatis aktif secara permanen.
+   - **Developer tidak perlu mengubah `AppServiceProvider` atau `config/minios.php` manual**. Penambahan file di `app/MiniOS/{AppName}/` otomatis aktif secara permanen.
 
 ---
 
@@ -296,8 +321,8 @@ Setiap aplikasi baru harus memiliki feature test di `tests/Feature/Apps/{Name}Ap
 ```php
 <?php
 
-use App\Apps\Notes\NotesApp;
-use App\Apps\Notes\Livewire\Notes;
+use App\MiniOS\Notes\NotesApp;
+use App\MiniOS\Notes\Livewire\Notes;
 use App\Models\User;
 use Livewire\Livewire;
 
@@ -333,7 +358,7 @@ When a user asks: *"Buatkan aplikasi X di MiniOS"*:
 1. **Analyze Requirements**: Determine app ID, icon, data model, and default window size.
 2. **Scaffold**: Execute `php artisan minios:make-app {Name} --icon={icon} --pinned`.
 3. **Database (if needed)**: Create migration & model, run `php artisan migrate`.
-4. **Implement Livewire**: Write state variables, validation rules, actions in `app/Apps/{Name}/Livewire/{Name}.php`.
+4. **Implement Livewire**: Write state variables, validation rules, actions in `app/MiniOS/{Name}/Livewire/{Name}.php`.
 5. **Design Blade UI**: Implement a Windows 11 / macOS desktop-styled view in `resources/views/apps/{kebab-name}.blade.php` with responsive flexbox, dark mode, and smooth interactions.
 6. **Test**: Write and run feature test in `tests/Feature/Apps/{Name}AppTest.php`.
 7. **Format & Assets**: Run `vendor/bin/pint --format agent` and `npm run build` if assets need compiling.

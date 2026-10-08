@@ -185,6 +185,10 @@ class MiniOSServiceProvider extends ServiceProvider
                 __DIR__.'/../resources/js' => resource_path('js/vendor/minios'),
                 __DIR__.'/../resources/css' => resource_path('css/vendor/minios'),
             ], 'minios-src');
+
+            $this->publishes([
+                __DIR__.'/../.agents/skills' => base_path('.agents/skills'),
+            ], 'minios-skills');
         }
     }
 

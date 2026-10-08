@@ -50,9 +50,6 @@ mini-os/
 │               └── ContactCreate.php <-- /contacts/create Livewire Component
 ├── config/
 │   └── minios.php                    <-- Configuration & App Registry
-├── packages/
-│   └── novay/
-│       └── minios/                   <-- MiniOS Package
 ├── resources/
 │   └── views/
 │       └── apps/                     <-- Blade Templates for Custom Apps
@@ -97,16 +94,23 @@ composer require novay/minios
 
 ### 2. Run Installer & Migrations
 
-Publish configuration, migrations, and assets using the installer:
+Jalankan installer MiniOS:
 
 ```bash
 php artisan minios:install
 php artisan migrate
+npm run build
 ```
 
-### 3. Frontend Setup (Vite & Tailwind v4)
+> ⚡ **Otomatis & Siap Pakai**: Perintah `php artisan minios:install` secara otomatis mempublikasikan konfigurasi, migrasi database, wallpaper/aset, skill AI agent, serta **langsung menyematkan konfigurasi di `vite.config.js`**, **`resources/css/app.css`**, dan **`resources/js/app.js`** untuk Anda!
 
-1. **Update `vite.config.js`** with path aliases:
+---
+
+### 3. Konfigurasi Frontend Manual (Opsional / Referensi)
+
+Jika Anda ingin menyesuaikan secara manual atau menggunakan arsitektur frontend khusus, pastikan integrasi berikut telah terpasang:
+
+1. **Path Aliases di `vite.config.js`**:
 
 ```javascript
 import path from 'node:path';
@@ -126,28 +130,21 @@ export default defineConfig({
 ```
 *(Catatan: Jika Anda mengembangkan secara lokal di monorepo `packages/novay/minios`, ganti `vendor/` dengan `packages/`)*
 
-2. **In `resources/js/app.js`**, register the MiniOS Alpine store:
+2. **Registrasi Alpine di `resources/js/app.js`**:
 
 ```javascript
 import minios from '@minios/minios';
 
-// Register ke Alpine
 if (window.Alpine) {
     Alpine.data('minios', minios);
+} else {
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('minios', minios);
+    });
 }
 ```
 
-Or for Starter Kit bundling Livewire ESM:
-```javascript
-import { Livewire, Alpine } from '../../vendor/livewire/livewire/dist/livewire.esm';
-import minios from '@minios/minios';
-
-Alpine.data('minios', minios);
-
-Livewire.start();
-```
-
-3. **In `resources/css/app.css`**, import the MiniOS stylesheet and scan package views:
+3. **Stylesheet & View Scanning di `resources/css/app.css`**:
 
 ```css
 @import 'tailwindcss';
@@ -158,11 +155,11 @@ Livewire.start();
 @source '../../vendor/novay/minios/resources/views/**/*.blade.php';
 ```
 
-4. **Build assets**:
+4. **Kompilasi Aset**:
 
 ```bash
 npm run build
-# or run development watch server
+# atau development server
 npm run dev
 ```
 
@@ -520,4 +517,4 @@ MiniOS is open-sourced software licensed under the [MIT license](LICENSE).
 
 ## 👤 Author
 
-Developed by **[Noviyanto Rahmadi](https://github.com/novay)** ([novay@btekno.id](mailto:novay@btekno.id)).
+Developed by **[Novianto Rahmadi](https://github.com/novay)** ([novay@btekno.id](mailto:novay@btekno.id)).

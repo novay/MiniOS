@@ -13,7 +13,7 @@ return [
     */
 
     'apps' => [
-        // \App\Apps\Todo\TodoApp::class,
+        // \App\MiniOS\Todo\TodoApp::class,
     ],
 
     /*

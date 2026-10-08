@@ -195,10 +195,16 @@ class ControlPanel extends Component
                 continue;
             }
 
-            // Write to app directory
-            $destFile = "{$targetDir}/{$relative}";
-            File::ensureDirectoryExists(dirname($destFile));
-            File::put($destFile, $content);
+            // Only write PHP application classes to app directory if not an external asset
+            $isExternalAsset = preg_match('#^(resources/)?views/#i', $relative)
+                || preg_match('#^(app/)?Models/#i', $relative)
+                || preg_match('#^(database/)?migrations/#i', $relative);
+
+            if (! $isExternalAsset) {
+                $destFile = "{$targetDir}/{$relative}";
+                File::ensureDirectoryExists(dirname($destFile));
+                File::put($destFile, $content);
+            }
 
             // Mirror views to resources/views/apps if packaged under views/
             if (preg_match('#^(resources/)?views/(.+)$#', $relative, $viewMatch)) {
