@@ -25,7 +25,7 @@
 
 ---
 
-## 🥱 Ngapain Bikin Dashboard yang Gitu-Gitu Aja?
+### 🥱 Lagi Bosen, nih!
 
 Jujur aja, dashboard admin jaman now ngebosenin parah: sidebar item di kiri, navbar di atas, isinya tabel putih polosan. 
 
@@ -33,16 +33,16 @@ Jujur aja, dashboard admin jaman now ngebosenin parah: sidebar item di kiri, nav
 
 Ditenagai langsung sama **Laravel**, **Livewire**, **Alpine.js**, **Tailwind CSS v4**, dan **Vite**. Enteng, reaktif, gak ada dependensi framework JS ribet.
 
----
+<br/>
 
-## ⚡ Cara Pasang (<1 Menit Beres)
+### ⚡ Cara Pasang (<1 Menit Beres)
 
-### 1. Install via Composer
+#### 1. Install via Composer
 ```bash
 composer require novay/minios
 ```
 
-### 2. Install, Migrasi & Run
+#### 2. Install, Migrasi & Run
 
 ```bash
 php artisan minios:install
@@ -52,14 +52,14 @@ npm run build
 
 ---
 
-### 3. Selesai
+#### 3. Selesai
 
 Lu gak wajib ngetik apa-apa lagi! 
 *Desktop MiniOS bakal tetap jalan lancar jaya membaca sesi login lama lu tanpa masalah!*
 
 ---
 
-### Mentok di `/email/verify`?
+#### Mentok di `/email/verify`?
 Itu kelakuan bawaan Fortify. Langsung gini saja: 
 
 Buka `config/fortify.php`, matiin (komentari) baris ini:
@@ -225,84 +225,6 @@ class TodoApp implements DesktopApp
 *Selesai! MiniOS otomatis nemuin dan nampilin aplikasi lu di desktop.*
 
 </details>
-
----
-
-## 🔀 Pola Routing & Komponen
-
-### Pola A: Native Desktop App (Rekomendasi)
-Gak perlu bikin route manual di `routes/web.php`. Daftarin aja URL-nya di `DesktopApp::routes()`, MiniOS yang bakal nangkep dan ngebuka jendelanya secara dinamis.
-
-### Pola B: Multi-Route & Decoupled CRUD Components
-Kalo aplikasi lu punya beberapa halaman (misal: `/contacts` buat daftar, dan `/contacts/create` buat form baru):
-1. **Manifest (`ContactApp.php`)**:
-   ```php
-   public function routes(): array
-   {
-       return ['/contacts', '/contacts/create'];
-   }
-   ```
-2. **Pisahin Komponen Livewire**:
-   - `app/MiniOS/Contact/Livewire/ContactList.php`
-   - `app/MiniOS/Contact/Livewire/ContactCreate.php`
-3. **Switcher View (`resources/views/apps/contact.blade.php`)**:
-   ```blade
-   <div class="h-full w-full overflow-hidden">
-       @if ($view === 'create')
-           <livewire:dynamic-component :is="\App\MiniOS\Contact\Livewire\ContactCreate::class" wire:key="contact-create" />
-       @else
-           <livewire:dynamic-component :is="\App\MiniOS\Contact\Livewire\ContactList::class" wire:key="contact-list" />
-       @endif
-   </div>
-   ```
-
----
-
-## 📦 Distribusi App via ZIP & Control Panel
-
-Punya modul aplikasi yang mau lu bagiin ke temen atau pindah server? Bungkus aja jadi `.zip` dengan susunan begini:
-
-```
-aplikasi-kasir.zip
-├── manifest.json              <-- Metadata (id, nama, icon, versi, dependensi composer)
-├── app/                       <-- Berisi KasirApp.php & Livewire/Kasir.php
-├── resources/views/           <-- Berisi template apps/kasir.blade.php
-├── database/migrations/       <-- File migrasi (opsional, otomatis dijalankan)
-└── models/                    <-- File model Eloquent (opsional)
-```
-
-Tinggal buka **Control Panel** di desktop MiniOS (`/control-panel`), klik **Pasang Aplikasi (.zip)**, lalu upload:
-- Otomatis diekstrak ke direktori yang pas.
-- Migrasi database langsung dieksekusi di background.
-- Kalo butuh package luar (misal: `spatie/laravel-backup`), Control Panel bakal nampilin tombol **[Pasang via Composer]** lengkap sama terminal interaktif realtime!
-
----
-
-## ⚙️ Helper Pengaturan (`os_setting`)
-
-MiniOS nyediain helper pengaturan database per-user dengan cache otomatis:
-
-```php
-// Ambil setting (plus nilai default kalo belum ada)
-$theme = os_setting('appearance.theme', 'dark');
-
-// Simpan setting buat user yang lagi login
-os_setting()->set('appearance.accent_color', 'emerald');
-```
-
----
-
-## 🧪 Testing & Code Style
-
-Biar gak ada drama bug di production:
-
-```bash
-# Tes fitur
-php artisan test --compact
-
-# Rapihin format kode
-vendor/bin/pint --format agent
-```
 
 ---
 
