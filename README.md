@@ -35,99 +35,14 @@ Ditenagai langsung sama **Laravel**, **Livewire**, **Alpine.js**, **Tailwind CSS
 
 ---
 
-## 💥 Fitur (Bukan Kaleng-Kaleng)
+## ⚡ Cara Pasang (<1 Menit Beres)
 
-- 🖥️ **Desktop Workspace Beneran**: Jendela ngambang bisa digeser, resize, snap tepi layar, minimize ke dock, maximize, dan z-index otomatis rapi.
-- 🎛️ **Control Panel & App Installer**:
-  - Pasang aplikasi baru semudah upload file `.zip`.
-  - Migrasi database langsung jalan otomatis.
-  - Cek dependensi Composer (ada tombol sakti **"Install via Composer"** langsung lewat modal GUI terminal realtime).
-  - Uninstall bersih plus opsi rollback tabel database.
-- 🛠️ **Aplikasi Bawaan Siap Tempur**:
-  - 🌐 **Browser**: Peramban web mini dengan histori dan kontrol navigasi.
-  - 📁 **Files**: File explorer penyimpanan lokal / S3 / BunnyCDN (grid & list view).
-  - ⌨️ **Terminal**: Shell interaktif buat eksekusi perintah Artisan langsung di browser.
-  - ⚙️ **Settings**: Atur wallpaper, dark/light mode, aksen warna, blur, dan posisi dock.
-  - 📊 **Activity Monitor**: Task manager pantau RAM, disk, sama load server.
-  - 🧮 **Calculator** & ℹ️ **About MiniOS**.
-- 🔒 **Login & Lockscreen**: Terintegrasi penuh sama Laravel Fortify, support Passkey & Lock Screen interaktif.
-- 🔗 **Deep-linking URL**: Buka aplikasi di jendela desktop otomatis update URL browser tanpa reload halaman.
-- 🤖 **AI Agent Ready**: Pas diinstall langsung nyediain skill di `.agents/`, jadi AI assistant lu (Cursor, Windsurf, Antigravity, Copilot) langsung khatam cara bikinin lu aplikasi MiniOS.
-
----
-
-## 🏛️ Struktur Folder
-
-MiniOS itu modular abis. Aplikasi buatan lu cukup ngumpul di `app/MiniOS/{NamaApp}/`:
-
-```
-mini-os/
-├── app/
-│   └── MiniOS/
-│       ├── Todo/                     <-- Modul Aplikasi Kustom Lu
-│       │   ├── TodoApp.php           <-- Manifest / Kontrak Aplikasi
-│       │   └── Livewire/
-│       │       └── Todo.php          <-- Komponen Livewire
-│       └── Kasir/                    <-- Contoh Aplikasi Lainnya
-│           ├── KasirApp.php
-│           └── Livewire/
-│               └── Kasir.php
-├── config/
-│   └── minios.php                    <-- Konfigurasi & Registrasi
-├── resources/
-│   └── views/
-│       └── apps/                     <-- Tampilan Blade Aplikasi
-│           ├── todo.blade.php
-│           └── kasir.blade.php
-└── routes/
-    └── web.php                       <-- Cukup panggil MiniOS::routes()
-```
-
----
-
-## ⚡ Cara Pasang (3 Menit Beres)
-
-MiniOS bisa dipasang di aplikasi Laravel yang sudah berjalan maupun proyek baru dari nol.
-
-### 🆕 Opsi 1: Mulai dari Fresh Install Laravel (Proyek Baru)
-
-Kalo lu mau bikin dari kosongan, buat project Laravel baru pake installer resmi:
-
-```bash
-laravel new example
-```
-
-Pilih opsi di prompt interaktif terminal seperti ini:
-```text
-Do you want to use a starter kit? [Yes]
-Which frontend stack should your starter kit use? [Livewire]
-Which authentication provider do you prefer? [Laravel's built-in authentication]
-Would you like to use single-file Livewire components? [Bebas]
-Would you like to add teams support to your application? [Bebas]
-
-Tunggu...
-
-Which authentication features would you like to enable? [Bebas]
-
-Selesai.
-```
-
-Begitu instalasi Laravel beres, masuk ke direktori proyek:
-```bash
-cd example
-```
-
----
-
-### 📦 Opsi 2 / Lanjutan: Pasang Package MiniOS
-
-### 1. Tarik Package via Composer
+### 1. Install via Composer
 ```bash
 composer require novay/minios
 ```
 
-### 2. Eksekusi Installer & Migrasi
-Gak perlu ngedit file ini-itu satu per satu, perintah ini otomatis nyiapin config, migrasi, aset, skill AI, sekaligus nyuntik alias di `vite.config.js`, `app.css`, dan `app.js`:
+### 2. Install, Migrasi & Run
 
 ```bash
 php artisan minios:install
@@ -135,161 +50,26 @@ php artisan migrate
 npm run build
 ```
 
-<details>
-<summary><strong>🛠️ Apes Pas Install Otomatis? Nih Cara Manualnya (Frontend)</strong></summary>
-
-<br>
-
-> *Catatan: Bagian ini udah ditangani otomatis sama `minios:install`. Buka cuma kalau lu pake bundler kustom atau instalasinya gagal.*
-
-**1. Pasang Alias di `vite.config.js`:**
-```javascript
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
-export default defineConfig({
-    resolve: {
-        alias: {
-            '@minios': path.resolve(__dirname, 'vendor/novay/minios/resources/js'),
-            '@minios-css': path.resolve(__dirname, 'vendor/novay/minios/resources/css'),
-            '@minios-img': path.resolve(__dirname, 'vendor/novay/minios/resources/img'),
-        },
-    },
-});
-```
-
-**2. Daftarin Livewire & Alpine di `resources/js/app.js`:**
-```javascript
-import {
-    Livewire,
-    Alpine,
-} from '../../vendor/livewire/livewire/dist/livewire.esm';
-import minios from '@minios/minios';
-
-Alpine.data('minios', minios);
-
-Livewire.start();
-```
-
-**3. Impor Stylesheet di `resources/css/app.css`:**
-```css
-@import 'tailwindcss';
-@import '../../vendor/livewire/flux/dist/flux.css';
-@import '../../vendor/novay/minios/resources/css/minios.css';
-
-@source '../views';
-@source '../../vendor/novay/minios/resources/views/**/*.blade.php';
-```
-</details>
-
 ---
 
-### 3. Rute Desktop & Autentikasi (Semuanya Udah Otomatis!)
+### 3. Selesai
 
-Kabar gembira: perintah `php artisan minios:install` tadi udah **otomatis**:
-- Menaruh `MiniOS::routes();` di baris **paling bawah** `routes/web.php`.
-- Menaruh `MiniOS::fortify();` di dalam `boot()` pada `app/Providers/FortifyServiceProvider.php` (kalo Laravel Fortify terpasang).
-
-Lu gak wajib ngetik apa-apa lagi! Tapi kalo mau cek manual atau butuh kustomisasi:
-
-<details>
-<summary><strong>🔍 Cek Rute di <code>routes/web.php</code></strong></summary>
-
-```php
-use Novay\MiniOS\Facades\MiniOS;
-
-// Rute kustom lu yang lain...
-
-// Tangkap semua rute desktop MiniOS (harus di paling bawah!)
-MiniOS::routes();
-```
-</details>
-
-<details>
-<summary><strong>🔍 Cek Provider di <code>app/Providers/FortifyServiceProvider.php</code></strong></summary>
-
-```php
-use Novay\MiniOS\Facades\MiniOS;
-
-public function boot(): void
-{
-    $this->configureActions();
-    $this->configureViews();
-    MiniOS::fortify(); // Wajib ditaruh SETELAH configureViews() agar me-override view bawaan
-    $this->configureRateLimiting();
-}
-```
-</details>
-
----
-
-### 🛑 Mau Nonaktifkan (Disable) UI Autentikasi MiniOS?
-
-Kalo aplikasi lu mau tetap pake tampilan login bawaan lama (Breeze, Jetstream, Filament, atau custom auth) dan **gak mau** pake UI auth MiniOS:
-
-- **Cara 1: Lewat Config (Rekomendasi)**
-  Buka `config/minios.php`, set:
-  ```php
-  'fortify_views' => false,
-  ```
-
-- **Cara 2: Lewat Provider**
-  Buka `app/Providers/FortifyServiceProvider.php`, hapus atau komentari baris:
-  ```php
-  // MiniOS::fortify();
-  ```
-
+Lu gak wajib ngetik apa-apa lagi! 
 *Desktop MiniOS bakal tetap jalan lancar jaya membaca sesi login lama lu tanpa masalah!*
 
-#### ⚠️ "Woi, kok abis register/login malah mentok di `/email/verify`?"
-Santai, itu kelakuan bawaan Fortify kalau fitur verifikasi email-nya nyala tapi SMTP mailer lu belum diset. Pilih salah satu solusinya:
-
-1. **Jalur Santai / Dev Lokal (Matiin Verifikasi):**
-   - Buka `config/fortify.php`, matiin (komentari) baris ini:
-     ```php
-     // Features::emailVerification(),
-     ```
-   - Buka `config/minios.php`, pastiin middleware-nya gak maksa `verified`:
-     ```php
-     'middleware' => ['web', 'auth'],
-     ```
-   *Beres! Abis login langsung nyelonong masuk desktop tanpa hambatan.*
-
-2. **Jalur Beneran / Production (Pake Email Asli):**
-   - Set config email di `.env` lu (atau set `MAIL_MAILER=log` pas testing lokal, link verifikasinya tinggal lu intip di `storage/logs/laravel.log`).
-   - Begitu link diklik, otomatis langsung landing di desktop MiniOS (`/?verified=1`).
-
-3. **Jalur Barbar (Verifikasi via Terminal):**
-   ```bash
-   php artisan tinker --execute "App\Models\User::first()->markEmailAsVerified();"
-   ```
-
 ---
 
-### ❓ "Kalo dipasang di aplikasi Laravel yang sudah berjalan (Existing Project), bakal ngeganggu/ngerusak gak?"
+### Mentok di `/email/verify`?
+Itu kelakuan bawaan Fortify. Langsung gini saja: 
 
-**Jawaban singkat: AMAN BANGET, GAK AKAN NGERUSAK.**
+Buka `config/fortify.php`, matiin (komentari) baris ini:
+```php
+// Features::emailVerification(),
+```
 
-Tapi pahami 4 poin to the point ini:
+<br/>
 
-1. **Rute Lama Gak Bakal Bentrok:**
-   Pastikan selalu menaruh baris `MiniOS::routes();` di baris **paling bawah** `routes/web.php`. Rute-rute aplikasi lu yang sudah ada (seperti `/admin`, `/api`, `/checkout`, `/dashboard`, `/blog`) akan tetap diproses lebih dulu oleh Laravel tanpa terganggu sama sekali.
-   *(Catatan: Halaman root `/` secara default bakal diarahkan ke Desktop MiniOS. Kalo homepage publik lama lu mau tetap di `/`, deklarasikan rute homepage lama sebelum baris `MiniOS::routes()`)*.
-
-2. **Database 100% Aman:**
-   Migrasi MiniOS cuma nambah 1 tabel baru `desktop_settings` dan 1 kolom nullable `locked_at` di tabel `users`. Gak ada tabel lama yang diubah paksa atau dihapus.
-
-3. **Autentikasi Fleksibel:**
-   MiniOS cuma butuh session login bawaan Laravel (`auth`). Kalo aplikasi lu udah punya sistem login sendiri (Breeze, Jetstream, Filament, atau custom auth), lu **gak wajib** panggil `MiniOS::fortify()`. User yang sudah login lewat auth lama lu bisa langsung membuka desktop MiniOS!
-
-4. **Vite & Aset Aman:**
-   Script `minios:install` cuma nambah alias di `vite.config.js` dan mengimpor CSS/JS pelengkap di `app.css` & `app.js`. Style Tailwind dan script yang sudah ada sebelumnya tetap berjalan normal.
-
----
-
-## 🔨 Cara Bikin Aplikasi Sendiri
+##  Bikin Kustom Aplikasi di MiniOS
 
 Ada 3 opsi, pilih yang paling cocok sama gaya lu:
 
@@ -305,8 +85,8 @@ Bum! Langsung brojol 3 file:
 
 ---
 
-### Cara 2: Suruh AI Kerja Rodi (Paling Enak & Cepet)
-Karena perintah `minios:install` tadi otomatis nyelipin skill panduan ke `.agents/skills/minios-app-development/`, AI coding assistant lu (**Google Antigravity**, **Cursor**, **Windsurf**, **Claude Code**, atau **Copilot**) udah paham jeroan arsitektur MiniOS.
+### Cara 2: Suruh AI (Paling Enak & Cepet)
+Proses instalasi sudah nyelipin skill untuk agent, jadi AI *coding assistant* lu (**Google Antigravity**, **Cursor**, **Windsurf**, **Claude Code**, atau **Copilot**) udah paham jeroan arsitektur MiniOS.
 
 Tinggal suruh pake prompt santai begini:
 
@@ -323,7 +103,10 @@ Tinggal suruh pake prompt santai begini:
 
 ### Cara 3: Bikin Manual (Kalo Lu Gabut & Doyan Ngetik)
 
-#### 1. Bikin Komponen Livewire
+<details>
+<summary>
+<strong>1. Bikin Komponen Livewire</strong>
+</summary>
 Buat file di `app/MiniOS/Todo/Livewire/Todo.php`:
 ```php
 namespace App\MiniOS\Todo\Livewire;
@@ -377,9 +160,14 @@ Bikin tampilannya di `resources/views/apps/todo.blade.php`:
     </ul>
 </div>
 ```
+</details>
 
-#### 2. Bikin Manifest Aplikasi (`DesktopApp`)
+<details>
+<summary>
+<strong>2. Bikin Manifest Aplikasi (`DesktopApp`)</strong>
+</summary>
 Buat file di `app/MiniOS/Todo/TodoApp.php`:
+
 ```php
 namespace App\MiniOS\Todo;
 
@@ -435,6 +223,8 @@ class TodoApp implements DesktopApp
 ```
 
 *Selesai! MiniOS otomatis nemuin dan nampilin aplikasi lu di desktop.*
+
+</details>
 
 ---
 
