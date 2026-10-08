@@ -128,7 +128,6 @@ export default defineConfig({
     },
 });
 ```
-*(Catatan: Jika Anda mengembangkan secara lokal di monorepo `packages/novay/minios`, ganti `vendor/` dengan `packages/`)*
 
 2. **Registrasi Alpine di `resources/js/app.js`**:
 
@@ -381,6 +380,34 @@ Your app is now fully functional!
 - Desktop & Dock icons are active with launch notifications.
 - Windows are draggable, resizable, minimizable, and maximizable.
 - URL state (`/todo`) syncs seamlessly without browser page reloads.
+
+---
+
+### Method 3: Using AI Coding Agent (Zero-Boilerplate Prompting)
+
+MiniOS includes official skill definitions in `.agents/skills/minios-app-development/` that are automatically installed with `php artisan minios:install`.
+
+AI coding assistants (such as **Google Antigravity**, **Cursor**, **Windsurf**, **Claude Code**, or **GitHub Copilot**) will automatically activate this skill and know all MiniOS contracts, architectural patterns, window geometry constraints, Livewire reactivity, and desktop aesthetics.
+
+You can simply prompt your AI assistant:
+
+```text
+Buatkan aplikasi Kasir (POS) di MiniOS lengkap dengan keranjang belanja, 
+pencarian produk, dan dialog struk pembayaran.
+```
+
+*(Or in English)*:
+```text
+Create an Invoice Manager application in MiniOS with customer selection, 
+line items calculation, and printable invoice preview.
+```
+
+#### What the Agent Automatically Handles:
+1. **Scaffolding**: Runs `php artisan minios:make-app {Name} --icon={icon} --pinned`.
+2. **Database & Migrations**: Generates migrations, Eloquent models, and runs `php artisan migrate`.
+3. **Reactive Livewire UI**: Builds the desktop component in `app/MiniOS/{Name}/Livewire/{Name}.php`.
+4. **Desktop Aesthetics**: Creates a modern Windows 11-styled responsive window view in `resources/views/apps/{name}.blade.php` with dark mode support.
+5. **Quality Assurance**: Adds automated Pest feature tests in `tests/Feature/Apps/{Name}AppTest.php` and formats code with Laravel Pint.
 
 ---
 
