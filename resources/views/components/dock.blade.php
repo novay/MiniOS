@@ -1,4 +1,5 @@
 <div
+    id="taskbar"
     x-data="{
         getDockPx() {
             const val = settings?.dock?.size || 'medium';
@@ -30,43 +31,43 @@
             '-translate-x-full': (settings?.dock?.position ?? 'bottom') === 'left' && shouldHideDock(),
             'translate-x-full': (settings?.dock?.position ?? 'bottom') === 'right' && shouldHideDock(),
             'translate-y-full': (settings?.dock?.position ?? 'bottom') === 'bottom' && shouldHideDock(),
-            'bottom-0 left-0 right-0 flex-row px-3 items-center justify-center': (settings?.dock?.position ?? 'bottom') === 'bottom',
-            'bottom-0 left-0 top-7 flex-col py-1.5 items-center justify-start': (settings?.dock?.position ?? 'bottom') === 'left',
-            'bottom-0 right-0 top-7 flex-col py-1.5 items-center justify-start': (settings?.dock?.position ?? 'bottom') === 'right',
+            'bottom-0 left-0 right-0 flex-row px-4 items-center justify-center border-t border-white/5 dark:border-white/10 bg-white/25 dark:bg-[#181818]/35 backdrop-blur-2xl backdrop-saturate-150 shadow-lg': (settings?.dock?.position ?? 'bottom') === 'bottom',
+            'bottom-0 left-0 top-7 flex-col py-2 items-center justify-start border-r border-white/5 dark:border-white/10 bg-white/25 dark:bg-[#181818]/35 backdrop-blur-2xl backdrop-saturate-150 shadow-lg': (settings?.dock?.position ?? 'bottom') === 'left',
+            'bottom-0 right-0 top-7 flex-col py-2 items-center justify-start border-l border-white/5 dark:border-white/10 bg-white/25 dark:bg-[#181818]/35 backdrop-blur-2xl backdrop-saturate-150 shadow-lg': (settings?.dock?.position ?? 'bottom') === 'right',
             'opacity-0 pointer-events-none': applicationsOpen,
         }"
         :style="(settings?.dock?.position ?? 'bottom') === 'bottom'
             ? 'height: ' + getDockPx() + 'px'
             : 'width: ' + getDockPx() + 'px'"
-        class="desktop-dock absolute z-[9000] flex transform-gpu transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
+        class="desktop-dock absolute z-[9000] flex transform-gpu transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] select-none"
     >
-        {{-- SHOW APPLICATIONS (Start button on bottom dock, or bottom button on side dock) --}}
-        <div
-            class="flex"
+        <nav
+            class="flex items-center justify-center gap-1 sm:gap-1.5"
             :class="{
-                'order-first border-r border-white/10 pr-1 mr-1': (settings?.dock?.position ?? 'bottom') === 'bottom',
-                'order-last mt-auto border-t border-white/10 pt-1': (settings?.dock?.position ?? 'bottom') !== 'bottom',
+                'flex-row h-full': (settings?.dock?.position ?? 'bottom') === 'bottom',
+                'flex-col w-full': (settings?.dock?.position ?? 'bottom') !== 'bottom',
             }"
         >
-            <x-minios.dock-item
-                label="Show Applications"
-                @click.stop="toggleApplications()"
+            {{-- SHOW APPLICATIONS (Windows 11 Start Menu Button) --}}
+            <div
+                class="flex"
+                :class="{
+                    'order-first': (settings?.dock?.position ?? 'bottom') === 'bottom',
+                    'order-last mt-auto': (settings?.dock?.position ?? 'bottom') !== 'bottom',
+                }"
             >
-                <x-minios.icon
-                    name="apps"
-                    class="size-7 text-white"
-                />
-            </x-minios.dock-item>
-        </div>
+                <x-minios.dock-item
+                    label="Start Menu"
+                    @click.stop="toggleApplications()"
+                >
+                    <x-minios.icon
+                        name="windows"
+                        class="text-[#0078d4]"
+                    />
+                </x-minios.dock-item>
+            </div>
 
-        {{-- DOCK APPLICATIONS (PINNED & RUNNING) --}}
-        <div
-            class="flex gap-1"
-            :class="{
-                'flex-row items-center': (settings?.dock?.position ?? 'bottom') === 'bottom',
-                'flex-col items-center': (settings?.dock?.position ?? 'bottom') !== 'bottom',
-            }"
-        >
+            {{-- DOCK APPLICATIONS (PINNED & RUNNING) --}}
             @foreach (config('desktop.applications') as $id => $application)
                 <div
                     x-cloak
@@ -77,26 +78,12 @@
                         :label="$application['name']"
                         :app-id="$id"
                     >
-                        {{-- Running Indicator --}}
-                        <span
-                            x-cloak
-                            x-show="(settings?.dock?.show_indicators ?? true) && isWindowRunning(@js($id))"
-                            class="absolute transition-all"
-                            :class="{
-                                '-bottom-1 left-1/2 -translate-x-1/2 h-1 w-4 rounded-t-full': (settings?.dock?.position ?? 'bottom') === 'bottom',
-                                '-left-1 top-1/2 -translate-y-1/2 w-1 h-4 rounded-r-full': (settings?.dock?.position ?? 'bottom') === 'left',
-                                '-right-1 top-1/2 -translate-y-1/2 w-1 h-4 rounded-l-full': (settings?.dock?.position ?? 'bottom') === 'right',
-                            }"
-                            :style="'background-color: var(--accent-color, #6366f1)'"
-                        ></span>
-
                         <x-minios.icon
                             :name="$application['icon']"
-                            class="size-10"
                         />
                     </x-minios.dock-item>
                 </div>
             @endforeach
-        </div>
+        </nav>
     </aside>
 </div>

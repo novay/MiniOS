@@ -209,10 +209,12 @@ class ControlPanel extends Component
             // Mirror views to resources/views/apps if packaged under views/
             if (preg_match('#^(resources/)?views/(.+)$#', $relative, $viewMatch)) {
                 $viewSub = $viewMatch[2];
-                if (basename($viewSub) === "{$kebabName}.blade.php") {
+                if ($viewSub === "{$kebabName}.blade.php" || $viewSub === "apps/{$kebabName}.blade.php") {
                     $viewDest = resource_path("views/apps/{$kebabName}.blade.php");
-                } elseif (basename($viewSub) === 'index.blade.php' && ! File::exists(resource_path("views/apps/{$kebabName}.blade.php"))) {
+                } elseif ($viewSub === 'index.blade.php' && ! File::exists(resource_path("views/apps/{$kebabName}.blade.php"))) {
                     $viewDest = resource_path("views/apps/{$kebabName}.blade.php");
+                } elseif (str_starts_with($viewSub, 'tabs/') || str_starts_with($viewSub, 'apps/')) {
+                    $viewDest = resource_path('views/'.(str_starts_with($viewSub, 'apps/') ? $viewSub : "apps/{$viewSub}"));
                 } else {
                     $viewDest = resource_path("views/apps/{$kebabName}/{$viewSub}");
                 }

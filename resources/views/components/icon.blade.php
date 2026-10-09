@@ -72,6 +72,19 @@
     @case('minios')
     @case('logo')
         <img src="{{ asset('minios/images/logo.png') }}" alt="MiniOS" {{ $attributes->merge(['class' => $class]) }} />
+    @case('windows')
+    @case('start')
+        <svg
+            {{ $attributes->merge(['class' => $class]) }}
+            viewBox="0 0 88 88"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+        >
+            <path d="M0 0H40V40H0V0Z" fill="#0078D4" />
+            <path d="M48 0H88V40H48V0Z" fill="#0078D4" />
+            <path d="M0 48H40V88H0V48Z" fill="#0078D4" />
+            <path d="M48 48H88V88H48V48Z" fill="#0078D4" />
+        </svg>
     @break
 
     @case('apps')

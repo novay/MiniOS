@@ -8,6 +8,8 @@
 
     @keydown.escape.window="closeAll()"
 
+    @open-app.window="openApplication($event.detail?.id || $event.detail)"
+
     @click="closeContextMenu(); selectedShortcut = null"
 
     style="background-image: url('{{ asset('minios/wallpapers/'.$wallpaperFile) }}'); background-size: cover; background-position: center; background-repeat: no-repeat;"
