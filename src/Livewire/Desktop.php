@@ -5,15 +5,22 @@ namespace Novay\MiniOS\Livewire;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Renderless;
 use Livewire\Component;
+use Novay\MiniOS\Concerns\HasNotifications;
 use Novay\MiniOS\Facades\MiniOS;
+use Novay\MiniOS\Services\TrashService;
 
 class Desktop extends Component
 {
+    use HasNotifications;
+
     public ?string $desktopPath = null;
+
+    public int $trashCount = 0;
 
     public function mount(?string $desktopPath = null): void
     {
         $this->desktopPath = $desktopPath;
+        $this->trashCount = app(TrashService::class)->getTrashCount();
     }
 
     #[On('toggle-dark-mode')]
@@ -42,6 +49,58 @@ class Desktop extends Component
             'key' => $key,
             'value' => $value,
         ]);
+    }
+
+    #[On('trash-updated')]
+    public function onTrashUpdated(mixed $count = null): void
+    {
+        if (is_array($count)) {
+            $count = $count['count'] ?? null;
+        }
+
+        $this->trashCount = is_numeric($count) ? (int) $count : app(TrashService::class)->getTrashCount();
+    }
+
+    #[On('empty-trash')]
+    public function emptyTrash(): void
+    {
+        /** @var TrashService $trash */
+        $trash = app(TrashService::class);
+        $count = $trash->emptyTrash();
+        $this->trashCount = $trash->getTrashCount();
+
+        $this->success(
+            __(':count item berhasil dihapus permanen dari Tempat Sampah.', ['count' => $count]),
+            __('Tempat Sampah')
+        );
+
+        $this->dispatch('trash-updated', count: $this->trashCount);
+    }
+
+    #[On('restore-all-trash')]
+    public function restoreAllTrash(): void
+    {
+        /** @var TrashService $trash */
+        $trash = app(TrashService::class);
+        $count = $trash->restoreAll();
+        $this->trashCount = $trash->getTrashCount();
+
+        $this->success(
+            __(':count berkas berhasil dipulihkan ke lokasi semula.', ['count' => $count]),
+            __('Pulihkan Berkas')
+        );
+
+        $this->dispatch('trash-updated', count: $this->trashCount);
+    }
+
+    public function trashCount(): int
+    {
+        return $this->trashCount = app(TrashService::class)->getTrashCount();
+    }
+
+    public function getTrashCountProperty(): int
+    {
+        return $this->trashCount;
     }
 
     /**

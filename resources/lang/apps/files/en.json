@@ -88,7 +88,15 @@
     "word_folder": "Folder",
     "word_file": "File",
     "modal_delete_confirm": "Are you sure you want to delete \":name\"? This action will permanently remove data.",
+    "modal_move_trash_title": "Move to Trash?",
+    "modal_move_trash_confirm": "Are you sure you want to move \":name\" to Trash? You can restore it anytime.",
+    "btn_move_to_trash": "Move to Trash",
+    "modal_delete_permanent_title": "Delete :type Permanently?",
+    "modal_delete_permanent_confirm": "Are you sure you want to delete \":name\" permanently from Trash? This action cannot be undone.",
     "btn_delete_permanent": "Delete Permanently",
+    "ctx_put_back": "Put back",
+    "ctx_delete_immediately": "Delete Immediately",
+    "ctx_empty_trash": "Empty Trash",
 
     "btn_save": "Save",
     "placeholder_text_editor": "Text file content...",
@@ -141,5 +149,17 @@
 
     "error_cloud_not_configured": "Cloud Storage is not configured yet.",
     "success_cloud_connected": "Connection to :name (':target') successfully verified!",
-    "error_cloud_failed": "Failed to connect to Cloud Storage: :error"
+    "error_cloud_failed": "Failed to connect to Cloud Storage: :error",
+    "panel_details_title": "Details",
+    "lbl_details_type": "Type",
+    "lbl_details_size": "Size",
+    "lbl_details_location": "Location",
+    "lbl_details_modified": "Date modified",
+    "lbl_details_original_path": "Original location",
+    "btn_open_folder": "Open Folder",
+    "btn_preview_file": "Open File",
+    "btn_close_panel": "Close Panel",
+    "btn_toggle_details": "Details Pane",
+    "word_folder_type": "File folder",
+    "panel_details_empty": "Select an item to view details"
 }

@@ -11,6 +11,7 @@ use Novay\MiniOS\Console\InstallCommand;
 use Novay\MiniOS\Console\MakeAppCommand;
 use Novay\MiniOS\Contracts\DesktopApp;
 use Novay\MiniOS\Services\SettingService;
+use Novay\MiniOS\Services\TrashService;
 use Novay\MiniOS\Support\AppRegistry;
 use PlatformCommunity\Flysystem\BunnyCDN\BunnyCDNAdapter;
 use PlatformCommunity\Flysystem\BunnyCDN\BunnyCDNClient;
@@ -31,12 +32,22 @@ class MiniOSServiceProvider extends ServiceProvider
             return new SettingService;
         });
 
+        $this->app->singleton(TrashService::class, function () {
+            return new TrashService;
+        });
+
+        $this->app->singleton(Services\AppCatalogService::class, function () {
+            return new Services\AppCatalogService;
+        });
+
         $this->app->singleton('novay.minios', function ($app) {
             return new MiniOS($app->make(AppRegistry::class));
         });
 
         $this->app->alias('novay.minios', MiniOS::class);
         $this->app->alias(SettingService::class, 'minios.settings');
+        $this->app->alias(TrashService::class, 'minios.trash');
+        $this->app->alias(Services\AppCatalogService::class, 'minios.catalog');
     }
 
     public function boot(): void

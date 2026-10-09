@@ -4,10 +4,12 @@ namespace Novay\MiniOS\Livewire\Apps;
 
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
+use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Novay\MiniOS\Concerns\HasNotifications;
 use Novay\MiniOS\Concerns\HasTranslations;
+use Novay\MiniOS\Services\TrashService;
 
 class Files extends Component
 {
@@ -82,11 +84,16 @@ class Files extends Component
 
     public ?string $previewContent = null;
 
+    public int $trashCount = 0;
+
+    public bool $showDetailsPanel = true;
+
     public function mount(string $path = ''): void
     {
         $this->currentPath = $this->sanitizePath($path);
         $this->history = [$this->currentPath];
         $this->historyIndex = 0;
+        $this->trashCount = app(TrashService::class)->getTrashCount();
     }
 
     public function navigate(string $path): void
@@ -99,6 +106,12 @@ class Files extends Component
             $this->historyIndex = count($this->history) - 1;
         }
         $this->searchQuery = '';
+        $this->selectedPath = null;
+    }
+
+    public function toggleDetailsPanel(): void
+    {
+        $this->showDetailsPanel = ! $this->showDetailsPanel;
     }
 
     public function navigateUp(): void
@@ -158,9 +171,36 @@ class Files extends Component
         }
     }
 
+    #[On('open-folder')]
+    public function openFolder(string $path): void
+    {
+        $this->navigate($path);
+    }
+
+    #[On('trash-updated')]
+    public function onTrashUpdated(mixed $count = null): void
+    {
+        if (is_array($count)) {
+            $count = $count['count'] ?? null;
+        }
+
+        $this->trashCount = is_numeric($count) ? (int) $count : app(TrashService::class)->getTrashCount();
+    }
+
     protected function sanitizePath(string $path): string
     {
         $path = trim(str_replace('\\', '/', $path), '/');
+
+        if (str_starts_with($path, 'files/')) {
+            $path = substr($path, 6);
+        } elseif ($path === 'files') {
+            $path = '';
+        }
+
+        if ($path === 'trash' || str_starts_with($path, 'trash/')) {
+            $path = '.trash'.substr($path, 5);
+        }
+
         $parts = array_filter(explode('/', $path), function ($part) {
             return $part !== '' && $part !== '.' && $part !== '..';
         });
@@ -212,6 +252,53 @@ class Files extends Component
     public function getIsLockedProperty(): bool
     {
         return ! auth()->check();
+    }
+
+    public function getIsInTrashProperty(): bool
+    {
+        return $this->currentPath === '.trash' || str_starts_with($this->currentPath, '.trash/');
+    }
+
+    public function getIsSystemProtectedProperty(): bool
+    {
+        return $this->currentPath === 'logs'
+            || str_starts_with($this->currentPath, 'logs/')
+            || $this->currentPath === 'framework'
+            || str_starts_with($this->currentPath, 'framework/');
+    }
+
+    public function trashCount(): int
+    {
+        return $this->trashCount = app(TrashService::class)->getTrashCount();
+    }
+
+    public function getTrashCountProperty(): int
+    {
+        return $this->trashCount;
+    }
+
+    public function getSelectedItemProperty(): ?array
+    {
+        if (! $this->selectedPath) {
+            return null;
+        }
+
+        foreach ($this->items as $item) {
+            if ($item['path'] === $this->selectedPath) {
+                $item['preview_thumb'] = null;
+                if (! $item['is_dir'] && in_array($item['extension'], ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg'])) {
+                    $realPath = storage_path($this->sanitizePath($item['path']));
+                    if (File::exists($realPath) && File::size($realPath) <= 2 * 1024 * 1024) {
+                        $mime = $item['extension'] === 'svg' ? 'image/svg+xml' : 'image/'.$item['extension'];
+                        $item['preview_thumb'] = 'data:'.$mime.';base64,'.base64_encode(File::get($realPath));
+                    }
+                }
+
+                return $item;
+            }
+        }
+
+        return null;
     }
 
     public function getItemsProperty(): array
@@ -287,11 +374,55 @@ class Files extends Component
             } catch (\Exception $e) {
                 return [];
             }
+        } elseif ($this->isInTrash) {
+            try {
+                /** @var TrashService $trashService */
+                $trashService = app(TrashService::class);
+                $metadata = $trashService->getMetadata();
+
+                foreach ($metadata as $trashName => $meta) {
+                    $itemPath = storage_path('.trash/'.$trashName);
+                    if (! File::exists($itemPath)) {
+                        continue;
+                    }
+
+                    $isDir = (bool) ($meta['is_dir'] ?? File::isDirectory($itemPath));
+                    $sizeBytes = $isDir ? 0 : File::size($itemPath);
+                    $originalName = $meta['original_name'] ?? $trashName;
+                    $extension = $isDir ? 'folder' : strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
+
+                    $itemData = [
+                        'name' => $originalName,
+                        'trash_name' => $trashName,
+                        'path' => '.trash/'.$trashName,
+                        'original_path' => $meta['original_path'] ?? '',
+                        'location' => dirname($meta['original_path'] ?? '') === '.' ? 'storage' : dirname($meta['original_path'] ?? ''),
+                        'is_dir' => $isDir,
+                        'size' => $isDir ? 'Folder' : $this->formatBytes($sizeBytes),
+                        'bytes' => $sizeBytes,
+                        'extension' => $extension ?: 'file',
+                        'updated_at' => isset($meta['deleted_at']) ? date('d M Y, H:i', strtotime($meta['deleted_at'])) : date('d M Y, H:i', File::lastModified($itemPath)),
+                        'raw_mtime' => isset($meta['deleted_at']) ? strtotime($meta['deleted_at']) : File::lastModified($itemPath),
+                        'is_trash_item' => true,
+                    ];
+
+                    if ($isDir) {
+                        $dirs[] = $itemData;
+                    } else {
+                        $files[] = $itemData;
+                    }
+                }
+            } catch (\Exception $e) {
+                return [];
+            }
         } else {
             try {
                 $contents = File::directories($absPath);
                 foreach ($contents as $dir) {
                     $basename = basename($dir);
+                    if (empty($this->currentPath) && $basename === '.trash') {
+                        continue;
+                    }
                     $relativePath = empty($this->currentPath) ? $basename : $this->currentPath.'/'.$basename;
                     $childCount = count(File::directories($dir)) + count(File::files($dir));
                     $dirs[] = [
@@ -310,6 +441,9 @@ class Files extends Component
                 $fileContents = File::files($absPath);
                 foreach ($fileContents as $file) {
                     $basename = $file->getFilename();
+                    if (empty($this->currentPath) && ($basename === '.trash' || $basename === '.metadata.json')) {
+                        continue;
+                    }
                     $relativePath = empty($this->currentPath) ? $basename : $this->currentPath.'/'.$basename;
                     $extension = strtolower($file->getExtension());
                     $sizeBytes = $file->getSize();
@@ -595,19 +729,80 @@ class Files extends Component
         }
 
         try {
-            if (File::isDirectory($fullPath)) {
-                File::deleteDirectory($fullPath);
+            /** @var TrashService $trashService */
+            $trashService = app(TrashService::class);
+
+            if ($this->isInTrash) {
+                // Permanently delete item
+                $trashName = basename($fullPath);
+                $trashService->deletePermanently($trashName);
+                $this->notify($this->trans('success_deleted_permanently', ['name' => $this->deleteTargetName]));
             } else {
-                File::delete($fullPath);
+                // Soft delete to trash
+                $trashService->moveToTrash($this->deleteTargetPath);
+                $this->notify($this->trans('success_moved_to_trash', ['name' => $this->deleteTargetName]));
             }
-            $this->notify($this->trans('success_deleted', ['name' => $this->deleteTargetName]));
+
             $this->closeDeleteModal();
             if ($this->selectedPath === $this->deleteTargetPath) {
                 $this->selectedPath = null;
             }
+            $this->trashCount = $trashService->getTrashCount();
+            $this->dispatch('trash-updated', count: $this->trashCount);
         } catch (\Exception $e) {
             $this->notify($this->trans('error_delete_failed', ['error' => $e->getMessage()]), 'error');
         }
+    }
+
+    public function restorePath(string $path): void
+    {
+        $trashName = basename($path);
+        /** @var TrashService $trashService */
+        $trashService = app(TrashService::class);
+
+        if ($trashService->restore($trashName)) {
+            $this->notify($this->trans('success_restored'));
+            if ($this->selectedPath === $path) {
+                $this->selectedPath = null;
+            }
+            $this->trashCount = $trashService->getTrashCount();
+            $this->dispatch('trash-updated', count: $this->trashCount);
+        } else {
+            $this->notify($this->trans('error_restore_failed'), 'error');
+        }
+    }
+
+    public function restoreSelected(): void
+    {
+        if (! $this->selectedPath) {
+            return;
+        }
+
+        $this->restorePath($this->selectedPath);
+    }
+
+    public function restoreAllTrash(): void
+    {
+        /** @var TrashService $trashService */
+        $trashService = app(TrashService::class);
+        $count = $trashService->restoreAll();
+
+        $this->notify($this->trans('success_restored_all', ['count' => $count]));
+        $this->selectedPath = null;
+        $this->trashCount = $trashService->getTrashCount();
+        $this->dispatch('trash-updated', count: $this->trashCount);
+    }
+
+    public function emptyTrash(): void
+    {
+        /** @var TrashService $trashService */
+        $trashService = app(TrashService::class);
+        $count = $trashService->emptyTrash();
+
+        $this->notify($this->trans('success_trash_emptied', ['count' => $count]));
+        $this->selectedPath = null;
+        $this->trashCount = $trashService->getTrashCount();
+        $this->dispatch('trash-updated', count: $this->trashCount);
     }
 
     public function downloadFile(string $path)
@@ -842,9 +1037,11 @@ class Files extends Component
                 'bg_hover' => 'hover:bg-zinc-800',
                 'badge' => 'bg-zinc-800 text-white shadow-zinc-500/30',
                 'active_tab' => 'bg-zinc-700 text-white shadow-sm font-medium',
+                'radio_card' => 'border-zinc-500 bg-zinc-500/10 ring-1 ring-zinc-500',
+                'selected_row' => 'bg-zinc-500/10 dark:bg-zinc-500/15 ring-1 ring-inset ring-zinc-500/30 font-medium',
                 'ring' => 'focus:ring-zinc-500 focus:border-zinc-500',
                 'text' => 'text-zinc-600 dark:text-zinc-400',
-                'hex' => '#27272a',
+                'hex' => '#71717a',
             ],
             'emerald' => [
                 'name' => 'emerald',
@@ -852,6 +1049,8 @@ class Files extends Component
                 'bg_hover' => 'hover:bg-emerald-700',
                 'badge' => 'bg-emerald-600 text-white shadow-emerald-500/30',
                 'active_tab' => 'bg-emerald-600 text-white shadow-sm font-medium',
+                'radio_card' => 'border-emerald-500 bg-emerald-500/10 ring-1 ring-emerald-500',
+                'selected_row' => 'bg-emerald-500/10 dark:bg-emerald-500/15 ring-1 ring-inset ring-emerald-500/30 font-medium',
                 'ring' => 'focus:ring-emerald-500 focus:border-emerald-500',
                 'text' => 'text-emerald-600 dark:text-emerald-400',
                 'hex' => '#10b981',
@@ -862,6 +1061,8 @@ class Files extends Component
                 'bg_hover' => 'hover:bg-sky-600',
                 'badge' => 'bg-sky-500 text-white shadow-sky-500/30',
                 'active_tab' => 'bg-sky-600 text-white shadow-sm font-medium',
+                'radio_card' => 'border-sky-500 bg-sky-500/10 ring-1 ring-sky-500',
+                'selected_row' => 'bg-sky-500/10 dark:bg-sky-500/15 ring-1 ring-inset ring-sky-500/30 font-medium',
                 'ring' => 'focus:ring-sky-500 focus:border-sky-500',
                 'text' => 'text-sky-600 dark:text-sky-400',
                 'hex' => '#0ea5e9',
@@ -872,6 +1073,8 @@ class Files extends Component
                 'bg_hover' => 'hover:bg-amber-600',
                 'badge' => 'bg-amber-500 text-white shadow-amber-500/30',
                 'active_tab' => 'bg-amber-600 text-white shadow-sm font-medium',
+                'radio_card' => 'border-amber-500 bg-amber-500/10 ring-1 ring-amber-500',
+                'selected_row' => 'bg-amber-500/10 dark:bg-amber-500/15 ring-1 ring-inset ring-amber-500/30 font-medium',
                 'ring' => 'focus:ring-amber-500 focus:border-amber-500',
                 'text' => 'text-amber-600 dark:text-amber-400',
                 'hex' => '#f59e0b',
@@ -882,9 +1085,23 @@ class Files extends Component
                 'bg_hover' => 'hover:bg-rose-600',
                 'badge' => 'bg-rose-500 text-white shadow-rose-500/30',
                 'active_tab' => 'bg-rose-600 text-white shadow-sm font-medium',
+                'radio_card' => 'border-rose-500 bg-rose-500/10 ring-1 ring-rose-500',
+                'selected_row' => 'bg-rose-500/10 dark:bg-rose-500/15 ring-1 ring-inset ring-rose-500/30 font-medium',
                 'ring' => 'focus:ring-rose-500 focus:border-rose-500',
                 'text' => 'text-rose-600 dark:text-rose-400',
                 'hex' => '#f43f5e',
+            ],
+            'violet' => [
+                'name' => 'violet',
+                'bg' => 'bg-violet-600',
+                'bg_hover' => 'hover:bg-violet-700',
+                'badge' => 'bg-violet-600 text-white shadow-violet-500/30',
+                'active_tab' => 'bg-violet-600 text-white shadow-sm font-medium',
+                'radio_card' => 'border-violet-500 bg-violet-500/10 ring-1 ring-violet-500',
+                'selected_row' => 'bg-violet-500/10 dark:bg-violet-500/15 ring-1 ring-inset ring-violet-500/30 font-medium',
+                'ring' => 'focus:ring-violet-500 focus:border-violet-500',
+                'text' => 'text-violet-600 dark:text-violet-400',
+                'hex' => '#8b5cf6',
             ],
             default => [ // indigo
                 'name' => 'indigo',
@@ -892,6 +1109,8 @@ class Files extends Component
                 'bg_hover' => 'hover:bg-indigo-700',
                 'badge' => 'bg-indigo-600 text-white shadow-indigo-500/30',
                 'active_tab' => 'bg-indigo-600 text-white shadow-sm font-medium',
+                'radio_card' => 'border-indigo-500 bg-indigo-500/10 ring-1 ring-indigo-500',
+                'selected_row' => 'bg-indigo-500/10 dark:bg-indigo-500/15 ring-1 ring-inset ring-indigo-500/30 font-medium',
                 'ring' => 'focus:ring-indigo-500 focus:border-indigo-500',
                 'text' => 'text-indigo-600 dark:text-indigo-400',
                 'hex' => '#4f46e5',

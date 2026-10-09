@@ -88,7 +88,15 @@
     "word_folder": "Folder",
     "word_file": "Berkas",
     "modal_delete_confirm": "Apakah Anda yakin ingin menghapus \":name\"? Tindakan ini akan menghapus data secara permanen.",
+    "modal_move_trash_title": "Pindahkan ke Tempat Sampah?",
+    "modal_move_trash_confirm": "Apakah Anda yakin ingin memindahkan \":name\" ke Tempat Sampah? Anda dapat memulihkannya kapan saja.",
+    "btn_move_to_trash": "Pindahkan ke Tempat Sampah",
+    "modal_delete_permanent_title": "Hapus :type Permanen?",
+    "modal_delete_permanent_confirm": "Apakah Anda yakin ingin menghapus \":name\" secara permanen dari Tempat Sampah? Tindakan ini tidak dapat dibatalkan.",
     "btn_delete_permanent": "Hapus Permanen",
+    "ctx_put_back": "Kembalikan",
+    "ctx_delete_immediately": "Hapus Segera",
+    "ctx_empty_trash": "Kosongkan Tempat Sampah",
 
     "btn_save": "Simpan",
     "placeholder_text_editor": "Isi berkas teks...",
@@ -141,5 +149,17 @@
 
     "error_cloud_not_configured": "Belum ada konfigurasi Cloud Storage.",
     "success_cloud_connected": "Koneksi ke :name (':target') berhasil diverifikasi!",
-    "error_cloud_failed": "Gagal terhubung ke Cloud Storage: :error"
+    "error_cloud_failed": "Gagal terhubung ke Cloud Storage: :error",
+    "panel_details_title": "Detail",
+    "lbl_details_type": "Tipe",
+    "lbl_details_size": "Ukuran",
+    "lbl_details_location": "Lokasi",
+    "lbl_details_modified": "Terakhir Diubah",
+    "lbl_details_original_path": "Lokasi Asal",
+    "btn_open_folder": "Buka Folder",
+    "btn_preview_file": "Buka Berkas",
+    "btn_close_panel": "Tutup Panel",
+    "btn_toggle_details": "Panel Detail",
+    "word_folder_type": "Folder Berkas",
+    "panel_details_empty": "Pilih item untuk melihat detail"
 }

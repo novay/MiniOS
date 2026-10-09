@@ -106,36 +106,122 @@
 
 
     @case('trash')
+    @case('trash-empty')
         <svg
             {{ $attributes->merge(['class' => $class]) }}
             viewBox="0 0 48 48"
             fill="none"
+            xmlns="http://www.w3.org/2000/svg"
         >
+            <defs>
+                <linearGradient id="binBodyEmpty" x1="12" y1="14" x2="36" y2="44" gradientUnits="userSpaceOnUse">
+                    <stop offset="0%" stop-color="#E2E8F0" stop-opacity="0.9" />
+                    <stop offset="100%" stop-color="#CBD5E1" stop-opacity="0.95" />
+                </linearGradient>
+                <linearGradient id="binRimEmpty" x1="10" y1="11" x2="38" y2="15" gradientUnits="userSpaceOnUse">
+                    <stop offset="0%" stop-color="#F8FAFC" />
+                    <stop offset="100%" stop-color="#94A3B8" />
+                </linearGradient>
+                <linearGradient id="binInnerEmpty" x1="14" y1="12" x2="34" y2="16" gradientUnits="userSpaceOnUse">
+                    <stop offset="0%" stop-color="#64748B" />
+                    <stop offset="100%" stop-color="#94A3B8" />
+                </linearGradient>
+            </defs>
+
+            {{-- Inner depth --}}
+            <ellipse cx="24" cy="14" rx="13.5" ry="3.8" fill="url(#binInnerEmpty)" />
+
+            {{-- Bin Body --}}
             <path
-                d="M13 15H35L33 40H15L13 15Z"
-                fill="#D8D8D8"
+                d="M12 14.5 L15 41 C15.2 42.4 16.4 43.5 17.8 43.5 H30.2 C31.6 43.5 32.8 42.4 33 41 L36 14.5 Z"
+                fill="url(#binBodyEmpty)"
+                stroke="#94A3B8"
+                stroke-width="1.2"
+                stroke-linejoin="round"
             />
 
+            {{-- Vertical ribs --}}
+            <path d="M18.5 17 L20 39.5" stroke="#94A3B8" stroke-width="1.2" stroke-linecap="round" opacity="0.6" />
+            <path d="M24 17.5 L24 40" stroke="#94A3B8" stroke-width="1.2" stroke-linecap="round" opacity="0.6" />
+            <path d="M29.5 17 L28 39.5" stroke="#94A3B8" stroke-width="1.2" stroke-linecap="round" opacity="0.6" />
+
+            {{-- Bin Outer Rim --}}
+            <ellipse cx="24" cy="13.5" rx="14.5" ry="4" fill="none" stroke="url(#binRimEmpty)" stroke-width="2" />
+            <ellipse cx="24" cy="13" rx="14.2" ry="3.6" fill="none" stroke="#F8FAFC" stroke-width="0.8" opacity="0.8" />
+
+            {{-- Recycle Mobius Arrows Accent --}}
             <path
-                d="M11 12H37"
-                stroke="#F3F3F3"
-                stroke-width="4"
+                d="M21.5 27 L24 23 L26.5 27 M26 31 L24 33 L21 31"
+                stroke="#64748B"
+                stroke-width="1.2"
                 stroke-linecap="round"
+                stroke-linejoin="round"
+                opacity="0.45"
+            />
+        </svg>
+    @break
+
+    @case('trash-full')
+        <svg
+            {{ $attributes->merge(['class' => $class]) }}
+            viewBox="0 0 48 48"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+        >
+            <defs>
+                <linearGradient id="binBodyFull" x1="12" y1="14" x2="36" y2="44" gradientUnits="userSpaceOnUse">
+                    <stop offset="0%" stop-color="#E2E8F0" stop-opacity="0.9" />
+                    <stop offset="100%" stop-color="#CBD5E1" stop-opacity="0.95" />
+                </linearGradient>
+                <linearGradient id="binRimFull" x1="10" y1="11" x2="38" y2="15" gradientUnits="userSpaceOnUse">
+                    <stop offset="0%" stop-color="#F8FAFC" />
+                    <stop offset="100%" stop-color="#94A3B8" />
+                </linearGradient>
+                <linearGradient id="paperGradWhite" x1="20" y1="5" x2="30" y2="15" gradientUnits="userSpaceOnUse">
+                    <stop offset="0%" stop-color="#FFFFFF" />
+                    <stop offset="100%" stop-color="#E2E8F0" />
+                </linearGradient>
+                <linearGradient id="paperGradBlue" x1="25" y1="6" x2="35" y2="16" gradientUnits="userSpaceOnUse">
+                    <stop offset="0%" stop-color="#BAE6FD" />
+                    <stop offset="100%" stop-color="#7DD3FC" />
+                </linearGradient>
+                <linearGradient id="paperGradYellow" x1="14" y1="7" x2="22" y2="17" gradientUnits="userSpaceOnUse">
+                    <stop offset="0%" stop-color="#FEF08A" />
+                    <stop offset="100%" stop-color="#FDE047" />
+                </linearGradient>
+            </defs>
+
+            {{-- Crumpled trash papers sticking out top --}}
+            <path d="M16 14 L14 7 L20 9 L22 14 Z" fill="url(#paperGradYellow)" stroke="#EAB308" stroke-width="0.8" stroke-linejoin="round" />
+            <path d="M21 13 L25 5 L30 8 L28 14 Z" fill="url(#paperGradWhite)" stroke="#94A3B8" stroke-width="0.8" stroke-linejoin="round" />
+            <path d="M26 14 L32 7 L35 11 L31 15 Z" fill="url(#paperGradBlue)" stroke="#38BDF8" stroke-width="0.8" stroke-linejoin="round" />
+
+            <path d="M18 11 C16 9 20 7 22 9 C24 7 28 8 27 11 C29 11 31 13 29 14 C27 16 19 15 18 11 Z" fill="#FFFFFF" stroke="#94A3B8" stroke-width="0.8" />
+            <path d="M21 9 L24 12 L20 12 Z" fill="#E2E8F0" opacity="0.8" />
+
+            {{-- Bin Body --}}
+            <path
+                d="M12 14.5 L15 41 C15.2 42.4 16.4 43.5 17.8 43.5 H30.2 C31.6 43.5 32.8 42.4 33 41 L36 14.5 Z"
+                fill="url(#binBodyFull)"
+                stroke="#94A3B8"
+                stroke-width="1.2"
+                stroke-linejoin="round"
             />
 
-            <path
-                d="M19 9H29"
-                stroke="#F3F3F3"
-                stroke-width="4"
-                stroke-linecap="round"
-            />
+            {{-- Trash shadow inside semi-transparent bin --}}
+            <path d="M16 21 C14 25 18 31 22 30 C25 29 28 32 30 28 C31 24 29 20 26 21 C23 22 18 19 16 21 Z" fill="#64748B" opacity="0.3" />
 
-            <path
-                d="M20 20V34M28 20V34"
-                stroke="#999"
-                stroke-width="2"
-                stroke-linecap="round"
-            />
+            {{-- Vertical ribs --}}
+            <path d="M18.5 17 L20 39.5" stroke="#94A3B8" stroke-width="1.2" stroke-linecap="round" opacity="0.6" />
+            <path d="M24 17.5 L24 40" stroke="#94A3B8" stroke-width="1.2" stroke-linecap="round" opacity="0.6" />
+            <path d="M29.5 17 L28 39.5" stroke="#94A3B8" stroke-width="1.2" stroke-linecap="round" opacity="0.6" />
+
+            {{-- Bin Outer Rim --}}
+            <ellipse cx="24" cy="13.5" rx="14.5" ry="4" fill="none" stroke="url(#binRimFull)" stroke-width="2" />
+            <ellipse cx="24" cy="13" rx="14.2" ry="3.6" fill="none" stroke="#F8FAFC" stroke-width="0.8" opacity="0.8" />
+
+            {{-- Front folded paper hanging over rim --}}
+            <path d="M22 13 L26 13 L24 17 Z" fill="#FFFFFF" stroke="#94A3B8" stroke-width="0.8" />
         </svg>
     @break
 

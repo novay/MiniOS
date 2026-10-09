@@ -11,14 +11,14 @@
     x-transition:leave-end="opacity-0 scale-95 -translate-y-4"
     class="fixed inset-0 z-[9600] flex justify-center items-start pt-[12vh] sm:pt-[15vh] px-4 select-none"
 >
-    {{-- Dimmed Backdrop --}}
+    {{-- Dimmed Backdrop (Without backdrop blur) --}}
     <div
-        class="fixed inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm transition-opacity"
+        class="fixed inset-0 bg-black/30 dark:bg-black/60 transition-opacity"
         @click="closeSpotlight()"
         aria-hidden="true"
     ></div>
 
-    {{-- Spotlight Modal Box --}}
+    {{-- Spotlight Modal Box (Solid, Shadow only, No Backdrop Blur) --}}
     <div
         @click.stop
         class="
@@ -30,10 +30,11 @@
             border
             border-black/10
             dark:border-white/10
-            bg-white/95
-            dark:bg-[#1c1c1f]/95
+            bg-white
+            dark:bg-[#1e1e1e]
             shadow-2xl
-            backdrop-blur-3xl
+            shadow-black/30
+            dark:shadow-black/70
             flex
             flex-col
             text-neutral-800
@@ -120,12 +121,23 @@
                         {{-- Icon for Application --}}
                         <template x-if="item.type === 'app'">
                             <div class="flex size-10 shrink-0 items-center justify-center rounded-xl p-1">
-                                <img
-                                    :src="'{{ asset('minios/images/apps') }}/' + item.icon + '.png'"
-                                    :alt="item.title"
-                                    class="size-8 object-contain"
-                                    onerror="this.onerror=null; this.src='{{ asset('minios/images/logo.png') }}';"
-                                />
+                                @foreach (config('desktop.applications') as $appId => $application)
+                                    <template x-if="item.id === '{{ $appId }}'">
+                                        <div class="flex size-8 items-center justify-center">
+                                            <x-minios.icon :name="$application['icon']" class="size-8" />
+                                        </div>
+                                    </template>
+                                @endforeach
+
+                                <template x-if="!@js(array_keys(config('desktop.applications'))).includes(item.id)">
+                                    <div class="flex size-8 items-center justify-center">
+                                        <img
+                                            src="{{ asset('minios/images/logo.png') }}"
+                                            :alt="item.title"
+                                            class="size-8 object-contain"
+                                        />
+                                    </div>
+                                </template>
                             </div>
                         </template>
 

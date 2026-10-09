@@ -15,8 +15,8 @@
             </div>
 
             <div class="flex items-center gap-2 mt-0.5">
-                <h1 class="text-base font-semibold tracking-tight text-neutral-900 dark:text-white">{{ $this->t('header_installed_apps') }}</h1>
-                <span class="rounded-md bg-neutral-200/70 dark:bg-white/10 px-2 py-0.2 text-[11px] font-medium text-neutral-600 dark:text-neutral-300">{{ $stats['total'] }}</span>
+                <h1 class="text-base font-semibold tracking-tight text-neutral-900 dark:text-white">{{ $activeTab === 'catalog' ? $this->t('catalog_banner_title') : $this->t('header_installed_apps') }}</h1>
+                <span class="rounded-md bg-neutral-200/70 dark:bg-white/10 px-2 py-0.2 text-[11px] font-medium text-neutral-600 dark:text-neutral-300">{{ $activeTab === 'catalog' ? count($catalogApps) : $stats['total'] }}</span>
             </div>
         </div>
 
@@ -47,22 +47,42 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                 </svg>
             </div>
-            <input
-                type="text"
-                wire:model.live.debounce.250ms="search"
-                placeholder="{{ $this->t('search_placeholder') }}"
-                class="w-full rounded-md border border-neutral-300/90 dark:border-white/10 bg-white dark:bg-[#2d2d2d] py-1.5 pl-9 pr-8 text-xs text-neutral-800 dark:text-neutral-100 placeholder-neutral-400 dark:placeholder-neutral-500 shadow-xs transition-all focus:outline-none focus:ring-2 {{ $accent['ring'] }}"
-            />
-            @if ($search)
-                <button
-                    type="button"
-                    wire:click="$set('search', '')"
-                    class="absolute inset-y-0 right-0 flex items-center pr-2.5 text-neutral-400 hover:text-neutral-700 dark:hover:text-white transition-colors"
-                >
-                    <svg class="size-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                    </svg>
-                </button>
+            @if ($activeTab === 'catalog')
+                <input
+                    type="text"
+                    wire:model.live.debounce.250ms="catalogSearch"
+                    placeholder="{{ $this->t('catalog_search_placeholder') }}"
+                    class="w-full rounded-md border border-neutral-300/90 dark:border-white/10 bg-white dark:bg-[#2d2d2d] py-1.5 pl-9 pr-8 text-xs text-neutral-800 dark:text-neutral-100 placeholder-neutral-400 dark:placeholder-neutral-500 shadow-xs transition-all focus:outline-none focus:ring-2 {{ $accent['ring'] }}"
+                />
+                @if ($catalogSearch)
+                    <button
+                        type="button"
+                        wire:click="$set('catalogSearch', '')"
+                        class="absolute inset-y-0 right-0 flex items-center pr-2.5 text-neutral-400 hover:text-neutral-700 dark:hover:text-white transition-colors"
+                    >
+                        <svg class="size-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                @endif
+            @else
+                <input
+                    type="text"
+                    wire:model.live.debounce.250ms="search"
+                    placeholder="{{ $this->t('search_placeholder') }}"
+                    class="w-full rounded-md border border-neutral-300/90 dark:border-white/10 bg-white dark:bg-[#2d2d2d] py-1.5 pl-9 pr-8 text-xs text-neutral-800 dark:text-neutral-100 placeholder-neutral-400 dark:placeholder-neutral-500 shadow-xs transition-all focus:outline-none focus:ring-2 {{ $accent['ring'] }}"
+                />
+                @if ($search)
+                    <button
+                        type="button"
+                        wire:click="$set('search', '')"
+                        class="absolute inset-y-0 right-0 flex items-center pr-2.5 text-neutral-400 hover:text-neutral-700 dark:hover:text-white transition-colors"
+                    >
+                        <svg class="size-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                @endif
             @endif
         </div>
 
@@ -103,12 +123,186 @@
                 <span>{{ $this->t('tab_system') }}</span>
                 <span class="rounded px-1.5 py-0.2 text-[10px] {{ $activeTab === 'system' ? 'bg-white/20 text-white' : 'bg-neutral-300/80 text-neutral-600 dark:bg-white/10 dark:text-neutral-400' }}">{{ $stats['system'] }}</span>
             </button>
+
+            <button
+                type="button"
+                wire:click="setTab('catalog')"
+                @if ($activeTab === 'catalog')
+                    style="background-color: var(--accent-color, {{ $accent['hex'] }}); color: #ffffff;"
+                @endif
+                class="flex items-center gap-1.5 rounded-[5px] px-3 py-1 font-medium transition-all {{ $activeTab === 'catalog' ? 'text-white shadow-xs' : 'text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white' }}"
+            >
+                <svg class="size-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                </svg>
+                <span>{{ $this->t('tab_catalog') }}</span>
+                <span class="rounded px-1.5 py-0.2 text-[10px] {{ $activeTab === 'catalog' ? 'bg-white/20 text-white' : 'bg-neutral-300/80 text-neutral-600 dark:bg-white/10 dark:text-neutral-400' }}">{{ $stats['catalog'] ?? count($catalogApps) }}</span>
+            </button>
         </div>
     </div>
 
-    {{-- ========================================================= --}}
-    {{-- INSTALLED APPS (WINDOWS 11 FLUENT LIST TILES) --}}
-    {{-- ========================================================= --}}
+    @if ($activeTab === 'catalog')
+        {{-- ========================================================= --}}
+        {{-- APP CATALOG / DISCOVERY MARKETPLACE SHOWCASE --}}
+        {{-- ========================================================= --}}
+        <div class="flex-1 overflow-y-auto px-6 pb-6 space-y-4">
+            {{-- Category Filter Pills --}}
+            <div class="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs select-none">
+                @php
+                    $categories = [
+                        'all' => $this->t('cat_all'),
+                        'productivity' => $this->t('cat_productivity'),
+                        'media' => $this->t('cat_media'),
+                        'developer' => $this->t('cat_developer'),
+                        'games' => $this->t('cat_games'),
+                        'utilities' => $this->t('cat_utilities'),
+                    ];
+                @endphp
+                @foreach ($categories as $catKey => $catLabel)
+                    <button
+                        type="button"
+                        wire:click="setCatalogCategory('{{ $catKey }}')"
+                        class="rounded-full px-3 py-1 text-xs font-medium transition-all shrink-0 {{ $catalogCategory === $catKey ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 shadow-2xs font-semibold' : 'bg-neutral-200/60 dark:bg-white/5 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-white/10' }}"
+                    >
+                        {{ $catLabel }}
+                    </button>
+                @endforeach
+            </div>
+
+            {{-- Catalog Cards Grid --}}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+                @forelse ($catalogApps as $catApp)
+                    <div class="flex flex-col justify-between rounded-xl border border-neutral-200/90 dark:border-white/5 bg-white dark:bg-[#2b2b2b]/70 p-4 shadow-2xs transition-all hover:border-neutral-300 dark:hover:border-white/10 hover:shadow-xs group">
+                        <div>
+                            {{-- Top row: Icon, Title, Rating, Badge --}}
+                            <div class="flex items-start justify-between gap-2.5">
+                                <div class="flex items-center gap-3 min-w-0">
+                                    <div class="size-11 shrink-0 flex items-center justify-center rounded-xl bg-neutral-100 dark:bg-black/30 p-2 border border-neutral-200/60 dark:border-white/5 shadow-2xs">
+                                        <x-minios.icon :name="$catApp['icon']" class="size-full" />
+                                    </div>
+                                    <div class="min-w-0">
+                                        <div class="flex items-center gap-1.5">
+                                            <h3 class="font-bold text-xs text-neutral-900 dark:text-white truncate">{{ $catApp['name'] }}</h3>
+                                        </div>
+                                        <div class="text-[11px] text-neutral-500 dark:text-neutral-400">
+                                            by {{ $catApp['author'] }}
+                                        </div>
+                                        <div class="flex items-center gap-1 text-[11px] text-neutral-500 dark:text-neutral-400 mt-0.5">
+                                            <span class="text-amber-500 font-semibold">★ {{ $catApp['rating'] }}</span>
+                                            <span class="text-neutral-300 dark:text-neutral-600">•</span>
+                                            <span>{{ $catApp['downloads'] }} {{ $this->t('lbl_downloads') }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {{-- Category Badge --}}
+                                <span class="rounded px-2 py-0.5 text-[10px] font-semibold shrink-0 {{
+                                    $catApp['badge_color'] === 'indigo' ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-500/20' :
+                                    ($catApp['badge_color'] === 'emerald' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-500/20' :
+                                    'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400 border border-amber-200/60 dark:border-amber-500/20')
+                                }}">
+                                    {{ $catApp['badge'] }}
+                                </span>
+                            </div>
+
+                            {{-- Description --}}
+                            <p class="mt-3 text-xs text-neutral-600 dark:text-neutral-300 leading-relaxed line-clamp-2">
+                                {{ $catApp['description'] }}
+                            </p>
+
+                            {{-- Features bullet points --}}
+                            <div class="mt-3 space-y-1 border-t border-neutral-100 dark:border-white/5 pt-2 text-[11px] text-neutral-500 dark:text-neutral-400">
+                                @foreach ($catApp['features'] as $feat)
+                                    <div class="flex items-center gap-1.5 truncate">
+                                        <svg class="size-3 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                        <span class="truncate">{{ $feat }}</span>
+                                    </div>
+                                @endforeach
+                            </div>
+
+                            {{-- Tags --}}
+                            <div class="mt-3 flex flex-wrap gap-1">
+                                @foreach ($catApp['tags'] as $tag)
+                                    <span class="rounded bg-neutral-100 dark:bg-white/5 px-1.5 py-0.2 text-[10px] font-medium text-neutral-500 dark:text-neutral-400 border border-neutral-200/40 dark:border-white/5">
+                                        #{{ $tag }}
+                                    </span>
+                                @endforeach
+                            </div>
+                        </div>
+
+                        {{-- Footer Action Bar --}}
+                        <div class="mt-4 flex items-center justify-between border-t border-neutral-100 dark:border-white/5 pt-3">
+                            <span class="text-[11px] font-mono text-neutral-400">
+                                v{{ $catApp['version'] }} • {{ $catApp['size'] }}
+                            </span>
+
+                            <div class="flex items-center gap-1.5">
+                                @if ($catApp['is_installed'])
+                                    <span class="inline-flex items-center gap-1 rounded bg-emerald-50 dark:bg-emerald-500/10 px-2 py-1 text-[11px] font-semibold text-emerald-700 dark:text-emerald-400 border border-emerald-200/80 dark:border-emerald-500/20">
+                                        <svg class="size-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                        <span>{{ $this->t('badge_installed_catalog') }}</span>
+                                    </span>
+
+                                    <button
+                                        type="button"
+                                        @click="openWindow('{{ $catApp['id'] }}')"
+                                        class="inline-flex items-center gap-1 rounded-md border border-neutral-300/80 dark:border-white/10 bg-white dark:bg-[#323232] px-2.5 py-1 text-xs font-medium text-neutral-700 dark:text-neutral-200 shadow-2xs hover:bg-neutral-50 dark:hover:bg-[#3c3c3c] transition-all"
+                                    >
+                                        <svg class="size-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                                        </svg>
+                                        <span>{{ $this->t('btn_open') }}</span>
+                                    </button>
+                                @else
+                                    <button
+                                        type="button"
+                                        wire:click="installCatalogApp('{{ $catApp['id'] }}')"
+                                        wire:loading.attr="disabled"
+                                        wire:target="installCatalogApp('{{ $catApp['id'] }}')"
+                                        style="background-color: var(--accent-color, {{ $accent['hex'] }});"
+                                        class="inline-flex items-center gap-1.5 rounded-md px-3.5 py-1 text-xs font-medium text-white shadow-xs transition-all hover:brightness-110 active:scale-95 disabled:opacity-50"
+                                    >
+                                        <span wire:loading.remove wire:target="installCatalogApp('{{ $catApp['id'] }}')" class="inline-flex items-center gap-1">
+                                            <svg class="size-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                                            </svg>
+                                            <span>{{ $this->t('btn_one_click_install') }}</span>
+                                        </span>
+                                        <span wire:loading wire:target="installCatalogApp('{{ $catApp['id'] }}')" class="inline-flex items-center gap-1">
+                                            <svg class="size-3 animate-spin" fill="none" viewBox="0 0 24 24">
+                                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                                            </svg>
+                                            <span>{{ $this->t('btn_installing_catalog') }}</span>
+                                        </span>
+                                    </button>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                @empty
+                    <div class="col-span-full rounded-lg border border-neutral-200/90 dark:border-white/5 bg-white dark:bg-[#2b2b2b]/70 py-12 text-center">
+                        <div class="flex flex-col items-center justify-center gap-2">
+                            <div class="flex size-12 items-center justify-center rounded-lg bg-neutral-100 dark:bg-white/5 text-neutral-400">
+                                <svg class="size-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                                </svg>
+                            </div>
+                            <p class="text-sm font-medium text-neutral-700 dark:text-neutral-300">{{ $this->t('catalog_empty_title') }}</p>
+                            <p class="text-xs text-neutral-500">{{ $this->t('catalog_empty_desc') }}</p>
+                        </div>
+                    </div>
+                @endforelse
+            </div>
+        </div>
+    @else
+        {{-- ========================================================= --}}
+        {{-- INSTALLED APPS (WINDOWS 11 FLUENT LIST TILES) --}}
+        {{-- ========================================================= --}}
     <div class="flex-1 overflow-y-auto px-6 pb-4">
         <div class="flex flex-col gap-1.5">
             @forelse ($applications as $app)
@@ -423,6 +617,7 @@
             @endforelse
         </div>
     </div>
+    @endif
 
     {{-- ========================================================= --}}
     {{-- BOTTOM STATUS BAR (WINDOWS 11 COMPACT INFO BAR) --}}
@@ -452,7 +647,13 @@
             @else
                 <div class="flex items-center gap-2 truncate">
                     <span class="inline-block size-1.5 rounded-full bg-neutral-400 dark:bg-neutral-600 shrink-0"></span>
-                    <span class="truncate">{{ $this->t('total_apps_status', ['total' => $stats['total'], 'system' => $stats['system'], 'custom' => $stats['custom']]) }}</span>
+                    <span class="truncate">
+                        @if ($activeTab === 'catalog')
+                            {{ $this->t('tab_catalog') }}: {{ count($catalogApps) }} template aplikasi
+                        @else
+                            {{ $this->t('total_apps_status', ['total' => $stats['total'], 'system' => $stats['system'], 'custom' => $stats['custom']]) }}
+                        @endif
+                    </span>
                 </div>
             @endif
         </div>

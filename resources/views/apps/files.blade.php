@@ -18,7 +18,14 @@
     }"
     @click="closeContextMenu(); showNewMenu = false"
     @keydown.escape.window="closeContextMenu(); showNewMenu = false"
+    @trash-updated.window="
+        const c = $event.detail?.count ?? $event.detail?.[0]?.count ?? (typeof $event.detail === 'number' ? $event.detail : null);
+        if (c !== null && c !== undefined) {
+            $wire.trashCount = Number(c);
+        }
+    "
     class="flex h-full min-h-125 w-full flex-col overflow-hidden bg-[#f3f3f3] dark:bg-[#202020] text-neutral-800 dark:text-neutral-100 font-sans select-none relative"
+    style="--accent-color: {{ $accent['hex'] }};"
 >
 
     {{-- ========================================================= --}}
@@ -146,103 +153,123 @@
     {{-- ========================================================= --}}
     <div class="relative z-30 flex shrink-0 items-center justify-between border-b border-neutral-200/90 dark:border-white/5 bg-[#f8f8f8]/90 dark:bg-[#262626]/80 px-4 py-1.5 text-xs backdrop-blur-md gap-3">
         <div class="flex items-center gap-1.5 flex-wrap">
-            {{-- Tombol Baru (+ New Dropdown) --}}
-            <div class="relative">
+            @if ($this->isInTrash)
+                {{-- Tombol Kosongkan Tempat Sampah (Empty Trash) --}}
                 <button
                     type="button"
-                    @click.stop="showNewMenu = !showNewMenu"
-                    style="background-color: var(--accent-color, {{ $accent['hex'] }});"
-                    class="flex items-center gap-1.5 rounded-md px-3 py-1 text-xs font-medium text-white shadow-2xs hover:brightness-110 active:scale-98 transition-all"
+                    wire:click="emptyTrash"
+                    @disabled(count($this->items) === 0)
+                    title="{{ $this->t('ctx_empty_trash') }}"
+                    class="flex items-center gap-1.5 rounded-md border border-neutral-300/80 dark:border-white/10 bg-white dark:bg-[#2b2b2b] px-3 py-1 text-xs font-medium text-neutral-700 dark:text-neutral-200 shadow-2xs hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-500/10 dark:hover:text-rose-400 hover:border-rose-300 dark:hover:border-rose-500/20 disabled:opacity-40 disabled:pointer-events-none transition-all active:scale-98"
                 >
-                    <flux:icon name="plus" class="size-3.5 stroke-[2.5]" />
-                    <span>{{ $this->t('btn_new') }}</span>
-                    <flux:icon name="chevron-down" class="size-3" />
+                    <flux:icon name="trash" class="size-3.5 text-rose-500" />
+                    <span>{{ $this->t('ctx_empty_trash') }}</span>
                 </button>
+            @elseif (! $this->isSystemProtected)
+                {{-- Tombol Baru (+ New Dropdown) --}}
+                <div class="relative">
+                    <button
+                        type="button"
+                        @click.stop="showNewMenu = !showNewMenu"
+                        style="background-color: var(--accent-color, {{ $accent['hex'] }});"
+                        class="flex items-center gap-1.5 rounded-md px-3 py-1 text-xs font-medium text-white shadow-2xs hover:brightness-110 active:scale-98 transition-all"
+                    >
+                        <flux:icon name="plus" class="size-3.5 stroke-[2.5]" />
+                        <span>{{ $this->t('btn_new') }}</span>
+                        <flux:icon name="chevron-down" class="size-3" />
+                    </button>
 
-                {{-- Dropdown Menu Baru --}}
-                <div
-                    x-show="showNewMenu"
-                    x-transition:enter="transition ease-out duration-100"
-                    x-transition:enter-start="opacity-0 scale-95"
-                    x-transition:enter-end="opacity-100 scale-100"
-                    x-transition:leave="transition ease-in duration-75"
-                    x-transition:leave-start="opacity-100 scale-100"
-                    x-transition:leave-end="opacity-0 scale-95"
-                    class="absolute left-0 top-full mt-1.5 w-48 rounded-xl border border-neutral-200/90 dark:border-white/10 bg-white/95 dark:bg-[#2b2b2b]/95 p-1.5 shadow-2xl backdrop-blur-xl z-50 space-y-0.5"
-                    style="display: none;"
-                >
-                    <button
-                        type="button"
-                        wire:click="openNewFolderModal"
-                        @click="showNewMenu = false"
-                        class="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-xs text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-white/10 transition-colors"
+                    {{-- Dropdown Menu Baru --}}
+                    <div
+                        x-show="showNewMenu"
+                        x-transition:enter="transition ease-out duration-100"
+                        x-transition:enter-start="opacity-0 scale-95"
+                        x-transition:enter-end="opacity-100 scale-100"
+                        x-transition:leave="transition ease-in duration-75"
+                        x-transition:leave-start="opacity-100 scale-100"
+                        x-transition:leave-end="opacity-0 scale-95"
+                        class="absolute left-0 top-full mt-1.5 w-48 rounded-xl border border-neutral-200/90 dark:border-white/10 bg-white/95 dark:bg-[#2b2b2b]/95 p-1.5 shadow-2xl backdrop-blur-xl z-50 space-y-0.5"
+                        style="display: none;"
                     >
-                        <flux:icon name="folder-plus" class="size-4 text-amber-500" />
-                        <span>{{ $this->t('menu_new_folder') }}</span>
-                    </button>
-                    <button
-                        type="button"
-                        wire:click="openNewFileModal"
-                        @click="showNewMenu = false"
-                        class="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-xs text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-white/10 transition-colors"
-                    >
-                        <flux:icon name="document-plus" class="size-4 text-sky-500" />
-                        <span>{{ $this->t('menu_new_file') }}</span>
-                    </button>
+                        <button
+                            type="button"
+                            wire:click="openNewFolderModal"
+                            @click="showNewMenu = false"
+                            class="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-xs text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-white/10 transition-colors"
+                        >
+                            <flux:icon name="folder-plus" class="size-4 text-amber-500" />
+                            <span>{{ $this->t('menu_new_folder') }}</span>
+                        </button>
+                        <button
+                            type="button"
+                            wire:click="openNewFileModal"
+                            @click="showNewMenu = false"
+                            class="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-xs text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-white/10 transition-colors"
+                        >
+                            <flux:icon name="document-plus" class="size-4 text-sky-500" />
+                            <span>{{ $this->t('menu_new_file') }}</span>
+                        </button>
+                    </div>
                 </div>
-            </div>
 
-            {{-- Tombol Unggah (Upload) --}}
-            <button
-                type="button"
-                wire:click="openUploadModal"
-                class="flex items-center gap-1.5 rounded-md border border-neutral-300/80 dark:border-white/10 bg-white dark:bg-[#2b2b2b] px-3 py-1 text-xs font-medium text-neutral-700 dark:text-neutral-200 shadow-2xs hover:bg-neutral-50 dark:hover:bg-[#333333] transition-all active:scale-98"
-            >
-                <flux:icon name="arrow-up-tray" class="size-3.5 text-neutral-500 dark:text-neutral-400" />
-                <span>{{ $this->t('btn_upload') }}</span>
-            </button>
+                {{-- Tombol Unggah (Upload) --}}
+                <button
+                    type="button"
+                    wire:click="openUploadModal"
+                    class="flex items-center gap-1.5 rounded-md border border-neutral-300/80 dark:border-white/10 bg-white dark:bg-[#2b2b2b] px-3 py-1 text-xs font-medium text-neutral-700 dark:text-neutral-200 shadow-2xs hover:bg-neutral-50 dark:hover:bg-[#333333] transition-all active:scale-98"
+                >
+                    <flux:icon name="arrow-up-tray" class="size-3.5 text-neutral-500 dark:text-neutral-400" />
+                    <span>{{ $this->t('btn_upload') }}</span>
+                </button>
+            @endif
 
             {{-- Action Buttons if Item Selected --}}
             @if ($selectedPath)
-                <div class="h-3.5 w-px bg-neutral-300/80 dark:bg-white/10 mx-1"></div>
+                @if ($this->isInTrash || ! $this->isSystemProtected)
+                    <div class="h-3.5 w-px bg-neutral-300/80 dark:bg-white/10 mx-1"></div>
+                @endif
 
-                {{-- Unduh File --}}
-                <button
-                    type="button"
-                    wire:click="downloadFile('{{ $selectedPath }}')"
-                    title="{{ $this->t('btn_download') }}"
-                    class="flex items-center gap-1.5 rounded-md border border-neutral-300/80 dark:border-white/10 bg-white dark:bg-[#2b2b2b] px-2.5 py-1 text-xs font-medium text-neutral-700 dark:text-neutral-200 shadow-2xs hover:bg-neutral-50 dark:hover:bg-[#333333] transition-all"
-                >
-                    <flux:icon name="arrow-down-tray" class="size-3.5 text-neutral-500 dark:text-neutral-400" />
-                    <span class="hidden sm:inline">{{ $this->t('btn_download') }}</span>
-                </button>
+                @if (! $this->isInTrash)
+                    {{-- Unduh File --}}
+                    <button
+                        type="button"
+                        wire:click="downloadFile('{{ $selectedPath }}')"
+                        title="{{ $this->t('btn_download') }}"
+                        class="flex items-center gap-1.5 rounded-md border border-neutral-300/80 dark:border-white/10 bg-white dark:bg-[#2b2b2b] px-2.5 py-1 text-xs font-medium text-neutral-700 dark:text-neutral-200 shadow-2xs hover:bg-neutral-50 dark:hover:bg-[#333333] transition-all"
+                    >
+                        <flux:icon name="arrow-down-tray" class="size-3.5 text-neutral-500 dark:text-neutral-400" />
+                        <span class="hidden sm:inline">{{ $this->t('btn_download') }}</span>
+                    </button>
 
-                {{-- Ganti Nama --}}
-                <button
-                    type="button"
-                    wire:click="openRenameModal('{{ $selectedPath }}')"
-                    title="{{ $this->t('btn_rename') }}"
-                    class="flex items-center gap-1.5 rounded-md border border-neutral-300/80 dark:border-white/10 bg-white dark:bg-[#2b2b2b] px-2.5 py-1 text-xs font-medium text-neutral-700 dark:text-neutral-200 shadow-2xs hover:bg-neutral-50 dark:hover:bg-[#333333] transition-all"
-                >
-                    <flux:icon name="pencil-square" class="size-3.5 text-neutral-500 dark:text-neutral-400" />
-                    <span class="hidden sm:inline">{{ $this->t('btn_rename') }}</span>
-                </button>
+                    @if (! $this->isSystemProtected)
+                        {{-- Ganti Nama --}}
+                        <button
+                            type="button"
+                            wire:click="openRenameModal('{{ $selectedPath }}')"
+                            title="{{ $this->t('btn_rename') }}"
+                            class="flex items-center gap-1.5 rounded-md border border-neutral-300/80 dark:border-white/10 bg-white dark:bg-[#2b2b2b] px-2.5 py-1 text-xs font-medium text-neutral-700 dark:text-neutral-200 shadow-2xs hover:bg-neutral-50 dark:hover:bg-[#333333] transition-all"
+                        >
+                            <flux:icon name="pencil-square" class="size-3.5 text-neutral-500 dark:text-neutral-400" />
+                            <span class="hidden sm:inline">{{ $this->t('btn_rename') }}</span>
+                        </button>
+                    @endif
+                @endif
 
-                {{-- Hapus --}}
+                {{-- Hapus (Hapus Permanen jika di Trash) --}}
                 <button
                     type="button"
                     wire:click="openDeleteModal('{{ $selectedPath }}', false)"
-                    title="{{ $this->t('btn_delete') }}"
+                    title="{{ $this->isInTrash ? __('Hapus Permanen') : $this->t('btn_delete') }}"
                     class="flex items-center gap-1.5 rounded-md border border-rose-300/80 dark:border-rose-500/20 bg-rose-50/50 dark:bg-rose-500/10 px-2.5 py-1 text-xs font-medium text-rose-600 dark:text-rose-400 shadow-2xs hover:bg-rose-100 dark:hover:bg-rose-500/20 transition-all"
                 >
                     <flux:icon name="trash" class="size-3.5 text-rose-500" />
-                    <span class="hidden sm:inline">{{ $this->t('btn_delete') }}</span>
+                    <span class="hidden sm:inline">{{ $this->isInTrash ? __('Hapus Permanen') : $this->t('btn_delete') }}</span>
                 </button>
 
                 {{-- Batal Seleksi --}}
                 <button
                     type="button"
-                    wire:click="$set('selectedPath', null)"
+                    @click="$dispatch('close-details'); setTimeout(() => $wire.set('selectedPath', null), 180)"
                     title="{{ $this->t('btn_clear_selection') }}"
                     class="text-neutral-400 hover:text-neutral-700 dark:hover:text-white p-1"
                 >
@@ -251,7 +278,9 @@
             @endif
 
             {{-- Divider --}}
-            <div class="h-3.5 w-px bg-neutral-300/80 dark:bg-white/10 mx-1"></div>
+            @if ($this->isInTrash || ! $this->isSystemProtected || $selectedPath)
+                <div class="h-3.5 w-px bg-neutral-300/80 dark:bg-white/10 mx-1"></div>
+            @endif
 
             {{-- Tampilan View Mode Toggle --}}
             <div class="flex items-center rounded-md border border-neutral-300/70 dark:border-white/10 bg-white/80 dark:bg-[#202020]/80 p-0.5 shadow-2xs">
@@ -273,7 +302,15 @@
                 </button>
             </div>
 
-            
+            {{-- Toggle Panel Detail --}}
+            <button
+                type="button"
+                @click="if ($wire.selectedPath && $wire.showDetailsPanel) { $dispatch('close-details'); setTimeout(() => $wire.toggleDetailsPanel(), 200); } else { $wire.toggleDetailsPanel(); }"
+                title="{{ $this->t('btn_toggle_details') }}"
+                class="flex size-7 items-center justify-center rounded-md border border-neutral-300/70 dark:border-white/10 bg-white/80 dark:bg-[#202020]/80 transition-all {{ $showDetailsPanel ? 'bg-neutral-200/90 dark:bg-white/15 '.$accent['text'].' font-medium shadow-2xs' : 'text-neutral-500 hover:text-neutral-800 dark:hover:text-white' }}"
+            >
+                <flux:icon name="information-circle" class="size-4" />
+            </button>
         </div>
 
         {{-- Current Path Pill --}}
@@ -453,6 +490,28 @@
                         </div>
                         <span class="truncate">{{ $this->t('nav_framework_cache') }}</span>
                     </button>
+
+                    {{-- Trash Can Nav Item --}}
+                    <button
+                        type="button"
+                        wire:click="navigate('.trash')"
+                        class="group relative flex items-center justify-between rounded-md px-2.5 py-1.5 text-left transition-all {{ $this->isInTrash ? 'bg-white dark:bg-white/10 text-neutral-900 dark:text-white shadow-2xs font-semibold' : 'text-neutral-600 dark:text-neutral-400 hover:bg-black/[0.04] dark:hover:bg-white/5 hover:text-neutral-900 dark:hover:text-white' }}"
+                    >
+                        @if ($this->isInTrash)
+                            <span class="absolute left-0 top-1/2 -translate-y-1/2 h-3.5 w-1 rounded-r-full" style="background-color: var(--accent-color, {{ $accent['hex'] }});"></span>
+                        @endif
+                        <div class="flex items-center gap-2.5 min-w-0">
+                            <div class="flex size-5 items-center justify-center rounded text-rose-500">
+                                <flux:icon name="trash" class="size-4" />
+                            </div>
+                            <span class="truncate">{{ __('Trash') }}</span>
+                        </div>
+                        <span
+                            x-show="$wire.trashCount > 0"
+                            class="rounded-full bg-neutral-200 dark:bg-neutral-700 px-1.5 py-0.2 text-[10px] font-mono text-neutral-600 dark:text-neutral-300"
+                            x-text="$wire.trashCount"
+                        ></span>
+                    </button>
                 </nav>
             </div>
 
@@ -489,7 +548,7 @@
         </aside>
 
         {{-- Main File View Area --}}
-        <main class="flex-1 bg-white dark:bg-[#191919] p-4 sm:p-5 overflow-y-auto">
+        <main class="flex-1 bg-white dark:bg-[#191919] p-4 sm:p-5 overflow-y-auto transition-all duration-200" @if ($this->isInTrash) @contextmenu.prevent="openContextMenu($event, null)" @endif @click.self="$dispatch('close-details'); setTimeout(() => $wire.set('selectedPath', null), 180)">
             @if ($this->isLocked)
                 {{-- Windows 11 Security Access Prompt --}}
                 <div class="flex h-full w-full flex-col items-center justify-center text-center p-8 space-y-4">
@@ -530,7 +589,7 @@
                     {{-- ========================================================= --}}
                     {{-- GRID VIEW (WINDOWS 11 TILES / ICONS)                     --}}
                     {{-- ========================================================= --}}
-                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-2.5">
+                    <div class="grid grid-cols-[repeat(auto-fill,minmax(104px,1fr))] gap-2.5 sm:gap-3 transition-all duration-200">
                         @foreach ($this->items as $item)
                             @php
                                 $isSelected = $selectedPath === $item['path'];
@@ -538,8 +597,11 @@
                             <div
                                 @contextmenu.prevent.stop="openContextMenu($event, { path: '{{ $item['path'] }}', name: '{{ addslashes($item['name']) }}', is_dir: {{ $item['is_dir'] ? 'true' : 'false' }} })"
                                 wire:click="selectItem('{{ $item['path'] }}')"
-                                @dblclick="@if ($item['is_dir']) $wire.navigate('{{ $item['path'] }}') @else $wire.openPreview('{{ $item['path'] }}') @endif"
+                                @dblclick.stop="@if ($item['is_dir']) $wire.navigate('{{ $item['path'] }}') @else $wire.openPreview('{{ $item['path'] }}') @endif"
                                 class="group relative flex flex-col items-center gap-1.5 p-3 rounded-xl border transition-all text-center cursor-pointer select-none active:scale-98 {{ $isSelected ? ($accent['radio_card'] ?? 'border-indigo-500 bg-indigo-500/10 ring-1 ring-indigo-500') : 'border-transparent hover:border-neutral-200/80 dark:hover:border-white/10 hover:bg-neutral-100/70 dark:hover:bg-white/5' }}"
+                                @if ($isSelected)
+                                    style="border-color: var(--accent-color, {{ $accent['hex'] }}); background-color: color-mix(in srgb, var(--accent-color, {{ $accent['hex'] }}) 14%, transparent); box-shadow: 0 0 0 1px var(--accent-color, {{ $accent['hex'] }});"
+                                @endif
                             >
                                 {{-- 3-Dots Quick Action Button (Hover) --}}
                                 <button
@@ -554,8 +616,7 @@
                                 @if ($item['is_dir'])
                                     {{-- Windows 11 Fluent 3D Folder Icon --}}
                                     <div
-                                        wire:click.stop="navigate('{{ $item['path'] }}')"
-                                        class="relative flex size-13 items-center justify-center transition-transform group-hover:scale-105"
+                                        class="relative flex size-13 items-center justify-center transition-transform group-hover:scale-105 pointer-events-none"
                                     >
                                         <svg class="size-12 drop-shadow-xs" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
                                             {{-- Back Flap --}}
@@ -575,8 +636,7 @@
                                 @else
                                     {{-- Windows 11 Fluent File Icons --}}
                                     <div
-                                        wire:click.stop="openPreview('{{ $item['path'] }}')"
-                                        class="flex size-13 items-center justify-center transition-transform group-hover:scale-105"
+                                        class="flex size-13 items-center justify-center transition-transform group-hover:scale-105 pointer-events-none"
                                     >
                                         @if (in_array($item['extension'], ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg']))
                                             <div class="flex size-11 items-center justify-center rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 shadow-2xs">
@@ -662,12 +722,13 @@
                                     <tr
                                         @contextmenu.prevent.stop="openContextMenu($event, { path: '{{ $item['path'] }}', name: '{{ addslashes($item['name']) }}', is_dir: {{ $item['is_dir'] ? 'true' : 'false' }} })"
                                         wire:click="selectItem('{{ $item['path'] }}')"
-                                        class="group cursor-pointer transition-colors {{ $isSelected ? 'bg-neutral-100 dark:bg-white/10 font-medium' : 'hover:bg-neutral-100/70 dark:hover:bg-white/5' }}"
+                                        @dblclick.stop="@if ($item['is_dir']) $wire.navigate('{{ $item['path'] }}') @else $wire.openPreview('{{ $item['path'] }}') @endif"
+                                        class="group cursor-pointer transition-colors {{ $isSelected ? ($accent['selected_row'] ?? 'bg-indigo-500/10 dark:bg-indigo-500/15 ring-1 ring-inset ring-indigo-500/30 font-medium') : 'hover:bg-neutral-100/70 dark:hover:bg-white/5' }}"
+                                        @if ($isSelected)
+                                            style="background-color: color-mix(in srgb, var(--accent-color, {{ $accent['hex'] }}) 14%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent-color, {{ $accent['hex'] }}) 35%, transparent);"
+                                        @endif
                                     >
-                                        <td
-                                            @if ($item['is_dir']) wire:click.stop="navigate('{{ $item['path'] }}')" @else wire:click.stop="openPreview('{{ $item['path'] }}')" @endif
-                                            class="py-2 px-3 flex items-center gap-2.5"
-                                        >
+                                        <td class="py-2 px-3 flex items-center gap-2.5">
                                             @if ($item['is_dir'])
                                                 <flux:icon name="folder" class="size-4 text-amber-500 shrink-0" />
                                             @elseif (in_array($item['extension'], ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg']))
@@ -689,23 +750,6 @@
                                                     ({{ $item['location'] }})
                                                 </span>
                                             @endif
-                                        </td>
-                                            @if ($item['is_dir'])
-                                                <flux:icon name="folder" class="size-4 text-amber-500 shrink-0" />
-                                            @elseif (in_array($item['extension'], ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg']))
-                                                <flux:icon name="photo" class="size-4 text-emerald-500 shrink-0" />
-                                            @elseif ($item['extension'] === 'pdf')
-                                                <flux:icon name="document" class="size-4 text-rose-500 shrink-0" />
-                                            @elseif (in_array($item['extension'], ['zip', 'tar', 'gz', 'rar']))
-                                                <flux:icon name="archive-box" class="size-4 text-amber-500 shrink-0" />
-                                            @elseif (in_array($item['extension'], ['php', 'js', 'json', 'md', 'css', 'html', 'txt', 'log']))
-                                                <flux:icon name="document-text" class="size-4 text-sky-500 shrink-0" />
-                                            @else
-                                                <flux:icon name="document" class="size-4 text-neutral-400 shrink-0" />
-                                            @endif
-                                            <span class="text-neutral-900 dark:text-neutral-100 group-hover:text-neutral-900 dark:group-hover:text-white truncate">
-                                                {{ $item['name'] }}
-                                            </span>
                                         </td>
                                         <td class="py-2 px-3 text-neutral-500 dark:text-neutral-400 whitespace-nowrap">
                                             {{ $item['updated_at'] }}
@@ -734,6 +778,195 @@
                 @endif
             @endif
         </main>
+
+        {{-- Right Inspector / Details Pane (Windows 11 Style) --}}
+        @if ($showDetailsPanel && $this->selectedItem)
+            @php $item = $this->selectedItem; @endphp
+            <aside
+                wire:key="files-details-inspector"
+                x-data="{
+                    closing: false,
+                    closeDetails() {
+                        if (this.closing) return;
+                        this.closing = true;
+                        setTimeout(() => {
+                            $wire.set('selectedPath', null);
+                        }, 200);
+                    }
+                }"
+                @close-details.window="closeDetails()"
+                :class="closing ? 'translate-x-full opacity-0 pointer-events-none' : 'translate-x-0 opacity-100'"
+                class="w-64 sm:w-72 shrink-0 border-l border-neutral-200/90 dark:border-white/5 bg-[#fafafa]/90 dark:bg-[#202020]/90 backdrop-blur-md flex flex-col overflow-y-auto select-none transition-all duration-200 ease-out transform animate-[detailsSlideIn_0.22s_cubic-bezier(0.16,1,0.3,1)]"
+            >
+                {{-- Panel Header --}}
+                <div class="flex items-center justify-between px-4 py-3 border-b border-neutral-200/60 dark:border-white/5">
+                    <span class="text-xs font-semibold text-neutral-800 dark:text-neutral-200">{{ $this->t('panel_details_title') }}</span>
+                    <button
+                        type="button"
+                        @click="closeDetails()"
+                        class="p-1 rounded-md text-neutral-400 hover:text-neutral-700 dark:hover:text-white hover:bg-neutral-200/60 dark:hover:bg-white/10 transition-colors"
+                        title="{{ $this->t('btn_close_panel') }}"
+                    >
+                        <flux:icon name="x-mark" class="size-4" />
+                    </button>
+                </div>
+
+                <div class="p-4 flex flex-col items-center text-center space-y-3">
+                    {{-- Large Preview / Icon --}}
+                    <div class="size-24 rounded-xl flex items-center justify-center bg-white dark:bg-white/5 border border-neutral-200/80 dark:border-white/10 shadow-xs overflow-hidden">
+                        @if (!empty($item['preview_thumb']))
+                            <img src="{{ $item['preview_thumb'] }}" alt="{{ $item['name'] }}" class="h-full w-full object-cover">
+                        @elseif ($item['is_dir'])
+                            <svg class="size-16 drop-shadow-sm" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M4 10C4 7.79086 5.79086 6 8 6H18.5858C19.6466 6 20.664 6.42143 21.4142 7.17157L24.8284 10.5858C25.5786 11.3359 26.596 11.7574 27.6569 11.7574H40C42.2091 11.7574 44 13.5482 44 15.7574V38C44 40.2091 42.2091 42 40 42H8C5.79086 42 4 40.2091 4 38V10Z" fill="#F1A21A"/>
+                                <rect x="8" y="11" width="32" height="14" rx="2" fill="#FFF2D6"/>
+                                <path d="M4 17C4 14.7909 5.79086 13 8 13H40C42.2091 13 44 14.7909 44 17V38C44 40.2091 42.2091 42 40 42H8C5.79086 42 4 40.2091 4 38V17Z" fill="url(#panel_folder_grad)"/>
+                                <defs>
+                                    <linearGradient id="panel_folder_grad" x1="24" y1="13" x2="24" y2="42" gradientUnits="userSpaceOnUse">
+                                        <stop stop-color="#FFD453"/>
+                                        <stop offset="1" stop-color="#F5B228"/>
+                                    </linearGradient>
+                                </defs>
+                            </svg>
+                        @elseif (in_array($item['extension'], ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg']))
+                            <div class="flex size-14 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-500">
+                                <flux:icon name="photo" class="size-8" />
+                            </div>
+                        @elseif ($item['extension'] === 'pdf')
+                            <div class="flex size-14 items-center justify-center rounded-2xl bg-rose-500/10 text-rose-500">
+                                <flux:icon name="document" class="size-8" />
+                            </div>
+                        @elseif (in_array($item['extension'], ['zip', 'tar', 'gz', 'rar']))
+                            <div class="flex size-14 items-center justify-center rounded-2xl bg-amber-500/10 text-amber-500">
+                                <flux:icon name="archive-box" class="size-8" />
+                            </div>
+                        @elseif (in_array($item['extension'], ['php', 'js', 'json', 'md', 'css', 'html', 'txt', 'log']))
+                            <div class="flex size-14 items-center justify-center rounded-2xl bg-sky-500/10 text-sky-500">
+                                <flux:icon name="document-text" class="size-8" />
+                            </div>
+                        @else
+                            <div class="flex size-14 items-center justify-center rounded-2xl bg-neutral-200/80 dark:bg-white/10 text-neutral-600 dark:text-neutral-300">
+                                <flux:icon name="document" class="size-8" />
+                            </div>
+                        @endif
+                    </div>
+
+                    {{-- Name --}}
+                    <div class="w-full">
+                        <div class="text-sm font-semibold text-neutral-900 dark:text-white break-words select-text" title="{{ $item['name'] }}">
+                            {{ $item['name'] }}
+                        </div>
+                        <div class="text-[11px] text-neutral-500 dark:text-neutral-400 mt-0.5">
+                            {{ $item['is_dir'] ? $this->t('word_folder_type') : strtoupper($item['extension'] ?: 'File') }}
+                        </div>
+                    </div>
+
+                    {{-- Primary Action Button --}}
+                    <div class="w-full pt-1 flex gap-2">
+                        @if ($item['is_dir'])
+                            <button
+                                type="button"
+                                wire:click="navigate('{{ $item['path'] }}')"
+                                class="flex-1 inline-flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg text-xs font-medium text-white shadow-xs transition-opacity hover:opacity-95"
+                                style="background-color: var(--accent-color, {{ $accent['hex'] }});"
+                            >
+                                <flux:icon name="folder-open" class="size-3.5" />
+                                <span>{{ $this->t('btn_open_folder') }}</span>
+                            </button>
+                        @else
+                            <button
+                                type="button"
+                                wire:click="openPreview('{{ $item['path'] }}')"
+                                class="flex-1 inline-flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg text-xs font-medium text-white shadow-xs transition-opacity hover:opacity-95"
+                                style="background-color: var(--accent-color, {{ $accent['hex'] }});"
+                            >
+                                <flux:icon name="eye" class="size-3.5" />
+                                <span>{{ $this->t('btn_preview_file') }}</span>
+                            </button>
+                        @endif
+
+                        @if (! $item['is_dir'] && ! $this->isInTrash)
+                            <button
+                                type="button"
+                                wire:click="downloadFile('{{ $item['path'] }}')"
+                                class="inline-flex items-center justify-center p-1.5 rounded-lg border border-neutral-300/80 dark:border-white/10 text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-white/5 transition-colors"
+                                title="{{ $this->t('btn_download') }}"
+                            >
+                                <flux:icon name="arrow-down-tray" class="size-4" />
+                            </button>
+                        @endif
+                    </div>
+                </div>
+
+                {{-- Property Details Table / List --}}
+                <div class="flex-1 px-4 py-2 border-t border-neutral-200/60 dark:border-white/5 space-y-3 text-xs">
+                    <div class="text-[10px] font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">
+                        {{ $this->t('panel_details_title') }}
+                    </div>
+
+                    <div class="space-y-2.5">
+                        <div class="flex flex-col gap-0.5">
+                            <span class="text-[11px] text-neutral-500 dark:text-neutral-400">{{ $this->t('lbl_details_type') }}</span>
+                            <span class="font-medium text-neutral-800 dark:text-neutral-200 break-words">
+                                {{ $item['is_dir'] ? $this->t('word_folder_type') : ($item['extension'] ? strtoupper($item['extension']) . ' File' : 'File') }}
+                            </span>
+                        </div>
+
+                        <div class="flex flex-col gap-0.5">
+                            <span class="text-[11px] text-neutral-500 dark:text-neutral-400">{{ $this->t('lbl_details_size') }}</span>
+                            <span class="font-medium text-neutral-800 dark:text-neutral-200 font-mono text-[11px]">
+                                {{ $item['size'] }}
+                            </span>
+                        </div>
+
+                        <div class="flex flex-col gap-0.5">
+                            <span class="text-[11px] text-neutral-500 dark:text-neutral-400">{{ $this->t('lbl_details_location') }}</span>
+                            <span class="font-medium text-neutral-800 dark:text-neutral-200 font-mono text-[11px] truncate select-text" title="{{ $item['path'] }}">
+                                {{ $item['path'] }}
+                            </span>
+                        </div>
+
+                        @if (isset($item['original_path']) && $item['original_path'])
+                            <div class="flex flex-col gap-0.5">
+                                <span class="text-[11px] text-neutral-500 dark:text-neutral-400">{{ $this->t('lbl_details_original_path') }}</span>
+                                <span class="font-medium text-neutral-800 dark:text-neutral-200 font-mono text-[11px] truncate select-text" title="{{ $item['original_path'] }}">
+                                    {{ $item['original_path'] }}
+                                </span>
+                            </div>
+                        @endif
+
+                        <div class="flex flex-col gap-0.5">
+                            <span class="text-[11px] text-neutral-500 dark:text-neutral-400">{{ $this->t('lbl_details_modified') }}</span>
+                            <span class="font-medium text-neutral-800 dark:text-neutral-200 text-[11px]">
+                                {{ $item['updated_at'] }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Trash Quick Actions if item is in trash --}}
+                @if ($this->isInTrash)
+                    <div class="p-4 border-t border-neutral-200/60 dark:border-white/5 flex gap-2">
+                        <button
+                            type="button"
+                            wire:click="restoreTrashItem('{{ $item['path'] }}')"
+                            class="flex-1 py-1.5 px-2.5 rounded-lg text-xs font-medium bg-neutral-200/80 dark:bg-white/10 hover:bg-neutral-300 dark:hover:bg-white/20 text-neutral-800 dark:text-neutral-200 transition-colors flex items-center justify-center gap-1.5"
+                        >
+                            <flux:icon name="arrow-uturn-left" class="size-3.5" />
+                            <span>{{ $this->t('trash_restore_item') }}</span>
+                        </button>
+                        <button
+                            type="button"
+                            wire:click="deleteForever('{{ $item['path'] }}')"
+                            class="py-1.5 px-2.5 rounded-lg text-xs font-medium bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 transition-colors"
+                            title="{{ $this->t('trash_delete_forever') }}"
+                        >
+                            <flux:icon name="trash" class="size-3.5" />
+                        </button>
+                    </div>
+                @endif
+            </aside>
+        @endif
     </div>
 
     {{-- ========================================================= --}}
@@ -743,7 +976,10 @@
         <div class="flex items-center gap-2">
             <span>{{ $this->t('footer_item_count', ['count' => count($this->items)]) }}</span>
             @if ($selectedPath)
-                <span class="rounded bg-neutral-200 dark:bg-white/10 px-1.5 py-0.2 text-[10px] text-neutral-700 dark:text-neutral-300">
+                <span
+                    class="rounded px-1.5 py-0.2 text-[10px] font-medium"
+                    style="color: var(--accent-color, {{ $accent['hex'] }}); background-color: color-mix(in srgb, var(--accent-color, {{ $accent['hex'] }}) 14%, transparent);"
+                >
                     {{ $this->t('status_selected_one') }}
                 </span>
             @endif
@@ -775,6 +1011,14 @@
                 >
                     <flux:icon name="list-bullet" class="size-3.5" />
                 </button>
+                <button
+                    type="button"
+                    wire:click="toggleDetailsPanel"
+                    title="{{ $this->t('btn_toggle_details') }}"
+                    class="p-0.5 rounded hover:text-neutral-900 dark:hover:text-white {{ $showDetailsPanel ? $accent['text'] : '' }}"
+                >
+                    <flux:icon name="information-circle" class="size-3.5" />
+                </button>
             </div>
         </div>
     </footer>
@@ -794,55 +1038,103 @@
         class="fixed z-50 w-52 rounded-xl border border-neutral-200/90 dark:border-white/10 bg-white/95 dark:bg-[#2b2b2b]/95 p-1.5 shadow-2xl backdrop-blur-xl text-xs space-y-0.5"
         style="display: none;"
     >
-        {{-- Item Info Header in Context Menu --}}
-        <div class="px-2 py-1 border-b border-neutral-200/80 dark:border-white/10 mb-1">
-            <span class="block truncate font-semibold text-neutral-900 dark:text-white" x-text="contextItem?.name"></span>
-        </div>
+        @if ($this->isInTrash)
+            {{-- CONTEXT MENU KHUSUS TEMPAT SAMPAH (TRASH) --}}
+            <div class="px-2 py-1 border-b border-neutral-200/80 dark:border-white/10 mb-1">
+                <span class="block truncate font-semibold text-neutral-900 dark:text-white" x-text="contextItem?.name || '{{ __('Tempat Sampah') }}'"></span>
+            </div>
 
-        {{-- Buka / Pratinjau --}}
-        <button
-            type="button"
-            @click="if (contextItem?.is_dir) { $wire.navigate(contextItem.path); } else { $wire.openPreview(contextItem.path); } closeContextMenu()"
-            class="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-left text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-white/10 transition-colors"
-        >
-            <flux:icon name="arrow-top-right-on-square" class="size-3.5 text-neutral-500 dark:text-neutral-400" />
-            <span x-text="contextItem?.is_dir ? '{{ $this->t('ctx_open_folder') }}' : '{{ $this->t('ctx_preview_file') }}'"></span>
-        </button>
+            {{-- 1. Put back / Kembalikan (Jika item di-klik kanan) --}}
+            <template x-if="contextItem">
+                <button
+                    type="button"
+                    @click="$wire.restorePath(contextItem.path); closeContextMenu()"
+                    class="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-left text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-white/10 transition-colors"
+                >
+                    <flux:icon name="arrow-uturn-left" class="size-3.5 text-indigo-500 dark:text-indigo-400" />
+                    <span>{{ $this->t('ctx_put_back') }}</span>
+                </button>
+            </template>
 
-        {{-- Unduh (Jika File) --}}
-        <template x-if="!contextItem?.is_dir">
+            {{-- 2. Delete Immediately / Hapus Segera (Jika item di-klik kanan) --}}
+            <template x-if="contextItem">
+                <button
+                    type="button"
+                    @click="$wire.openDeleteModal(contextItem.path, contextItem.is_dir); closeContextMenu()"
+                    class="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-left text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-colors"
+                >
+                    <flux:icon name="trash" class="size-3.5 text-rose-500" />
+                    <span>{{ $this->t('ctx_delete_immediately') }}</span>
+                </button>
+            </template>
+
+            {{-- Divider jika ada item --}}
+            <template x-if="contextItem">
+                <div class="h-px bg-neutral-200/80 dark:bg-white/10 my-1"></div>
+            </template>
+
+            {{-- 3. Empty Trash / Kosongkan Tempat Sampah --}}
             <button
                 type="button"
-                @click="$wire.downloadFile(contextItem.path); closeContextMenu()"
+                :disabled="!$wire.trashCount || $wire.trashCount <= 0"
+                @click="$wire.emptyTrash(); closeContextMenu()"
+                class="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-left text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-colors disabled:opacity-40 disabled:pointer-events-none"
+            >
+                <flux:icon name="trash" class="size-3.5 text-rose-500" />
+                <span>{{ $this->t('ctx_empty_trash') }}</span>
+            </button>
+        @else
+            {{-- CONTEXT MENU STANDAR (NON-TRASH) --}}
+            {{-- Item Info Header in Context Menu --}}
+            <div class="px-2 py-1 border-b border-neutral-200/80 dark:border-white/10 mb-1">
+                <span class="block truncate font-semibold text-neutral-900 dark:text-white" x-text="contextItem?.name"></span>
+            </div>
+
+            {{-- Buka / Pratinjau --}}
+            <button
+                type="button"
+                @click="if (contextItem?.is_dir) { $wire.navigate(contextItem.path); } else { $wire.openPreview(contextItem.path); } closeContextMenu()"
                 class="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-left text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-white/10 transition-colors"
             >
-                <flux:icon name="arrow-down-tray" class="size-3.5 text-neutral-500 dark:text-neutral-400" />
-                <span>{{ $this->t('ctx_download_file') }}</span>
+                <flux:icon name="arrow-top-right-on-square" class="size-3.5 text-neutral-500 dark:text-neutral-400" />
+                <span x-text="contextItem?.is_dir ? '{{ $this->t('ctx_open_folder') }}' : '{{ $this->t('ctx_preview_file') }}'"></span>
             </button>
-        </template>
 
-        {{-- Ganti Nama --}}
-        <button
-            type="button"
-            @click="$wire.openRenameModal(contextItem.path); closeContextMenu()"
-            class="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-left text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-white/10 transition-colors"
-        >
-            <flux:icon name="pencil-square" class="size-3.5 text-neutral-500 dark:text-neutral-400" />
-            <span>{{ $this->t('ctx_rename') }}</span>
-        </button>
+            {{-- Unduh (Jika File) --}}
+            <template x-if="!contextItem?.is_dir">
+                <button
+                    type="button"
+                    @click="$wire.downloadFile(contextItem.path); closeContextMenu()"
+                    class="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-left text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-white/10 transition-colors"
+                >
+                    <flux:icon name="arrow-down-tray" class="size-3.5 text-neutral-500 dark:text-neutral-400" />
+                    <span>{{ $this->t('ctx_download_file') }}</span>
+                </button>
+            </template>
 
-        {{-- Divider --}}
-        <div class="h-px bg-neutral-200/10 dark:border-white/10 my-1"></div>
+            {{-- Ganti Nama --}}
+            <button
+                type="button"
+                @click="$wire.openRenameModal(contextItem.path); closeContextMenu()"
+                class="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-left text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-white/10 transition-colors"
+            >
+                <flux:icon name="pencil-square" class="size-3.5 text-neutral-500 dark:text-neutral-400" />
+                <span>{{ $this->t('ctx_rename') }}</span>
+            </button>
 
-        {{-- Hapus --}}
-        <button
-            type="button"
-            @click="$wire.openDeleteModal(contextItem.path, contextItem.is_dir); closeContextMenu()"
-            class="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-left text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-colors"
-        >
-            <flux:icon name="trash" class="size-3.5 text-rose-500" />
-            <span>{{ $this->t('ctx_delete') }}</span>
-        </button>
+            {{-- Divider --}}
+            <div class="h-px bg-neutral-200/10 dark:border-white/10 my-1"></div>
+
+            {{-- Hapus --}}
+            <button
+                type="button"
+                @click="$wire.openDeleteModal(contextItem.path, contextItem.is_dir); closeContextMenu()"
+                class="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-left text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-colors"
+            >
+                <flux:icon name="trash" class="size-3.5 text-rose-500" />
+                <span>{{ $this->t('ctx_delete') }}</span>
+            </button>
+        @endif
     </div>
 
     {{-- ========================================================= --}}
@@ -1070,14 +1362,22 @@
                     </div>
                     <div>
                         <h3 class="text-sm font-semibold text-neutral-900 dark:text-white">
-                            {{ $this->t('modal_delete_title', ['type' => $deleteIsDirectory ? $this->t('word_folder') : $this->t('word_file')]) }}
+                            @if ($this->isInTrash)
+                                {{ $this->t('modal_delete_permanent_title', ['type' => $deleteIsDirectory ? $this->t('word_folder') : $this->t('word_file')]) }}
+                            @else
+                                {{ $this->t('modal_move_trash_title') }}
+                            @endif
                         </h3>
                         <p class="text-xs text-neutral-500 dark:text-neutral-400 truncate max-w-56">{{ $deleteTargetName }}</p>
                     </div>
                 </div>
 
                 <p class="text-xs text-neutral-600 dark:text-neutral-300">
-                    {{ $this->t('modal_delete_confirm', ['name' => $deleteTargetName]) }}
+                    @if ($this->isInTrash)
+                        {{ $this->t('modal_delete_permanent_confirm', ['name' => $deleteTargetName]) }}
+                    @else
+                        {{ $this->t('modal_move_trash_confirm', ['name' => $deleteTargetName]) }}
+                    @endif
                 </p>
 
                 <div class="flex items-center justify-end gap-2 pt-1">
@@ -1093,7 +1393,11 @@
                         wire:click="delete"
                         class="rounded-md bg-rose-600 hover:bg-rose-700 px-4 py-1.5 text-xs font-medium text-white shadow-2xs active:scale-98 transition-all"
                     >
-                        {{ $this->t('btn_delete_permanent') }}
+                        @if ($this->isInTrash)
+                            {{ $this->t('btn_delete_permanent') }}
+                        @else
+                            {{ $this->t('btn_move_to_trash') }}
+                        @endif
                     </button>
                 </div>
             </div>
@@ -1331,4 +1635,17 @@
             </div>
         </div>
     @endif
+
+    <style>
+        @keyframes detailsSlideIn {
+            0% {
+                transform: translateX(100%);
+                opacity: 0.5;
+            }
+            100% {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
 </div>

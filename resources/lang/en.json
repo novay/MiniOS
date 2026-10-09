@@ -125,5 +125,12 @@
     "Copy & Open": "Copy & Open",
     "Open App": "Open App",
     "Navigate": "Navigate",
-    "Shortcut": "Shortcut"
+    "Shortcut": "Shortcut",
+    "Restore Files": "Restore Files",
+    "Empty Trash": "Empty Trash",
+    "Restore All": "Restore All",
+    ":count item berhasil dihapus permanen dari Tempat Sampah.": ":count items permanently deleted from Trash.",
+    ":count berkas berhasil dipulihkan ke lokasi semula.": ":count files restored to original location.",
+    "Pulihkan Berkas": "Restore Files",
+    "Tempat Sampah": "Trash"
 }

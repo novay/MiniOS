@@ -6,9 +6,19 @@
 <div
     x-data="minios(@js(config('desktop.applications')), @js(os_setting()->all()))"
 
+    @contextmenu.prevent="openContextMenu($event)"
+
     @keydown.escape.window="closeAll()"
 
     @open-app.window="openApplication($event.detail?.id || $event.detail)"
+
+    @trash-updated.window="
+        const c = $event.detail?.count ?? $event.detail?.[0]?.count ?? (typeof $event.detail === 'number' ? $event.detail : null);
+        if (c !== null && c !== undefined) {
+            $wire.trashCount = Number(c);
+        }
+        $wire.onTrashUpdated(c);
+    "
 
     @click="closeContextMenu(); selectedShortcut = null"
 
@@ -42,7 +52,7 @@
     <main
         x-ref="workspace"
 
-        @contextmenu.prevent="
+        @contextmenu.prevent.stop="
             openContextMenu($event)
         "
 
@@ -90,14 +100,32 @@
                 label="{{ __('Trash') }}"
                 selected="selectedShortcut === 'trash'"
                 @click.stop="selectedShortcut = 'trash'"
-                @dblclick="openWindow('files', { url: '/files/trash' })"
+                @dblclick="openWindow('files', { url: '/files/.trash' }); $dispatch('open-folder', { path: '.trash' })"
+                @contextmenu.prevent.stop="openTrashContextMenu($event)"
             >
+                <div class="relative flex items-center justify-center h-full w-full">
+                    {{-- Icon Saat Kosong (Empty) --}}
+                    <div x-show="!$wire.trashCount || $wire.trashCount === 0" class="flex items-center justify-center h-full w-full">
+                        <x-minios.icon
+                            name="trash-empty"
+                            class="h-full w-full"
+                        />
+                    </div>
 
-                <x-minios.icon
-                    name="trash"
-                    class="h-full w-full"
-                />
+                    {{-- Icon Saat Terisi Sampah (Full) --}}
+                    <div x-show="$wire.trashCount > 0" class="flex items-center justify-center h-full w-full" style="display: none;">
+                        <x-minios.icon
+                            name="trash-full"
+                            class="h-full w-full"
+                        />
+                    </div>
 
+                    <span
+                        x-show="$wire.trashCount > 0"
+                        class="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-bold text-white shadow-md ring-2 ring-white/20"
+                        x-text="$wire.trashCount"
+                    ></span>
+                </div>
             </x-minios.shortcut>
 
         </div>

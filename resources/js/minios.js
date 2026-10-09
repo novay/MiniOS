@@ -170,6 +170,11 @@ export default function minios(applications = {}, userSettings = {}) {
             window.addEventListener('pagehide', this.pagehideHandler);
             document.addEventListener('visibilitychange', this.visibilityChangeHandler);
 
+            this.globalContextMenuHandler = (event) => {
+                event.preventDefault();
+            };
+            document.addEventListener('contextmenu', this.globalContextMenuHandler);
+
             // Child x-ref bindings and workspace classes are ready after Alpine renders.
             this.$nextTick(() => {
                 if (this.initialized) this.handleWorkspaceResize();
@@ -183,6 +188,10 @@ export default function minios(applications = {}, userSettings = {}) {
             this.initialized = false;
             window.removeEventListener('pagehide', this.pagehideHandler);
             document.removeEventListener('visibilitychange', this.visibilityChangeHandler);
+            if (this.globalContextMenuHandler) {
+                document.removeEventListener('contextmenu', this.globalContextMenuHandler);
+                this.globalContextMenuHandler = null;
+            }
             if (this.keydownHandler) {
                 window.removeEventListener('keydown', this.keydownHandler, true);
             }
@@ -2298,6 +2307,31 @@ export default function minios(applications = {}, userSettings = {}) {
                 open: true,
                 type: 'launcher',
                 appId: appId,
+                x: Math.max(8, x),
+                y: Math.max(36, y),
+            };
+        },
+
+        openTrashContextMenu(event) {
+            this.closeAll();
+
+            const menuWidth = 220;
+            const menuHeight = 150;
+
+            let x = event.clientX;
+            let y = event.clientY;
+
+            if (x + menuWidth > window.innerWidth) {
+                x = window.innerWidth - menuWidth - 8;
+            }
+            if (y + menuHeight > window.innerHeight) {
+                y = window.innerHeight - menuHeight - 8;
+            }
+
+            this.contextMenu = {
+                open: true,
+                type: 'trash',
+                appId: null,
                 x: Math.max(8, x),
                 y: Math.max(36, y),
             };

@@ -125,5 +125,14 @@
     "Copy & Open": "Salin & Buka",
     "Open App": "Buka Aplikasi",
     "Navigate": "Navigasi",
-    "Shortcut": "Pintasan"
+    "Shortcut": "Pintasan",
+    "Restore Files": "Pulihkan Berkas",
+    "Empty Trash": "Kosongkan Tempat Sampah",
+    "Restore All": "Pulihkan Semua",
+    ":count item berhasil dihapus permanen dari Tempat Sampah.": ":count item berhasil dihapus permanen dari Tempat Sampah.",
+    ":count berkas berhasil dipulihkan ke lokasi semula.": ":count berkas berhasil dipulihkan ke lokasi semula.",
+    "Pulihkan Berkas": "Pulihkan Berkas",
+    "Tempat Sampah": "Tempat Sampah",
+    "Put back": "Kembalikan",
+    "Delete Immediately": "Hapus Segera"
 }

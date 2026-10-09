@@ -14,6 +14,7 @@ use Livewire\WithFileUploads;
 use Novay\MiniOS\Concerns\HasTranslations;
 use Novay\MiniOS\Contracts\DesktopApp;
 use Novay\MiniOS\Facades\MiniOS;
+use Novay\MiniOS\Services\AppCatalogService;
 use ReflectionClass;
 use ZipArchive;
 
@@ -22,7 +23,11 @@ class ControlPanel extends Component
     use HasTranslations;
     use WithFileUploads;
 
-    public string $activeTab = 'all'; // 'all', 'system', 'custom'
+    public string $activeTab = 'all'; // 'all', 'system', 'custom', 'catalog'
+
+    public string $catalogCategory = 'all';
+
+    public string $catalogSearch = '';
 
     public string $search = '';
 
@@ -61,8 +66,32 @@ class ControlPanel extends Component
 
     public function setTab(string $tab): void
     {
-        if (in_array($tab, ['all', 'system', 'custom'], true)) {
+        if (in_array($tab, ['all', 'system', 'custom', 'catalog'], true)) {
             $this->activeTab = $tab;
+        }
+    }
+
+    public function setCatalogCategory(string $category): void
+    {
+        $this->catalogCategory = $category;
+    }
+
+    /**
+     * Install an application template from App Catalog with 1-click.
+     */
+    public function installCatalogApp(string $catalogId): void
+    {
+        /** @var AppCatalogService $service */
+        $service = app(AppCatalogService::class);
+
+        try {
+            $result = $service->install($catalogId);
+            $this->statusType = 'success';
+            $this->statusMessage = $this->trans('msg_catalog_installed', ['name' => $result['name']]);
+            $this->dispatch('app-installed', ['id' => $result['id'], 'name' => $result['name']]);
+        } catch (\Throwable $e) {
+            $this->statusType = 'error';
+            $this->statusMessage = $e->getMessage();
         }
     }
 
@@ -752,12 +781,43 @@ class ControlPanel extends Component
             }
         }
 
+        $catalogCount = count(app(AppCatalogService::class)->getCatalog());
+
         return [
             'total' => $total,
             'system' => $systemCount,
             'custom' => $customCount,
+            'catalog' => $catalogCount,
             'storage' => $this->formatBytes($customTotalBytes),
         ];
+    }
+
+    /**
+     * Catalog items from discovery service with category and search filters.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public function getCatalogAppsProperty(): array
+    {
+        /** @var AppCatalogService $service */
+        $service = app(AppCatalogService::class);
+        $apps = $service->getCatalog();
+
+        if ($this->catalogCategory !== 'all') {
+            $apps = array_values(array_filter($apps, fn ($a) => $a['category'] === $this->catalogCategory));
+        }
+
+        if (! empty(trim($this->catalogSearch))) {
+            $q = strtolower(trim($this->catalogSearch));
+            $apps = array_values(array_filter($apps, function ($a) use ($q) {
+                return str_contains(strtolower($a['name']), $q)
+                    || str_contains(strtolower($a['description']), $q)
+                    || in_array($q, array_map('strtolower', $a['tags'] ?? []), true)
+                    || str_contains(strtolower($a['category_label']), $q);
+            }));
+        }
+
+        return $apps;
     }
 
     protected function calculateDirSize(string $path): int
@@ -1080,6 +1140,7 @@ class ControlPanel extends Component
 
         return view($view, [
             'applications' => $this->applications,
+            'catalogApps' => $this->catalogApps,
             'stats' => $this->stats,
             'accent' => $this->accent,
         ]);

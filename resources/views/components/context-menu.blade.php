@@ -170,6 +170,57 @@
     </template>
 
     {{-- ========================================================= --}}
+    {{-- TRASH CONTEXT MENU --}}
+    {{-- ========================================================= --}}
+    <template x-if="contextMenu.type === 'trash'">
+        <div class="flex flex-col">
+            {{-- Header --}}
+            <div class="flex items-center justify-between px-2.5 py-1 text-[11px] font-semibold text-neutral-400 dark:text-neutral-500 border-b border-black/5 dark:border-white/5 mb-1">
+                <span class="truncate">{{ __('Trash') }}</span>
+                <span
+                    x-show="$wire.trashCount > 0"
+                    class="rounded-full bg-rose-500/15 dark:bg-rose-500/20 px-1.5 py-0.5 text-[10px] font-semibold text-rose-600 dark:text-rose-400 font-mono"
+                    x-text="$wire.trashCount"
+                ></span>
+            </div>
+
+            {{-- 1. Buka (Open) --}}
+            <button
+                type="button"
+                @click="openWindow('files', { url: '/files/.trash' }); $dispatch('open-folder', { path: '.trash' }); closeContextMenu()"
+                class="group flex w-full items-center gap-2.5 rounded px-2.5 py-1.5 text-left transition-colors hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-500"
+            >
+                <flux:icon name="arrow-top-right-on-square" class="size-4 text-neutral-500 dark:text-neutral-400 group-hover:text-white" />
+                <span>{{ __('Open') }}</span>
+            </button>
+
+            <div class="my-1 h-px bg-neutral-200/80 dark:bg-white/10"></div>
+
+            {{-- 2. Pulihkan Berkas (Restore) --}}
+            <button
+                type="button"
+                :disabled="!$wire.trashCount || $wire.trashCount <= 0"
+                @click="closeContextMenu(); $wire.restoreAllTrash()"
+                class="group flex w-full items-center gap-2.5 rounded px-2.5 py-1.5 text-left transition-colors hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-500 disabled:opacity-40 disabled:pointer-events-none"
+            >
+                <flux:icon name="arrow-uturn-left" class="size-4 text-neutral-500 dark:text-neutral-400 group-hover:text-white" />
+                <span>{{ __('Restore Files') }}</span>
+            </button>
+
+            {{-- 3. Kosongkan Tempat Sampah (Empty Trash) --}}
+            <button
+                type="button"
+                :disabled="!$wire.trashCount || $wire.trashCount <= 0"
+                @click="closeContextMenu(); $wire.emptyTrash()"
+                class="group flex w-full items-center gap-2.5 rounded px-2.5 py-1.5 text-left text-rose-600 dark:text-rose-400 transition-colors hover:bg-rose-600 hover:text-white dark:hover:bg-rose-600 dark:hover:text-white disabled:opacity-40 disabled:pointer-events-none"
+            >
+                <flux:icon name="trash" class="size-4 text-rose-500 dark:text-rose-400 group-hover:text-white" />
+                <span>{{ __('Empty Trash') }}</span>
+            </button>
+        </div>
+    </template>
+
+    {{-- ========================================================= --}}
     {{-- DESKTOP CONTEXT MENU (DEFAULT) --}}
     {{-- ========================================================= --}}
     <template x-if="!contextMenu.type || contextMenu.type === 'desktop'">
