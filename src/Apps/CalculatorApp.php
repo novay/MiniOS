@@ -46,6 +46,8 @@ class CalculatorApp implements DesktopApp
     {
         return WindowConfig::make()
             ->size(320, 480)
-            ->min(300, 440);
+            ->min(320, 480)
+            ->resizable(false)
+            ->maximizable(false);
     }
 }

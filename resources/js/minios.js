@@ -829,6 +829,12 @@ export default function minios(applications = {}, userSettings = {}) {
                         minHeight:
                             settings.min_height ?? 280,
 
+                        resizable:
+                            settings.resizable !== false,
+
+                        maximizable:
+                            settings.maximizable !== false,
+
                         zIndex:
                             ++this.zIndexCounter,
 
@@ -1440,7 +1446,7 @@ export default function minios(applications = {}, userSettings = {}) {
                 this.getWindow(id);
 
 
-            if (!windowState) {
+            if (!windowState || windowState.maximizable === false) {
                 return;
             }
 
@@ -1550,6 +1556,16 @@ export default function minios(applications = {}, userSettings = {}) {
                 this.activeWindow === id &&
                 this.isWindowVisible(id)
             );
+        },
+
+
+        isWindowMaximizable(id) {
+            return this.getWindow(id)?.maximizable !== false;
+        },
+
+
+        isWindowResizable(id) {
+            return this.getWindow(id)?.resizable !== false;
         },
 
 
@@ -1723,7 +1739,8 @@ export default function minios(applications = {}, userSettings = {}) {
 
             if (
                 !windowState ||
-                windowState.maximized
+                windowState.maximized ||
+                windowState.resizable === false
             ) {
                 return;
             }
@@ -2464,7 +2481,13 @@ export default function minios(applications = {}, userSettings = {}) {
                 state.open = saved.open === true;
                 state.minimized = state.open && saved.minimized === true;
                 // A minimized window may still need to restore to maximized mode.
-                state.maximized = saved.maximized === true;
+                state.maximized = state.maximizable !== false && saved.maximized === true;
+
+                if (state.resizable === false) {
+                    const appSettings = this.applications[id]?.window ?? {};
+                    if (typeof appSettings.width === 'number') state.width = appSettings.width;
+                    if (typeof appSettings.height === 'number') state.height = appSettings.height;
+                }
                 state.url = this.resolveWindowUrl(id, saved.url);
                 state.zIndex = isNumber(saved.zIndex) ? saved.zIndex : state.zIndex;
 

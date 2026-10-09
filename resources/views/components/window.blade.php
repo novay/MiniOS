@@ -71,9 +71,11 @@
         "
 
         @dblclick="
-            toggleMaximizeWindow(
-                @js($id)
-            )
+            if (isWindowMaximizable(@js($id))) {
+                toggleMaximizeWindow(
+                    @js($id)
+                )
+            }
         "
 
         :class="
@@ -189,18 +191,28 @@
             <button
                 type="button"
 
+                :disabled="!isWindowMaximizable(@js($id))"
+
                 :title="
-                    getWindow(@js($id))?.maximized
-                        ? 'Restore'
-                        : 'Maximize'
+                    !isWindowMaximizable(@js($id))
+                        ? ''
+                        : (getWindow(@js($id))?.maximized ? 'Restore' : 'Maximize')
                 "
 
                 @pointerdown.stop
 
                 @click.stop="
-                    toggleMaximizeWindow(
-                        @js($id)
-                    )
+                    if (isWindowMaximizable(@js($id))) {
+                        toggleMaximizeWindow(
+                            @js($id)
+                        )
+                    }
+                "
+
+                :class="
+                    !isWindowMaximizable(@js($id))
+                        ? 'opacity-30 cursor-not-allowed pointer-events-none'
+                        : 'hover:bg-white/10'
                 "
 
                 class="
@@ -215,8 +227,6 @@
 
                     transition-colors
                     duration-150
-
-                    hover:bg-white/10
                 "
             >
 
@@ -319,7 +329,7 @@
 
     <template
         x-if="
-            !getWindow(@js($id))?.maximized
+            !getWindow(@js($id))?.maximized && isWindowResizable(@js($id))
         "
     >
 

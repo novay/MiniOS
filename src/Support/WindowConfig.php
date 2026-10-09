@@ -18,6 +18,10 @@ class WindowConfig
 
     protected bool $center = false;
 
+    protected bool $resizable = true;
+
+    protected bool $maximizable = true;
+
     public static function make(): self
     {
         return new self;
@@ -54,6 +58,30 @@ class WindowConfig
         return $this;
     }
 
+    public function resizable(bool $resizable = true): self
+    {
+        $this->resizable = $resizable;
+
+        return $this;
+    }
+
+    public function maximizable(bool $maximizable = true): self
+    {
+        $this->maximizable = $maximizable;
+
+        return $this;
+    }
+
+    public function isResizable(): bool
+    {
+        return $this->resizable;
+    }
+
+    public function isMaximizable(): bool
+    {
+        return $this->maximizable;
+    }
+
     /**
      * @return array<string, mixed>
      */
@@ -67,6 +95,8 @@ class WindowConfig
             'max_width' => $this->maxWidth,
             'max_height' => $this->maxHeight,
             'center' => $this->center,
+            'resizable' => $this->resizable,
+            'maximizable' => $this->maximizable,
         ], fn ($val) => $val !== null);
     }
 }
