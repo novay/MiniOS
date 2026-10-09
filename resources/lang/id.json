@@ -114,5 +114,16 @@
     "Toggle Theme": "Alihkan Tema",
     "Mute Audio": "Bisukan Audio",
     "Enable Audio": "Aktifkan Audio",
-    "Now": "Baru saja"
+    "Now": "Baru saja",
+
+    "Search (Win + S)": "Pencarian (Win + S)",
+    "Search apps or calculate math (e.g. 50 * 12 + 100)...": "Cari aplikasi atau hitung matematika (cth: 50 * 12 + 100)...",
+    "Clear": "Hapus",
+    "No results found": "Tidak ada hasil ditemukan",
+    "Try searching with another keyword or type a math formula": "Coba cari dengan kata kunci lain atau ketik rumus matematika",
+    "Math Result": "Hasil Matematika",
+    "Copy & Open": "Salin & Buka",
+    "Open App": "Buka Aplikasi",
+    "Navigate": "Navigasi",
+    "Shortcut": "Pintasan"
 }

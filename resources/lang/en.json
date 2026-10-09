@@ -114,5 +114,16 @@
     "Toggle Theme": "Toggle Theme",
     "Mute Audio": "Mute Audio",
     "Enable Audio": "Enable Audio",
-    "Now": "Now"
+    "Now": "Now",
+
+    "Search (Win + S)": "Search (Win + S)",
+    "Search apps or calculate math (e.g. 50 * 12 + 100)...": "Search apps or calculate math (e.g. 50 * 12 + 100)...",
+    "Clear": "Clear",
+    "No results found": "No results found",
+    "Try searching with another keyword or type a math formula": "Try searching with another keyword or type a math formula",
+    "Math Result": "Math Result",
+    "Copy & Open": "Copy & Open",
+    "Open App": "Open App",
+    "Navigate": "Navigate",
+    "Shortcut": "Shortcut"
 }

@@ -62,6 +62,20 @@
                 </x-minios.dock-item>
             </div>
 
+            {{-- WINDOWS 11 SEARCH / SPOTLIGHT BUTTON --}}
+            <div
+                class="flex order-first"
+            >
+                <x-minios.dock-item
+                    label="{{ __('Search (Win + S)') }}"
+                    @click.stop="toggleSpotlight()"
+                >
+                    <div class="flex size-full items-center justify-center text-neutral-700 dark:text-neutral-200">
+                        <flux:icon name="magnifying-glass" class="size-6" />
+                    </div>
+                </x-minios.dock-item>
+            </div>
+
             {{-- WINDOWS 11 TASKBAR SEPARATOR --}}
             <div
                 class="shrink-0 select-none rounded-full transition-all duration-150 order-first"

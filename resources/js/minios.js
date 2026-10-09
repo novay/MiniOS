@@ -79,6 +79,9 @@ export default function minios(applications = {}, userSettings = {}) {
         applicationsOpen: false,
         systemMenuOpen: false,
         notificationCenterOpen: false,
+        spotlightOpen: false,
+        spotlightQuery: '',
+        spotlightSelectedIndex: 0,
         notifications: [],
         activeToasts: [],
         audioContext: null,
@@ -1292,6 +1295,27 @@ export default function minios(applications = {}, userSettings = {}) {
 
         initKeyboardShortcuts() {
             this.keydownHandler = (event) => {
+                // 1. Spotlight / Global Search Shortcuts:
+                // Cmd+Space, Ctrl+Space, Cmd+K, Ctrl+K, or Win+S (Meta+S)
+                const isSpace = event.code === 'Space' || event.key === ' ';
+                const isK = event.key === 'k' || event.key === 'K';
+                const isS = event.key === 's' || event.key === 'S';
+
+                const isSpotlightCmd = (event.metaKey || event.ctrlKey)
+                    && !event.altKey
+                    && !event.shiftKey
+                    && (isSpace || isK);
+
+                const isWinS = event.metaKey && !event.ctrlKey && !event.altKey && !event.shiftKey && isS;
+
+                if (isSpotlightCmd || isWinS) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    this.toggleSpotlight();
+                    return;
+                }
+
+                // 2. Cmd+W / Ctrl+W to close active window
                 const isCmdOrCtrlW = (event.metaKey || event.ctrlKey)
                     && !event.altKey
                     && !event.shiftKey
@@ -1306,10 +1330,15 @@ export default function minios(applications = {}, userSettings = {}) {
                 const isAppPath = currentNormalizedPath !== '/';
 
                 // Intercept Cmd+W / Ctrl+W only when an app window is open, an app URL is accessed,
-                // or fullscreen launcher/system menu is open.
-                if (hasOpenWindows || isAppPath || this.applicationsOpen || this.systemMenuOpen) {
+                // or fullscreen launcher/system menu/spotlight is open.
+                if (hasOpenWindows || isAppPath || this.applicationsOpen || this.systemMenuOpen || this.spotlightOpen) {
                     event.preventDefault();
                     event.stopPropagation();
+
+                    if (this.spotlightOpen) {
+                        this.closeSpotlight();
+                        return;
+                    }
 
                     if (this.applicationsOpen) {
                         this.applicationsOpen = false;
@@ -2580,6 +2609,162 @@ export default function minios(applications = {}, userSettings = {}) {
 
         /*
         |--------------------------------------------------------------------------
+        | Spotlight & Global Search
+        |--------------------------------------------------------------------------
+        */
+
+        toggleSpotlight() {
+            const willOpen = !this.spotlightOpen;
+            this.closeAll();
+            this.spotlightOpen = willOpen;
+            if (willOpen) {
+                this.spotlightQuery = '';
+                this.spotlightSelectedIndex = 0;
+                this.$nextTick(() => {
+                    const input = document.getElementById('minios-spotlight-input');
+                    if (input) input.focus();
+                });
+            }
+        },
+
+        closeSpotlight() {
+            this.spotlightOpen = false;
+            this.spotlightQuery = '';
+            this.spotlightSelectedIndex = 0;
+        },
+
+        get spotlightResults() {
+            const query = (this.spotlightQuery || '').trim();
+            const results = [];
+
+            // 1. Quick Math Calculation
+            const mathResult = this.evaluateMath(query);
+            if (mathResult !== null) {
+                results.push({
+                    type: 'calculator',
+                    id: 'calc_quick_result',
+                    title: String(mathResult),
+                    subtitle: `${query} = ${mathResult}`,
+                    icon: 'calculator',
+                    actionText: 'Salin hasil & buka Kalkulator',
+                    value: mathResult,
+                });
+            }
+
+            // 2. Filter Desktop Applications
+            const apps = Object.entries(this.applications || {}).map(([id, app]) => ({
+                id,
+                name: app.name,
+                icon: app.icon,
+                entry: app.entry,
+                keywords: app.keywords || [],
+                description: app.description || '',
+            }));
+
+            const filteredApps = apps.filter(app => {
+                if (!query) return true;
+                const q = query.toLowerCase();
+                return app.name.toLowerCase().includes(q)
+                    || app.id.toLowerCase().includes(q)
+                    || app.keywords.some(k => k.toLowerCase().includes(q));
+            });
+
+            filteredApps.forEach(app => {
+                results.push({
+                    type: 'app',
+                    id: app.id,
+                    title: app.name,
+                    subtitle: 'Aplikasi MiniOS',
+                    icon: app.icon,
+                });
+            });
+
+            return results;
+        },
+
+        evaluateMath(expr) {
+            if (!expr || typeof expr !== 'string') return null;
+            let clean = expr.trim();
+
+            // Support "X% of Y" or "X% * Y"
+            const pctMatch = clean.match(/^(\d+(?:\.\d+)?)\s*%\s*(?:of|\*)\s*(\d+(?:\.\d+)?)$/i);
+            if (pctMatch) {
+                const pct = parseFloat(pctMatch[1]);
+                const base = parseFloat(pctMatch[2]);
+                return (pct / 100) * base;
+            }
+
+            // Replace common multiplication symbols: x or X preceded and followed by digits/brackets/spaces
+            clean = clean.replace(/(\d+)\s*[xX]\s*(\d+)/g, '$1 * $2');
+            clean = clean.replace(/\^/g, '**');
+
+            // Sanitize: allow only valid arithmetic tokens
+            const validTokensRegex = /^[\d\s+\-*/%().MathsqrtcobsinepPI]+$/;
+            if (!validTokensRegex.test(clean)) return null;
+
+            // Must contain at least one digit and one operator
+            if (!/\d/.test(clean) || !/[+\-*/%]/.test(clean)) return null;
+
+            try {
+                const fn = new Function('Math', `"use strict"; return (${clean});`);
+                const res = fn(Math);
+                if (typeof res === 'number' && !isNaN(res) && isFinite(res)) {
+                    return Math.round(res * 1000000000) / 1000000000;
+                }
+            } catch (e) {
+                return null;
+            }
+            return null;
+        },
+
+        executeSpotlightItem(item) {
+            if (!item) return;
+
+            if (item.type === 'calculator') {
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(String(item.value)).catch(() => {});
+                }
+                this.handleOsNotify({
+                    title: 'Kalkulator MiniOS',
+                    message: `${item.subtitle} telah disalin ke clipboard!`,
+                    variant: 'success',
+                });
+                this.openApplication('calculator');
+                this.closeSpotlight();
+                return;
+            }
+
+            if (item.type === 'app') {
+                this.openApplication(item.id);
+                this.closeSpotlight();
+            }
+        },
+
+        selectPrevSpotlightItem() {
+            const len = this.spotlightResults.length;
+            if (len === 0) return;
+            this.spotlightSelectedIndex = (this.spotlightSelectedIndex - 1 + len) % len;
+            this.scrollSpotlightIntoView();
+        },
+
+        selectNextSpotlightItem() {
+            const len = this.spotlightResults.length;
+            if (len === 0) return;
+            this.spotlightSelectedIndex = (this.spotlightSelectedIndex + 1) % len;
+            this.scrollSpotlightIntoView();
+        },
+
+        scrollSpotlightIntoView() {
+            this.$nextTick(() => {
+                const selectedEl = document.querySelector('[data-spotlight-item-selected="true"]');
+                if (selectedEl) {
+                    selectedEl.scrollIntoView({ block: 'nearest' });
+                }
+            });
+        },
+
+        /*
+        |--------------------------------------------------------------------------
         | Overlay
         |--------------------------------------------------------------------------
         */
@@ -2589,6 +2774,7 @@ export default function minios(applications = {}, userSettings = {}) {
             this.applicationsOpen = false;
             this.systemMenuOpen = false;
             this.notificationCenterOpen = false;
+            this.spotlightOpen = false;
             this.aboutOpen = false;
             this.selectedShortcut = null;
 
