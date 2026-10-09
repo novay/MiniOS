@@ -4,9 +4,12 @@ namespace Novay\MiniOS\Livewire\Apps;
 
 use Composer\InstalledVersions;
 use Livewire\Component;
+use Novay\MiniOS\Concerns\HasTranslations;
 
 class About extends Component
 {
+    use HasTranslations;
+
     public string $activeTab = 'specs';
 
     public function setTab(string $tab): void
@@ -151,74 +154,7 @@ class About extends Component
 
     public function getLocaleProperty(): string
     {
-        return os_setting()->get('locale_time.locale', config('app.locale', 'id'));
-    }
-
-    /**
-     * Dictionary i18n lokal per aplikasi About.
-     * Pola ini memungkinkan setiap aplikasi mendefinisikan kamus kata mandiri.
-     */
-    public function trans(string $key, array $replace = []): string
-    {
-        $dictionary = [
-            'id' => [
-                'app_title' => 'Tentang MiniOS',
-                'edition' => 'Fluent Edition',
-                'tagline' => 'Sistem Operasi Web Desktop Modern',
-                'tab_specs' => 'Spesifikasi',
-                'tab_about' => 'Lisensi & Info',
-                'device_name' => 'Nama Perangkat',
-                'processor' => 'Prosesor',
-                'memory' => 'Memori Terpasang',
-                'host_system' => 'Sistem Host',
-                'user' => 'Pengguna',
-                'framework' => 'Kerangka Kerja',
-                'ui_components' => 'Komponen UI',
-                'runtime' => 'Runtime Mesin',
-                'database' => 'Basis Data',
-                'author' => 'Pengembang',
-                'license' => 'Lisensi Perangkat',
-                'ui_design' => 'Desain UI',
-                'ecosystem' => 'Ekosistem',
-                'copy_specs' => 'Salin Spesifikasi',
-                'copied' => 'Tersalin ke Clipboard!',
-                'settings' => 'Pengaturan',
-                'close' => 'Tutup',
-            ],
-            'en' => [
-                'app_title' => 'About MiniOS',
-                'edition' => 'Fluent Edition',
-                'tagline' => 'Modern Web Desktop Operating System',
-                'tab_specs' => 'Specifications',
-                'tab_about' => 'License & Info',
-                'device_name' => 'Device Name',
-                'processor' => 'Processor',
-                'memory' => 'Installed RAM',
-                'host_system' => 'Host System',
-                'user' => 'User',
-                'framework' => 'Framework',
-                'ui_components' => 'UI Components',
-                'runtime' => 'Engine Runtime',
-                'database' => 'Database',
-                'author' => 'Developer',
-                'license' => 'Software License',
-                'ui_design' => 'UI Design',
-                'ecosystem' => 'Ecosystem',
-                'copy_specs' => 'Copy Specifications',
-                'copied' => 'Copied to Clipboard!',
-                'settings' => 'Settings',
-                'close' => 'Close',
-            ],
-        ];
-
-        $lang = $this->getLocaleProperty() === 'en' ? 'en' : 'id';
-        $text = $dictionary[$lang][$key] ?? $dictionary['id'][$key] ?? $key;
-
-        foreach ($replace as $placeholder => $val) {
-            $text = str_replace(':'.$placeholder, (string) $val, $text);
-        }
-
-        return $text;
+        return $this->getActiveLocale();
     }
 
     public function getCopySpecsTextProperty(): string
