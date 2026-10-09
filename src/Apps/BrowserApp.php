@@ -3,6 +3,7 @@
 namespace Novay\MiniOS\Apps;
 
 use Novay\MiniOS\Contracts\DesktopApp;
+use Novay\MiniOS\Livewire\Apps\Browser;
 use Novay\MiniOS\Support\WindowConfig;
 
 class BrowserApp implements DesktopApp
@@ -32,6 +33,11 @@ class BrowserApp implements DesktopApp
         return ['/browser'];
     }
 
+    public function version(): string
+    {
+        return '1.0.0';
+    }
+
     public function isPinned(): bool
     {
         return true;
@@ -39,7 +45,7 @@ class BrowserApp implements DesktopApp
 
     public function component(): ?string
     {
-        return 'minios.browser-window';
+        return class_exists(Browser::class) ? Browser::class : 'apps.browser';
     }
 
     public function window(): WindowConfig

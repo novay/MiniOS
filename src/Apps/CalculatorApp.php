@@ -3,6 +3,7 @@
 namespace Novay\MiniOS\Apps;
 
 use Novay\MiniOS\Contracts\DesktopApp;
+use Novay\MiniOS\Livewire\Apps\Calculator;
 use Novay\MiniOS\Support\WindowConfig;
 
 class CalculatorApp implements DesktopApp
@@ -32,6 +33,11 @@ class CalculatorApp implements DesktopApp
         return ['/calculator'];
     }
 
+    public function version(): string
+    {
+        return '1.0.0';
+    }
+
     public function isPinned(): bool
     {
         return true;
@@ -39,7 +45,7 @@ class CalculatorApp implements DesktopApp
 
     public function component(): ?string
     {
-        return 'minios.calculator-window';
+        return class_exists(Calculator::class) ? Calculator::class : 'apps.calculator';
     }
 
     public function window(): WindowConfig
