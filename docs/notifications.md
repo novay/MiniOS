@@ -1,17 +1,42 @@
 # MiniOS Notifications & Windows 11 Action Center
 
-MiniOS hadir dengan sistem notifikasi bawaan yang mengadopsi tampilan dan perilaku modern **Windows 11 Action & Notification Center**. Sistem ini menggabungkan **Flux UI Toast** untuk pop-up mengambang secara real-time dan **Notification Center Flyout** untuk menampung riwayat notifikasi, dilengkapi efek audio **Chime sintetis halus** (Web Audio API).
+MiniOS hadir dengan sistem notifikasi bawaan yang mengadopsi tampilan dan perilaku modern **Windows 11 Action & Notification Center**. Sistem ini menggunakan **Windows 11 Toast Hub** mandiri untuk pop-up mengambang secara real-time (lengkap dengan ikon aplikasi pengirim, animasi tumpukan kartu 3D ala Flux/Sonner, serta progress loader interaktif) dan **Notification Center Flyout** untuk menampung riwayat notifikasi, dilengkapi efek audio **Chime sintetis halus** (Web Audio API).
 
 ---
 
 ## 🚀 Fitur Utama
 
-1. **Windows 11 Native Toast Hub**: Komponen mengambang mandiri tanpa ketergantungan Flux UI (`<x-minios.toast-hub />`) dengan styling acrylic/mica otentik, animasi slide, auto-dismiss, dan pause-on-hover.
-2. **Statusbar Audio Toggle**: Tombol speaker interaktif di system tray statusbar (setelah toggle dark/light mode) yang otomatis mendeteksi apakah AudioContext browser sudah aktif/unlocked serta memungkinkan pengguna mengaktifkan/membisukan suara kapan saja.
-3. **Windows 11 Notification Center**: Flyout riwayat notifikasi di system tray (ikon lonceng) yang menampilkan notifikasi, waktu, badge jumlah yang belum dibaca, tombol hapus per item, dan *Clear all*.
-4. **Harmonic Sound Chime**: Sintesis audio dua nada lembut (D5 $\rightarrow$ A5) menggunakan Web Audio API tanpa perlu memuat file MP3/WAV eksternal.
-5. **Developer-Friendly Trait**: Trait `Novay\MiniOS\Concerns\HasNotifications` yang siap dipakai di seluruh Livewire Component.
-6. **Konfigurasi Pengguna**: Pengguna dapat mengubah posisi toast dan mengaktifkan/menonaktifkan efek suara kapan saja melalui statusbar atau mini-app **Settings > Notifications**.
+1. **Windows 11 Toast Stack (`<x-minios.toast.group>` & `<x-minios.toast />`)**:
+   - Komponen mengambang mandiri tanpa ketergantungan Flux UI.
+   - Menggunakan pola `@persist('toast')` agar container notifikasi tetap persisten di DOM saat terjadi transisi halaman Livewire (`wire:navigate`).
+   - **Stacked Cards Effect**: Ketika terdapat lebih dari satu notifikasi aktif, kartu notifikasi lama akan saling menumpuk secara berdimensi di belakang kartu utama (dengan offset vertikal dan pengecilan skala proporsional).
+   - **Expand on Hover**: Saat pengguna mengarahkan kursor mouse ke area toast, tumpukan kartu otomatis mekar (*expand*) menjadi daftar vertikal lengkap sehingga semua notifikasi dapat dibaca dan ditutup secara individual.
+   - **Smooth Slide Animation**: Menggunakan kurva akselerasi otentik WinUI (`cubic-bezier(0.16, 1, 0.3, 1)`) untuk animasi meluncur masuk dan keluar secara mulus.
+2. **Interactive Progress Loader**:
+   - Garis progres dinamis di bagian bawah kartu notifikasi yang menghitung mundur durasi tampil (default 5 detik).
+   - **Smart Pause**: Saat kursor mouse masuk (`mouseenter`), progress bar dan countdown otomatis berhenti (*pause*). Saat kursor keluar (`mouseleave`), progres berlanjut (*resume* dengan minimal buffer 2,5 detik).
+3. **App Icon Branding**:
+   - Menampilkan ikon dan nama aplikasi pengirim secara otomatis (misal Files, Editor, Player, Settings, dsb) baik pada pop-up Toast maupun di Notification Center Flyout.
+4. **Statusbar Audio Toggle**: Tombol speaker interaktif di system tray statusbar yang memungkinkan pengguna mengaktifkan/membisukan suara kapan saja.
+5. **Windows 11 Notification Center**: Flyout riwayat notifikasi di system tray (ikon lonceng) yang menampilkan daftar notifikasi berikon aplikasi, waktu, badge jumlah yang belum dibaca, tombol hapus per item, dan *Clear all*.
+6. **Harmonic Sound Chime**: Sintesis audio dua nada lembut (D5 $\rightarrow$ A5) menggunakan Web Audio API tanpa perlu memuat file MP3/WAV eksternal.
+7. **Developer-Friendly Trait**: Trait `Novay\MiniOS\Concerns\HasNotifications` yang siap dipakai di seluruh Livewire Component.
+
+---
+
+## 🧩 Blade Component Setup
+
+Untuk memasang sistem Toast di layout MiniOS, cukup gunakan sintaks Blade persisten:
+
+```blade
+@persist('toast')
+    <x-minios.toast.group>
+        <x-minios.toast />
+    </x-minios.toast.group>
+@endpersist
+```
+
+*(Atau gunakan tag ringkas `<x-minios.toast-hub />` yang sudah membungkus komponen di atas).*
 
 ---
 

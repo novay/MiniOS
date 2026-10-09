@@ -70,8 +70,9 @@ class MiniOSServiceProvider extends ServiceProvider
             Apps\AboutApp::class,
             Apps\ControlPanelApp::class,
             Apps\PreviewApp::class,
-            Apps\TextEditApp::class,
+            Apps\EditorApp::class,
             Apps\PlayerApp::class,
+            Apps\SoundcloudApp::class,
         ]);
 
         // Register additional configured apps from config/minios.php
@@ -225,6 +226,17 @@ class MiniOSServiceProvider extends ServiceProvider
                 Blade::component('minios::components.'.$name, 'minios.'.$name);
             }
         }
+
+        Blade::component('minios::components.toast.group', 'minios.toast.group');
+        Blade::component('minios::components.toast.index', 'minios.toast');
+
+        Blade::component('minios::components.menubar.index', 'minios.menubar');
+        Blade::component('minios::components.menubar.menu', 'minios.menubar.menu');
+        Blade::component('minios::components.menubar.item', 'minios.menubar.item');
+        Blade::component('minios::components.menubar.submenu', 'minios.menubar.submenu');
+        Blade::component('minios::components.menubar.checkbox', 'minios.menubar.checkbox');
+        Blade::component('minios::components.menubar.radio', 'minios.menubar.radio');
+        Blade::component('minios::components.menubar.separator', 'minios.menubar.separator');
 
         Blade::component('minios::layouts.app', 'layouts::minios.app');
         Blade::component('minios::layouts.auth', 'layouts::minios.auth');

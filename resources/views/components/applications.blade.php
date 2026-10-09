@@ -79,14 +79,14 @@
                 <button
                     type="button"
                     x-show="!searchQuery || @js(strtolower($application['name'])).includes(searchQuery.toLowerCase().trim()) || @js(strtolower($id)).includes(searchQuery.toLowerCase().trim())"
-                    @click="openApplication(@js($id))"
+                    @click="openApplication(@js($id), { fromLauncher: true })"
                     @contextmenu.prevent.stop="openLauncherContextMenu($event, @js($id))"
-                    class="group flex w-24 flex-col items-center gap-3 rounded-xl p-3 transition hover:bg-white/10"
+                    class="group flex w-24 flex-col items-center rounded-xl p-2 transition hover:bg-white/10"
                 >
-                    <div class="flex size-16 items-center justify-center transition-transform duration-150 group-hover:scale-110">
+                    <div class="flex size-20 items-center justify-center transition-transform duration-150 group-hover:scale-110">
                         <x-minios.icon
                             :name="$application['icon']"
-                            class="size-14"
+                            class="size-16"
                         />
                     </div>
 

@@ -11,9 +11,9 @@
     @keydown.escape.window="closeAll()"
 
     @open-app.window="
-        const targetId = $event.detail?.id || $event.detail;
+        const targetId = $event.detail?.id || $event.detail?.app || (typeof $event.detail === 'string' ? $event.detail : null);
         if (targetId) {
-            openApplication(targetId);
+            openApplication(targetId, { path: $event.detail?.path });
             if ($event.detail?.path) {
                 $dispatch('open-file', $event.detail);
             }
@@ -315,9 +315,11 @@
 
 
     {{-- ========================================================= --}}
-    {{-- TOAST NOTIFICATION HUB --}}
-    {{-- ========================================================= --}}
-    <x-minios.toast-hub />
+    @persist('toast')
+        <x-minios.toast.group>
+            <x-minios.toast />
+        </x-minios.toast.group>
+    @endpersist
 
 
     {{-- ========================================================= --}}

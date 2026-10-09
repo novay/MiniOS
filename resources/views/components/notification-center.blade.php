@@ -86,54 +86,79 @@
         {{-- Item List --}}
         <template x-for="notif in notifications" :key="notif.id">
             <div
-                class="group relative flex items-start gap-3 rounded-lg border border-black/5 dark:border-white/5 bg-white/70 dark:bg-white/[0.04] p-3 shadow-xs hover:bg-white/90 dark:hover:bg-white/[0.07] transition-all"
+                class="group relative flex flex-col gap-2 rounded-xl border border-black/5 dark:border-white/5 bg-white/75 dark:bg-white/[0.04] p-3 shadow-xs hover:bg-white/90 dark:hover:bg-white/[0.07] transition-all"
             >
-                {{-- Variant Icon --}}
-                <div class="shrink-0 mt-0.5">
-                    <template x-if="notif.variant === 'success'">
-                        <div class="flex size-6 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">
-                            <flux:icon name="check-circle" class="size-4" />
+                {{-- Item Header: App Icon, App Name, Time, Dismiss Button --}}
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-1.5 text-xs text-neutral-500 dark:text-neutral-400">
+                        {{-- App Icon --}}
+                        <div class="size-3.5 shrink-0 flex items-center justify-center">
+                            <template x-if="notif.icon_url">
+                                <img :src="notif.icon_url" alt="" class="size-3.5 object-contain rounded" />
+                            </template>
+
+                            @foreach (config('desktop.applications') as $appId => $application)
+                                <template x-if="!notif.icon_url && (notif.appId === '{{ $appId }}' || notif.icon === '{{ $application['icon'] }}' || (notif.app && notif.app.toLowerCase() === '{{ strtolower($application['name']) }}'))">
+                                    <x-minios.icon :name="$application['icon']" class="size-3.5 object-contain" />
+                                </template>
+                            @endforeach
+
+                            <template x-if="!notif.icon_url && !notif.icon && !@js(array_keys(config('desktop.applications'))).includes(notif.appId)">
+                                <img src="{{ asset('minios/images/logo.png') }}" alt="MiniOS" class="size-3 opacity-80" />
+                            </template>
                         </div>
-                    </template>
-                    <template x-if="notif.variant === 'danger' || notif.variant === 'error'">
-                        <div class="flex size-6 items-center justify-center rounded-full bg-rose-500/15 text-rose-600 dark:text-rose-400">
-                            <flux:icon name="exclamation-circle" class="size-4" />
-                        </div>
-                    </template>
-                    <template x-if="notif.variant === 'warning'">
-                        <div class="flex size-6 items-center justify-center rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400">
-                            <flux:icon name="exclamation-triangle" class="size-4" />
-                        </div>
-                    </template>
-                    <template x-if="notif.variant === 'info' || (!['success', 'danger', 'error', 'warning'].includes(notif.variant))">
-                        <div class="flex size-6 items-center justify-center rounded-full bg-blue-500/15 text-blue-600 dark:text-blue-400">
-                            <flux:icon name="information-circle" class="size-4" />
-                        </div>
-                    </template>
+
+                        <span class="font-semibold text-neutral-700 dark:text-neutral-300" x-text="notif.app || 'MiniOS'"></span>
+                        <span class="opacity-40">•</span>
+                        <span class="text-[10px] text-neutral-400 dark:text-neutral-500 font-mono" x-text="notif.time"></span>
+                    </div>
+
+                    <button
+                        type="button"
+                        @click.stop="removeNotification(notif.id)"
+                        class="p-0.5 rounded text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 hover:bg-black/5 dark:hover:bg-white/10 opacity-60 group-hover:opacity-100 transition-all"
+                        title="{{ __('Dismiss') }}"
+                    >
+                        <flux:icon name="x-mark" class="size-3.5" />
+                    </button>
                 </div>
 
-                {{-- Content Body --}}
-                <div class="flex-1 min-w-0 pr-5">
-                    <div class="flex items-center justify-between gap-2 mb-0.5">
+                {{-- Item Body: Variant Icon + Content --}}
+                <div class="flex items-start gap-2.5">
+                    {{-- Variant Icon --}}
+                    <div class="shrink-0 mt-0.5">
+                        <template x-if="notif.variant === 'success'">
+                            <div class="flex size-5 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">
+                                <flux:icon name="check-circle" class="size-3.5" />
+                            </div>
+                        </template>
+                        <template x-if="notif.variant === 'danger' || notif.variant === 'error'">
+                            <div class="flex size-5 items-center justify-center rounded-full bg-rose-500/15 text-rose-600 dark:text-rose-400">
+                                <flux:icon name="exclamation-circle" class="size-3.5" />
+                            </div>
+                        </template>
+                        <template x-if="notif.variant === 'warning'">
+                            <div class="flex size-5 items-center justify-center rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400">
+                                <flux:icon name="exclamation-triangle" class="size-3.5" />
+                            </div>
+                        </template>
+                        <template x-if="notif.variant === 'info' || (!['success', 'danger', 'error', 'warning'].includes(notif.variant))">
+                            <div class="flex size-5 items-center justify-center rounded-full bg-blue-500/15 text-blue-600 dark:text-blue-400">
+                                <flux:icon name="information-circle" class="size-3.5" />
+                            </div>
+                        </template>
+                    </div>
+
+                    {{-- Content Body --}}
+                    <div class="flex-1 min-w-0">
                         <h4
-                            x-show="notif.title"
-                            class="text-xs font-semibold text-neutral-900 dark:text-white truncate"
+                            x-show="notif.title && notif.title.trim().toLowerCase() !== (notif.app || '').trim().toLowerCase()"
+                            class="text-xs font-semibold text-neutral-900 dark:text-white truncate mb-0.5"
                             x-text="notif.title"
                         ></h4>
-                        <span class="text-[10px] text-neutral-400 dark:text-neutral-500 shrink-0 font-mono" x-text="notif.time"></span>
+                        <p class="text-xs text-neutral-600 dark:text-neutral-300 leading-relaxed break-words" x-text="notif.text"></p>
                     </div>
-                    <p class="text-xs text-neutral-600 dark:text-neutral-300 leading-relaxed break-words" x-text="notif.text"></p>
                 </div>
-
-                {{-- Dismiss Button --}}
-                <button
-                    type="button"
-                    @click="removeNotification(notif.id)"
-                    class="absolute top-2.5 right-2.5 p-1 rounded-md text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 hover:bg-black/5 dark:hover:bg-white/10 opacity-60 group-hover:opacity-100 transition-opacity"
-                    title="{{ __('Dismiss') }}"
-                >
-                    <flux:icon name="x-mark" class="size-3.5" />
-                </button>
             </div>
         </template>
     </div>

@@ -84,6 +84,8 @@ export default function minios(applications = {}, userSettings = {}) {
         spotlightSelectedIndex: 0,
         notifications: [],
         activeToasts: [],
+        toastGroupHovered: false,
+        toastTicker: null,
         audioContext: null,
         audioUnlocked: false,
         selectedShortcut: null,
@@ -988,7 +990,7 @@ export default function minios(applications = {}, userSettings = {}) {
         |--------------------------------------------------------------------------
         */
 
-        openApplication(id) {
+        openApplication(id, options = {}) {
             const application =
                 this.applications[id];
 
@@ -997,6 +999,26 @@ export default function minios(applications = {}, userSettings = {}) {
                 console.warn(
                     `Desktop application [${id}] is not registered.`
                 );
+
+                return;
+            }
+
+            const fileDependentApps = ['preview', 'editor', 'textedit', 'player'];
+            const isFileApp = fileDependentApps.includes(id);
+
+            // Buka langsung dari Launchpad / Spotlight tanpa file
+            if (isFileApp && !options?.path && (this.applicationsOpen || options?.fromLauncher || options?.fromSpotlight)) {
+                this.applicationsOpen = false;
+                this.closeAll();
+
+                const appName = application.name || (id === 'editor' ? 'Editor' : id === 'player' ? 'Player' : 'Preview');
+                this.handleOsNotify({
+                    title: '',
+                    message: 'Aplikasi berjalan, gunakan via Files.',
+                    text: 'Aplikasi berjalan, gunakan via Files.',
+                    variant: 'info',
+                    app: appName,
+                });
 
                 return;
             }
@@ -2414,14 +2436,54 @@ export default function minios(applications = {}, userSettings = {}) {
         */
 
         initNotificationListener() {
-            window.addEventListener('os-notify', (event) => {
-                this.handleOsNotify(event.detail);
-            });
+            this.recentNotifIds = new Set();
 
+            const handleEvent = (data, defaultVariant = 'info') => {
+                if (!data) return;
+                const payload = Array.isArray(data) ? data[0] : data;
+                if (!payload) return;
+
+                const item = (typeof payload === 'string')
+                    ? { message: payload, variant: defaultVariant }
+                    : { ...payload };
+
+                if (!item.variant && defaultVariant !== 'info') {
+                    item.variant = defaultVariant;
+                }
+
+                // Deduplicate rapidly repeated notifications (e.g. if both window and Livewire.on catch the same event)
+                const dedupKey = item.id || (item.message ? ('msg_' + item.message + '_' + (item.variant || '')) : null);
+                if (dedupKey) {
+                    if (this.recentNotifIds.has(dedupKey)) {
+                        return;
+                    }
+                    this.recentNotifIds.add(dedupKey);
+                    setTimeout(() => {
+                        this.recentNotifIds.delete(dedupKey);
+                    }, 800);
+                }
+
+                this.handleOsNotify(item);
+            };
+
+            // 1. Primary os-notify on window / Alpine $dispatch
+            window.addEventListener('os-notify', (event) => handleEvent(event.detail));
+
+            // 2. Convenience aliases for window / Alpine $dispatch
+            window.addEventListener('toast', (e) => handleEvent(e.detail));
+            window.addEventListener('toast-success', (e) => handleEvent(e.detail, 'success'));
+            window.addEventListener('toast-error', (e) => handleEvent(e.detail, 'danger'));
+            window.addEventListener('toast-warning', (e) => handleEvent(e.detail, 'warning'));
+            window.addEventListener('toast-info', (e) => handleEvent(e.detail, 'info'));
+
+            // 3. Livewire listeners
             if (window.Livewire) {
-                Livewire.on('os-notify', (data) => {
-                    this.handleOsNotify(data);
-                });
+                Livewire.on('os-notify', (data) => handleEvent(data));
+                Livewire.on('toast', (data) => handleEvent(data));
+                Livewire.on('toast-success', (data) => handleEvent(data, 'success'));
+                Livewire.on('toast-error', (data) => handleEvent(data, 'danger'));
+                Livewire.on('toast-warning', (data) => handleEvent(data, 'warning'));
+                Livewire.on('toast-info', (data) => handleEvent(data, 'info'));
             }
         },
 
@@ -2429,12 +2491,19 @@ export default function minios(applications = {}, userSettings = {}) {
             const data = Array.isArray(detail) ? detail[0] : detail;
             if (!data) return;
 
+            const appKey = (data.app_id || data.appId || data.app || '').toLowerCase();
+            const matchedApp = this.applications[appKey] || Object.values(this.applications).find(a => a.name?.toLowerCase() === appKey);
+            const iconName = data.icon || matchedApp?.icon || (this.applications[appKey] ? this.applications[appKey].icon : null);
+
             const notification = {
                 id: data.id || ('notif_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5)),
                 title: data.title || '',
                 text: data.text || data.message || '',
                 variant: data.variant || data.type || 'info',
-                app: data.app || 'MiniOS',
+                app: data.app || matchedApp?.name || 'MiniOS',
+                appId: matchedApp?.id || appKey || 'minios',
+                icon: iconName,
+                icon_url: data.icon_url || null,
                 timestamp: data.timestamp || new Date().toISOString(),
                 time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
                 read: false,
@@ -2446,56 +2515,164 @@ export default function minios(applications = {}, userSettings = {}) {
                 this.notifications = this.notifications.slice(0, 50);
             }
 
-            // Pop Windows 11 native toast banner
-            this.showToast(notification);
+            // Pop standalone MiniOS native toast banner instantly
+            if (data.show_toast !== false) {
+                this.showToast(notification);
+            }
 
             this.playNotificationChime();
         },
 
         showToast(notification) {
+            const duration = notification.duration || 5000;
             const toast = {
                 ...notification,
-                timer: null,
+                duration: duration,
+                remaining: duration,
+                progress: 100,
+                paused: false,
+                visible: true,
+                leaving: false,
+                entering: true,
             };
 
-            // Limit active toasts visible at once to 3
-            if (this.activeToasts.length >= 3) {
-                const oldest = this.activeToasts.shift();
-                if (oldest?.timer) clearTimeout(oldest.timer);
+            // Limit active non-leaving toasts visible at once to 3
+            const visibleToasts = this.activeToasts.filter(t => !t.leaving);
+            if (visibleToasts.length >= 3) {
+                const oldest = visibleToasts[0];
+                if (oldest) {
+                    this.dismissToast(oldest.id);
+                }
             }
 
             this.activeToasts.push(toast);
 
-            toast.timer = setTimeout(() => {
-                this.dismissToast(toast.id);
-            }, 5000);
+            // Clear entrance animation lock after 200ms so standard transition applies on hover/stack
+            setTimeout(() => {
+                toast.entering = false;
+            }, 200);
+
+            this.ensureToastTicker();
+        },
+
+        ensureToastTicker() {
+            if (this.toastTicker) return;
+
+            this.toastTicker = setInterval(() => {
+                if (this.activeToasts.length === 0) {
+                    clearInterval(this.toastTicker);
+                    this.toastTicker = null;
+                    return;
+                }
+
+                const delta = 50;
+                this.activeToasts.forEach(toast => {
+                    if (toast.leaving) return;
+                    if (toast.paused || this.toastGroupHovered) return;
+
+                    toast.remaining -= delta;
+                    if (toast.duration > 0) {
+                        toast.progress = Math.max(0, (toast.remaining / toast.duration) * 100);
+                    }
+
+                    if (toast.remaining <= 0) {
+                        this.dismissToast(toast.id);
+                    }
+                });
+            }, 50);
         },
 
         dismissToast(id) {
-            const index = this.activeToasts.findIndex(t => t.id === id);
-            if (index !== -1) {
-                if (this.activeToasts[index].timer) {
-                    clearTimeout(this.activeToasts[index].timer);
+            const toast = this.activeToasts.find(t => t.id === id);
+            if (!toast || toast.leaving) return;
+
+            toast.leaving = true;
+            toast.visible = false;
+            toast.entering = false;
+
+            // Wait for exit transition (180ms) before splicing
+            setTimeout(() => {
+                const index = this.activeToasts.findIndex(t => t.id === id);
+                if (index !== -1) {
+                    this.activeToasts.splice(index, 1);
                 }
-                this.activeToasts.splice(index, 1);
-            }
+            }, 180);
         },
 
         pauseToast(id) {
             const toast = this.activeToasts.find(t => t.id === id);
-            if (toast && toast.timer) {
-                clearTimeout(toast.timer);
-                toast.timer = null;
+            if (toast) {
+                toast.paused = true;
             }
         },
 
         resumeToast(id) {
             const toast = this.activeToasts.find(t => t.id === id);
-            if (toast && !toast.timer) {
-                toast.timer = setTimeout(() => {
-                    this.dismissToast(id);
-                }, 3000);
+            if (toast) {
+                toast.paused = false;
+                if (toast.remaining < 2500) {
+                    toast.remaining = 2500;
+                    toast.duration = Math.max(toast.duration, 2500);
+                }
             }
+        },
+
+        pauseAllToasts() {
+            this.toastGroupHovered = true;
+            this.activeToasts.forEach(t => {
+                t.paused = true;
+            });
+        },
+
+        resumeAllToasts() {
+            this.toastGroupHovered = false;
+            this.activeToasts.forEach(t => {
+                t.paused = false;
+                if (t.remaining < 2500) {
+                    t.remaining = 2500;
+                    t.duration = Math.max(t.duration, 2500);
+                }
+            });
+        },
+
+        getToastStyle(toast) {
+            const pos = (this.settings?.notifications?.position || 'bottom end');
+            const isStart = pos.includes('start');
+            const isTop = pos.includes('top');
+
+            const visibleToasts = this.activeToasts.filter(t => !t.leaving);
+            const itemIdx = visibleToasts.indexOf(toast);
+            const revIndex = itemIdx !== -1 ? Math.max(0, visibleToasts.length - 1 - itemIdx) : 0;
+
+            const offscreenX = isStart ? '-125%' : '125%';
+            const tx = toast.leaving ? offscreenX : '0px';
+
+            if (this.toastGroupHovered) {
+                return {
+                    transform: `translate3d(${tx}, 0, 0) scale(1)`,
+                    opacity: toast.leaving ? 0 : 1,
+                    zIndex: 50 - revIndex,
+                    position: 'relative',
+                    marginBottom: '0.625rem',
+                };
+            }
+
+            // Collapsed 3D stack
+            const yOffset = isTop ? (revIndex * 12) : (-revIndex * 12);
+            const scale = Math.max(0.85, 1 - (revIndex * 0.05));
+            const opacity = toast.leaving ? 0 : Math.max(0.65, 1 - (revIndex * 0.16));
+
+            return {
+                transform: `translate3d(${tx}, ${yOffset}px, 0) scale(${scale})`,
+                opacity: opacity,
+                zIndex: 50 - revIndex,
+                position: revIndex === 0 ? 'relative' : 'absolute',
+                bottom: isTop ? 'auto' : '0',
+                top: isTop ? '0' : 'auto',
+                right: isStart ? 'auto' : '0',
+                left: isStart ? '0' : 'auto',
+                marginBottom: '0px',
+            };
         },
 
         /*
@@ -2769,7 +2946,7 @@ export default function minios(applications = {}, userSettings = {}) {
             }
 
             if (item.type === 'app') {
-                this.openApplication(item.id);
+                this.openApplication(item.id, { fromSpotlight: true });
                 this.closeSpotlight();
             }
         },

@@ -482,7 +482,7 @@ class Settings extends Component
                 'desc' => $this->trans('nav_notifications_desc'),
                 'icon' => 'bell',
                 'color' => 'bg-purple-500 text-white',
-                'keywords' => ['notifikasi', 'toast', 'suara', 'sound', 'chime', 'posisi', 'position', 'alert', 'notifications', 'action center'],
+                'keywords' => ['notifikasi', 'toast', 'suara', 'sound', 'chime', 'posisi', 'position', 'alert', 'notifications', 'action center', 'flux', 'provider', 'bawaan'],
             ],
             'locale_time' => [
                 'label' => $this->trans('nav_locale_time'),

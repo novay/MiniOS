@@ -66,8 +66,9 @@ class MiniOS
         'about',
         'control-panel',
         'preview',
-        'textedit',
+        'editor',
         'player',
+        'soundcloud',
     ];
 
     /**

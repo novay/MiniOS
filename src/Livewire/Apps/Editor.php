@@ -9,7 +9,7 @@ use Novay\MiniOS\Concerns\HasNotifications;
 use Novay\MiniOS\Concerns\HasTranslations;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
-class TextEdit extends Component
+class Editor extends Component
 {
     use HasNotifications;
     use HasTranslations;
@@ -63,13 +63,14 @@ class TextEdit extends Component
             $targetApp = $id;
         }
 
-        if ($targetApp === 'textedit' && is_string($targetPath) && ! empty($targetPath)) {
+        if (in_array($targetApp, ['editor', 'textedit'], true) && is_string($targetPath) && ! empty($targetPath)) {
             $this->loadFile($targetPath);
         }
     }
 
+    #[On('open-editor')]
     #[On('open-textedit')]
-    public function onOpenTextEdit(?string $path = null, mixed $payload = null): void
+    public function onOpenEditor(?string $path = null, mixed $payload = null): void
     {
         $targetPath = $path;
         if (is_array($payload)) {
@@ -104,6 +105,8 @@ class TextEdit extends Component
         $this->originalContent = $content;
         $this->isDirty = false;
         $this->fileSize = $this->formatBytes($sizeBytes);
+
+        $this->dispatch('editor-file-loaded', content: $content, fileName: $this->fileName);
     }
 
     public function newFile(): void
@@ -114,6 +117,8 @@ class TextEdit extends Component
         $this->originalContent = '';
         $this->isDirty = false;
         $this->fileSize = null;
+
+        $this->dispatch('editor-content-reset', fileName: $this->fileName);
     }
 
     public function updatedContent(): void
@@ -218,9 +223,11 @@ class TextEdit extends Component
 
     public function render()
     {
-        $view = view()->exists('pages.minios.apps.textedit')
-            ? 'pages.minios.apps.textedit'
-            : 'minios::apps.textedit';
+        $view = view()->exists('pages.minios.apps.editor')
+            ? 'pages.minios.apps.editor'
+            : (view()->exists('minios::apps.editor')
+                ? 'minios::apps.editor'
+                : 'minios::apps.textedit');
 
         return view($view, [
             'accent' => $this->accent,

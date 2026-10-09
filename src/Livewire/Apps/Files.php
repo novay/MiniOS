@@ -42,9 +42,7 @@ class Files extends Component
 
     public ?string $selectedPath = null;
 
-    public ?string $statusMessage = null;
-
-    public string $statusType = 'success';
+    public ?string $statusType = null;
 
     // New Folder Modal State
     public bool $showNewFolderModal = false;
@@ -79,6 +77,26 @@ class Files extends Component
 
     public bool $deleteIsDirectory = false;
 
+    // Clipboard State (Copy / Cut)
+    public ?string $clipboardPath = null;
+
+    public ?string $clipboardMode = null; // 'copy' | 'cut'
+
+    public ?string $clipboardName = null;
+
+    public bool $clipboardIsDir = false;
+
+    // Move Modal State
+    public bool $showMoveModal = false;
+
+    public string $moveTargetPath = '';
+
+    public string $moveTargetName = '';
+
+    public bool $moveIsDirectory = false;
+
+    public string $moveDestination = '';
+
     // Preview / Text Editor State
     public ?array $previewItem = null;
 
@@ -86,7 +104,7 @@ class Files extends Component
 
     public int $trashCount = 0;
 
-    public bool $showDetailsPanel = true;
+    public bool $showDetailsPanel = false;
 
     public function mount(string $path = ''): void
     {
@@ -496,23 +514,21 @@ class Files extends Component
         $this->selectedPath = $this->selectedPath === $path ? null : $path;
     }
 
-    public function notify(string $message, string $type = 'success'): void
+    public function notify(string $message, ?string $heading = null, string $variant = 'success', int $duration = 5000): void
     {
-        $this->statusMessage = $message;
-        $this->statusType = $type;
+        if (in_array($heading, ['success', 'danger', 'error', 'warning', 'info'], true) && $variant === 'success') {
+            $variant = $heading;
+            $heading = null;
+        }
 
-        $variant = match ($type) {
-            'error' => 'danger',
-            'warning' => 'warning',
-            default => 'success',
-        };
+        $this->statusType = in_array($variant, ['error', 'danger'], true) ? 'error' : $variant;
 
-        $this->osNotify($message, $this->trans('app_title'), $variant);
+        $this->osNotify($message, $heading, $variant, $duration);
     }
 
     public function clearNotification(): void
     {
-        $this->statusMessage = null;
+        $this->statusType = null;
     }
 
     public function openNewFolderModal(): void
@@ -805,6 +821,276 @@ class Files extends Component
         $this->dispatch('trash-updated', count: $this->trashCount);
     }
 
+    public function copyItem(?string $path = null): void
+    {
+        $target = $path ?: $this->selectedPath;
+        if (! $target) {
+            return;
+        }
+
+        $sanitized = $this->sanitizePath($target);
+        $fullPath = storage_path($sanitized);
+
+        if (! File::exists($fullPath)) {
+            $this->notify($this->trans('error_delete_not_found'), 'error');
+
+            return;
+        }
+
+        $this->clipboardPath = $sanitized;
+        $this->clipboardMode = 'copy';
+        $this->clipboardName = basename($sanitized);
+        $this->clipboardIsDir = File::isDirectory($fullPath);
+
+        $this->notify($this->trans('success_copied_to_clipboard', ['name' => $this->clipboardName]));
+    }
+
+    public function cutItem(?string $path = null): void
+    {
+        if ($this->isLocked) {
+            return;
+        }
+
+        $target = $path ?: $this->selectedPath;
+        if (! $target) {
+            return;
+        }
+
+        $sanitized = $this->sanitizePath($target);
+        $fullPath = storage_path($sanitized);
+
+        if (! File::exists($fullPath)) {
+            $this->notify($this->trans('error_delete_not_found'), 'error');
+
+            return;
+        }
+
+        $this->clipboardPath = $sanitized;
+        $this->clipboardMode = 'cut';
+        $this->clipboardName = basename($sanitized);
+        $this->clipboardIsDir = File::isDirectory($fullPath);
+
+        $this->notify($this->trans('success_cut_to_clipboard', ['name' => $this->clipboardName]));
+    }
+
+    public function clearClipboard(): void
+    {
+        $this->clipboardPath = null;
+        $this->clipboardMode = null;
+        $this->clipboardName = null;
+        $this->clipboardIsDir = false;
+    }
+
+    public function pasteItem(?string $destinationDir = null): void
+    {
+        if ($this->isLocked || ! $this->clipboardPath) {
+            return;
+        }
+
+        $targetDir = $destinationDir !== null ? $this->sanitizePath($destinationDir) : $this->currentPath;
+        $sourceFullPath = storage_path($this->clipboardPath);
+
+        if (! File::exists($sourceFullPath)) {
+            $this->notify($this->trans('error_clipboard_source_missing'), 'error');
+            $this->clearClipboard();
+
+            return;
+        }
+
+        $destDirectoryFullPath = storage_path($targetDir);
+        if (! File::isDirectory($destDirectoryFullPath)) {
+            File::makeDirectory($destDirectoryFullPath, 0755, true);
+        }
+
+        $sourceName = basename($sourceFullPath);
+        $isDir = File::isDirectory($sourceFullPath);
+
+        // Prevent copying or moving a folder into itself or its own subfolder
+        if ($isDir) {
+            $sourceReal = realpath($sourceFullPath);
+            $destReal = realpath($destDirectoryFullPath);
+            if ($destReal && ($destReal === $sourceReal || str_starts_with($destReal, $sourceReal.DIRECTORY_SEPARATOR))) {
+                $this->notify($this->trans('error_cannot_copy_into_itself'), 'error');
+
+                return;
+            }
+        }
+
+        $targetName = $sourceName;
+        $targetFullPath = $destDirectoryFullPath.'/'.$targetName;
+
+        if ($this->clipboardMode === 'copy') {
+            if (File::exists($targetFullPath)) {
+                $targetName = $this->generateUniqueCopyName($destDirectoryFullPath, $sourceName, $isDir);
+                $targetFullPath = $destDirectoryFullPath.'/'.$targetName;
+            }
+
+            try {
+                if ($isDir) {
+                    File::copyDirectory($sourceFullPath, $targetFullPath);
+                } else {
+                    File::copy($sourceFullPath, $targetFullPath);
+                }
+                $this->notify($this->trans('success_pasted', ['name' => $targetName]));
+            } catch (\Exception $e) {
+                $this->notify($this->trans('error_paste_failed', ['error' => $e->getMessage()]), 'error');
+            }
+        } elseif ($this->clipboardMode === 'cut') {
+            if (File::exists($targetFullPath) && realpath($targetFullPath) !== realpath($sourceFullPath)) {
+                $targetName = $this->generateUniqueCopyName($destDirectoryFullPath, $sourceName, $isDir);
+                $targetFullPath = $destDirectoryFullPath.'/'.$targetName;
+            }
+
+            try {
+                File::move($sourceFullPath, $targetFullPath);
+                $this->notify($this->trans('success_moved', ['name' => $targetName]));
+                if ($this->selectedPath === $this->clipboardPath) {
+                    $this->selectedPath = null;
+                }
+                $this->clearClipboard();
+            } catch (\Exception $e) {
+                $this->notify($this->trans('error_move_failed', ['error' => $e->getMessage()]), 'error');
+            }
+        }
+    }
+
+    public function openMoveModal(?string $path = null, bool $isDir = false): void
+    {
+        $target = $path ?: $this->selectedPath;
+        if (! $target) {
+            return;
+        }
+
+        $this->moveTargetPath = $this->sanitizePath($target);
+        $this->moveTargetName = basename($this->moveTargetPath);
+        $this->moveIsDirectory = $isDir || File::isDirectory(storage_path($this->moveTargetPath));
+        $this->moveDestination = $this->currentPath;
+        $this->showMoveModal = true;
+    }
+
+    public function closeMoveModal(): void
+    {
+        $this->showMoveModal = false;
+        $this->moveTargetPath = '';
+        $this->moveTargetName = '';
+        $this->moveIsDirectory = false;
+        $this->moveDestination = '';
+    }
+
+    public function moveItem(): void
+    {
+        if ($this->isLocked || empty($this->moveTargetPath)) {
+            return;
+        }
+
+        $sourceFullPath = storage_path($this->moveTargetPath);
+        if (! File::exists($sourceFullPath)) {
+            $this->notify($this->trans('error_delete_not_found'), 'error');
+            $this->closeMoveModal();
+
+            return;
+        }
+
+        $destDir = $this->sanitizePath($this->moveDestination);
+        $destDirFullPath = storage_path($destDir);
+
+        if (! File::isDirectory($destDirFullPath)) {
+            File::makeDirectory($destDirFullPath, 0755, true);
+        }
+
+        // Prevent moving a directory into itself or child
+        if ($this->moveIsDirectory) {
+            $sourceReal = realpath($sourceFullPath);
+            $destReal = realpath($destDirFullPath);
+            if ($destReal && ($destReal === $sourceReal || str_starts_with($destReal, $sourceReal.DIRECTORY_SEPARATOR))) {
+                $this->notify($this->trans('error_cannot_copy_into_itself'), 'error');
+
+                return;
+            }
+        }
+
+        $sourceName = basename($sourceFullPath);
+        $targetName = $sourceName;
+        $targetFullPath = $destDirFullPath.'/'.$targetName;
+
+        if (File::exists($targetFullPath) && realpath($targetFullPath) !== realpath($sourceFullPath)) {
+            $targetName = $this->generateUniqueCopyName($destDirFullPath, $sourceName, $this->moveIsDirectory);
+            $targetFullPath = $destDirFullPath.'/'.$targetName;
+        }
+
+        try {
+            File::move($sourceFullPath, $targetFullPath);
+            $this->notify($this->trans('success_moved', ['name' => $targetName]));
+            if ($this->selectedPath === $this->moveTargetPath) {
+                $this->selectedPath = null;
+            }
+            $this->closeMoveModal();
+        } catch (\Exception $e) {
+            $this->notify($this->trans('error_move_failed', ['error' => $e->getMessage()]), 'error');
+        }
+    }
+
+    public function getAvailableFoldersProperty(): array
+    {
+        $folders = [
+            ['path' => '', 'name' => 'storage (Root)'],
+        ];
+
+        try {
+            $basePath = storage_path();
+            if (File::isDirectory($basePath)) {
+                $allDirs = File::directories($basePath);
+                foreach ($allDirs as $dir) {
+                    $rel = str_replace([$basePath.'/', $basePath.'\\'], '', $dir);
+                    $rel = str_replace('\\', '/', $rel);
+
+                    if (str_starts_with($rel, '.trash') || str_starts_with($rel, 'logs') || str_starts_with($rel, 'framework')) {
+                        continue;
+                    }
+
+                    $folders[] = ['path' => $rel, 'name' => $rel];
+
+                    foreach (File::directories($dir) as $sub) {
+                        $subRel = str_replace([$basePath.'/', $basePath.'\\'], '', $sub);
+                        $subRel = str_replace('\\', '/', $subRel);
+                        $folders[] = ['path' => $subRel, 'name' => $subRel];
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            // Fallback gracefully
+        }
+
+        return $folders;
+    }
+
+    protected function generateUniqueCopyName(string $dir, string $name, bool $isDir): string
+    {
+        if ($isDir) {
+            $copyName = $name.' - Salinan';
+            $counter = 1;
+            while (File::exists($dir.'/'.$copyName)) {
+                $counter++;
+                $copyName = $name." - Salinan ({$counter})";
+            }
+
+            return $copyName;
+        }
+
+        $ext = pathinfo($name, PATHINFO_EXTENSION);
+        $filename = pathinfo($name, PATHINFO_FILENAME);
+        $suffix = $ext ? '.'.$ext : '';
+
+        $copyName = $filename.' - Salinan'.$suffix;
+        $counter = 1;
+        while (File::exists($dir.'/'.$copyName)) {
+            $counter++;
+            $copyName = $filename." - Salinan ({$counter})".$suffix;
+        }
+
+        return $copyName;
+    }
+
     public function downloadFile(string $path)
     {
         if ($this->isLocked) {
@@ -871,7 +1157,7 @@ class Files extends Component
         // Populate previewItem for backwards compatibility if needed
         $extension = strtolower(pathinfo($basename, PATHINFO_EXTENSION));
         $sizeBytes = File::size($realPath);
-        $this->previewContent = in_array($appId, ['textedit']) && $sizeBytes < 100000 ? File::get($realPath) : null;
+        $this->previewContent = in_array($appId, ['editor', 'textedit']) && $sizeBytes < 100000 ? File::get($realPath) : null;
         $this->previewItem = [
             'name' => $basename,
             'path' => $sanitized,
@@ -898,7 +1184,7 @@ class Files extends Component
             return 'player';
         }
 
-        return 'textedit';
+        return 'editor';
     }
 
     public function openPreview(string $path): void

@@ -90,6 +90,7 @@ return [
         ],
 
         'notifications' => [
+            'provider' => 'minios',
             'position' => 'bottom end',
             'sound' => true,
         ],

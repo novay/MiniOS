@@ -195,6 +195,13 @@
     "notif_sound_desc": "Putar efek suara lembut saat notifikasi baru masuk.",
     "notif_test_header": "Uji Coba Notifikasi",
     "notif_test_header_desc": "Kirim notifikasi contoh untuk melihat tampilan dan mendengar suara.",
+    "notif_provider_title": "Sistem Pop-up Notifikasi",
+    "notif_provider_desc": "Pilih sistem tampilan toast yang akan digunakan saat notifikasi muncul.",
+    "notif_provider_minios": "Bawaan MiniOS",
+    "notif_provider_minios_desc": "Banner desktop modern dengan glassmorphism dan riwayat lengkap di Action Center.",
+    "notif_provider_flux": "Flux UI",
+    "notif_provider_flux_desc": "Komponen pop-up toast standar dari pustaka Flux UI.",
+    "notif_provider_recommended": "Default",
     "btn_test_notification": "Kirim Notifikasi Uji Coba",
     "notif_test_title": "Pusat Notifikasi MiniOS",
     "notif_test_desc": "Ini adalah contoh notifikasi sistem Windows 11 di MiniOS!"

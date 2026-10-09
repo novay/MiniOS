@@ -3,34 +3,34 @@
 namespace Novay\MiniOS\Apps;
 
 use Novay\MiniOS\Contracts\DesktopApp;
-use Novay\MiniOS\Livewire\Apps\TextEdit;
+use Novay\MiniOS\Livewire\Apps\Soundcloud;
 use Novay\MiniOS\Support\WindowConfig;
 
-class TextEditApp implements DesktopApp
+class SoundcloudApp implements DesktopApp
 {
     public function id(): string
     {
-        return 'textedit';
+        return 'soundcloud';
     }
 
     public function name(): string
     {
-        return 'TextEdit';
+        return 'SoundCloud';
     }
 
     public function icon(): string
     {
-        return 'textedit';
+        return 'soundcloud';
     }
 
     public function entry(): string
     {
-        return '/textedit';
+        return '/soundcloud';
     }
 
     public function routes(): array
     {
-        return ['/textedit'];
+        return ['/soundcloud'];
     }
 
     public function version(): string
@@ -40,18 +40,20 @@ class TextEditApp implements DesktopApp
 
     public function isPinned(): bool
     {
-        return false;
+        return true;
     }
 
     public function component(): ?string
     {
-        return class_exists(TextEdit::class) ? TextEdit::class : 'apps.textedit';
+        return class_exists(Soundcloud::class) ? Soundcloud::class : 'apps.soundcloud';
     }
 
     public function window(): WindowConfig
     {
         return WindowConfig::make()
-            ->size(800, 560)
-            ->min(450, 320);
+            ->size(520, 640)
+            ->min(380, 320)
+            ->resizable(false)
+            ->maximizable(false);
     }
 }

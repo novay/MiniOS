@@ -1,5 +1,5 @@
 {
-    "app_title": "TextEdit",
+    "app_title": "Editor",
     "untitled_file": "Untitled.txt",
     "btn_new": "New",
     "btn_save": "Save",
@@ -10,9 +10,9 @@
     "placeholder_editor": "Start typing text here...",
     "status_lines": ":lines lines",
     "status_chars": ":chars characters",
-    "status_cursor": "Ln :line, Col :col",
+    "status_cursor": "Line :line, Col :col",
     "status_unsaved": "Unsaved",
     "success_file_saved": "File \":name\" saved successfully.",
-    "error_file_not_found": "File not found or inaccessible.",
+    "error_file_not_found": "File not found or cannot be accessed.",
     "error_save_failed": "Failed to save file: :error"
 }

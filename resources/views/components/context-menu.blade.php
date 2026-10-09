@@ -160,7 +160,7 @@
             {{-- Open --}}
             <button
                 type="button"
-                @click="openApplication(contextMenu.appId); applicationsOpen = false; closeContextMenu()"
+                @click="openApplication(contextMenu.appId, { fromLauncher: true }); applicationsOpen = false; closeContextMenu()"
                 class="group flex w-full items-center gap-2.5 rounded px-2.5 py-1.5 text-left transition-colors hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-500"
             >
                 <flux:icon name="arrow-top-right-on-square" class="size-4 text-neutral-500 dark:text-neutral-400 group-hover:text-white" />

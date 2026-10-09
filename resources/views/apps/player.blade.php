@@ -385,7 +385,7 @@
                     {{ $this->trans('empty_desc') }}
                 </p>
                 <button type="button"
-                        @click="$dispatch('open-app', { app: 'files' })"
+                        @click="$dispatch('open-app', { id: 'files', app: 'files' })"
                         class="mt-5 px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 active:bg-purple-700 text-white font-medium text-xs shadow-lg shadow-purple-600/30 flex items-center space-x-2 transition">
                     <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>

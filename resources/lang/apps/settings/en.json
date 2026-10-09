@@ -195,6 +195,13 @@
     "notif_sound_desc": "Play a subtle sound effect when new notifications arrive.",
     "notif_test_header": "Test Notification",
     "notif_test_header_desc": "Send a sample notification to preview appearance and hear audio.",
+    "notif_provider_title": "Toast Notification System",
+    "notif_provider_desc": "Choose the toast notification style displayed by the system.",
+    "notif_provider_minios": "MiniOS Native",
+    "notif_provider_minios_desc": "Modern desktop glassmorphic banner with full history in Action Center.",
+    "notif_provider_flux": "Flux UI",
+    "notif_provider_flux_desc": "Standard toast pop-up component from the Flux UI library.",
+    "notif_provider_recommended": "Default",
     "btn_test_notification": "Send Test Notification",
     "notif_test_title": "MiniOS Notification Center",
     "notif_test_desc": "This is an authentic Windows 11 system notification sample in MiniOS!"
