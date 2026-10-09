@@ -7,15 +7,15 @@
         <div>
             {{-- Windows 11 Breadcrumb --}}
             <div class="flex items-center gap-1.5 text-[11px] font-medium text-neutral-500 dark:text-neutral-400">
-                <span>Control Panel</span>
+                <span>{{ $this->t('app_title') }}</span>
                 <svg class="size-3 text-neutral-400 dark:text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                 </svg>
-                <span class="text-neutral-700 dark:text-neutral-300">Program &amp; Fitur</span>
+                <span class="text-neutral-700 dark:text-neutral-300">{{ $this->t('crumb_programs') }}</span>
             </div>
 
             <div class="flex items-center gap-2 mt-0.5">
-                <h1 class="text-base font-semibold tracking-tight text-neutral-900 dark:text-white">Aplikasi terinstal</h1>
+                <h1 class="text-base font-semibold tracking-tight text-neutral-900 dark:text-white">{{ $this->t('header_installed_apps') }}</h1>
                 <span class="rounded-md bg-neutral-200/70 dark:bg-white/10 px-2 py-0.2 text-[11px] font-medium text-neutral-600 dark:text-neutral-300">{{ $stats['total'] }}</span>
             </div>
         </div>
@@ -31,7 +31,7 @@
                 <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
                 </svg>
-                <span>Pasang Aplikasi (.ZIP)</span>
+                <span>{{ $this->t('btn_install_zip') }}</span>
             </button>
         </div>
     </header>
@@ -50,7 +50,7 @@
             <input
                 type="text"
                 wire:model.live.debounce.250ms="search"
-                placeholder="Cari dalam daftar aplikasi..."
+                placeholder="{{ $this->t('search_placeholder') }}"
                 class="w-full rounded-md border border-neutral-300/90 dark:border-white/10 bg-white dark:bg-[#2d2d2d] py-1.5 pl-9 pr-8 text-xs text-neutral-800 dark:text-neutral-100 placeholder-neutral-400 dark:placeholder-neutral-500 shadow-xs transition-all focus:outline-none focus:ring-2 {{ $accent['ring'] }}"
             />
             @if ($search)
@@ -76,7 +76,7 @@
                 @endif
                 class="flex items-center gap-1.5 rounded-[5px] px-3 py-1 font-medium transition-all {{ $activeTab === 'all' ? 'text-white shadow-xs' : 'text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white' }}"
             >
-                <span>Semua</span>
+                <span>{{ $this->t('tab_all') }}</span>
                 <span class="rounded px-1.5 py-0.2 text-[10px] {{ $activeTab === 'all' ? 'bg-white/20 text-white' : 'bg-neutral-300/80 text-neutral-600 dark:bg-white/10 dark:text-neutral-400' }}">{{ $stats['total'] }}</span>
             </button>
 
@@ -88,7 +88,7 @@
                 @endif
                 class="flex items-center gap-1.5 rounded-[5px] px-3 py-1 font-medium transition-all {{ $activeTab === 'custom' ? 'text-white shadow-xs' : 'text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white' }}"
             >
-                <span>Custom</span>
+                <span>{{ $this->t('tab_custom') }}</span>
                 <span class="rounded px-1.5 py-0.2 text-[10px] {{ $activeTab === 'custom' ? 'bg-white/20 text-white' : 'bg-neutral-300/80 text-neutral-600 dark:bg-white/10 dark:text-neutral-400' }}">{{ $stats['custom'] }}</span>
             </button>
 
@@ -100,7 +100,7 @@
                 @endif
                 class="flex items-center gap-1.5 rounded-[5px] px-3 py-1 font-medium transition-all {{ $activeTab === 'system' ? 'text-white shadow-xs' : 'text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white' }}"
             >
-                <span>System</span>
+                <span>{{ $this->t('tab_system') }}</span>
                 <span class="rounded px-1.5 py-0.2 text-[10px] {{ $activeTab === 'system' ? 'bg-white/20 text-white' : 'bg-neutral-300/80 text-neutral-600 dark:bg-white/10 dark:text-neutral-400' }}">{{ $stats['system'] }}</span>
             </button>
         </div>
@@ -119,7 +119,7 @@
                         <div
                             wire:click="toggleAppDetails('{{ $app['id'] }}')"
                             class="flex items-center gap-3.5 min-w-0 flex-1 cursor-pointer select-none"
-                            title="Klik untuk melihat detail aplikasi, migrations & model"
+                            title="{{ $this->t('app_accordion_title') }}"
                         >
                             {{-- Accordion Chevron Indicator --}}
                             <div class="text-neutral-400 dark:text-neutral-500 transition-transform duration-200 {{ $expandedApp === $app['id'] ? 'rotate-90 text-neutral-700 dark:text-neutral-200' : '' }}">
@@ -145,7 +145,7 @@
                                             <svg class="size-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2 1.5 3 3.5 3h9c2 0 3.5-1 3.5-3V7c0-2-1.5-3-3.5-3h-9C5.5 4 4 5 4 7zM4 10h16M4 14h16"/>
                                             </svg>
-                                            <span>{{ count($app['models']) }} Model, {{ count($app['migrations']) }} Migration</span>
+                                            <span>{{ $this->t('models_migrations_count', ['models' => count($app['models']), 'migrations' => count($app['migrations'])]) }}</span>
                                         </span>
                                     @endif
                                 </div>
@@ -156,11 +156,11 @@
                         <div class="flex items-center gap-2 shrink-0">
                             @if ($app['isCore'])
                                 <flux:badge size="sm" icon="shield-check" icon:variant="outline">
-                                    System
+                                    {{ $this->t('badge_system') }}
                                 </flux:badge>
                             @else
                                 <flux:badge size="sm" icon="cube" icon:variant="outline" color="emerald">
-                                    Custom
+                                    {{ $this->t('badge_custom') }}
                                 </flux:badge>
                             @endif
                         </div>
@@ -171,13 +171,13 @@
                             <flux:button
                                 type="button"
                                 @click="openWindow('{{ $app['id'] }}')"
-                                title="Buka aplikasi di desktop"
+                                title="{{ $this->t('btn_open_title') }}"
                                 size="sm"
                             >
                                 <svg class="size-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
                                 </svg>
-                                <span>Buka</span>
+                                <span>{{ $this->t('btn_open') }}</span>
                             </flux:button>
 
                             {{-- Uninstall Custom App or Lock Badge --}}
@@ -185,13 +185,13 @@
                                 <button
                                     type="button"
                                     wire:click="confirmUninstall('{{ $app['id'] }}')"
-                                    title="Hapus instalasi aplikasi ini"
+                                    title="{{ $this->t('btn_uninstall_title') }}"
                                     class="inline-flex items-center gap-1 rounded-md border border-rose-200/90 dark:border-rose-500/20 bg-rose-50 dark:bg-rose-500/10 px-3 py-1.5 text-xs font-medium text-rose-700 dark:text-rose-300 shadow-xs transition-all hover:bg-rose-600 hover:text-white hover:border-transparent active:scale-98"
                                 >
                                     <svg class="size-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                                     </svg>
-                                    <span>Uninstall</span>
+                                    <span>{{ $this->t('btn_uninstall') }}</span>
                                 </button>
                             @endif
                         </div>
@@ -203,42 +203,42 @@
                             {{-- Info Grid (Manifest, Paths, Entrypoint) --}}
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
                                 <div class="rounded-lg border border-neutral-200/80 dark:border-white/5 bg-white dark:bg-[#202020] p-3 space-y-2">
-                                    <div class="text-[11px] font-semibold uppercase tracking-wider text-neutral-400">Arsitektur & Komponen</div>
+                                    <div class="text-[11px] font-semibold uppercase tracking-wider text-neutral-400">{{ $this->t('arch_components') }}</div>
                                     <div class="space-y-1 text-[11px]">
                                         <div class="flex items-start justify-between gap-2">
-                                            <span class="text-neutral-500 shrink-0">Class Manifest:</span>
+                                            <span class="text-neutral-500 shrink-0">{{ $this->t('lbl_class_manifest') }}</span>
                                             <span class="font-mono text-neutral-800 dark:text-neutral-200 text-right truncate" title="{{ $app['class'] }}">{{ $app['class'] }}</span>
                                         </div>
                                         <div class="flex items-start justify-between gap-2">
-                                            <span class="text-neutral-500 shrink-0">Livewire Component:</span>
+                                            <span class="text-neutral-500 shrink-0">{{ $this->t('lbl_livewire_component') }}</span>
                                             <span class="font-mono text-neutral-800 dark:text-neutral-200 text-right truncate" title="{{ $app['component'] ?? '-' }}">{{ $app['component'] ?? '-' }}</span>
                                         </div>
                                         <div class="flex items-start justify-between gap-2">
-                                            <span class="text-neutral-500 shrink-0">Entry Route:</span>
+                                            <span class="text-neutral-500 shrink-0">{{ $this->t('lbl_entry_route') }}</span>
                                             <span class="font-mono text-neutral-800 dark:text-neutral-200 text-right">{{ $app['entry'] }}</span>
                                         </div>
                                         <div class="flex items-start justify-between gap-2">
-                                            <span class="text-neutral-500 shrink-0">Terpasang Sejak:</span>
+                                            <span class="text-neutral-500 shrink-0">{{ $this->t('lbl_installed_at') }}</span>
                                             <span class="text-neutral-800 dark:text-neutral-200 text-right">{{ $app['installedAt'] }}</span>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="rounded-lg border border-neutral-200/80 dark:border-white/5 bg-white dark:bg-[#202020] p-3 space-y-2">
-                                    <div class="text-[11px] font-semibold uppercase tracking-wider text-neutral-400">Rute Aplikasi Terdaftar</div>
+                                    <div class="text-[11px] font-semibold uppercase tracking-wider text-neutral-400">{{ $this->t('registered_routes') }}</div>
                                     <div class="flex flex-wrap gap-1 max-h-24 overflow-y-auto pr-1">
                                         @forelse ($app['routes'] as $route)
                                             <span class="inline-flex items-center rounded bg-neutral-100 dark:bg-white/5 px-2 py-0.5 font-mono text-[10px] text-neutral-600 dark:text-neutral-300 border border-neutral-200/60 dark:border-white/5">
                                                 {{ $route }}
                                             </span>
                                         @empty
-                                            <span class="text-[11px] text-neutral-400 italic">Tidak ada rute kustom yang didefinisikan.</span>
+                                            <span class="text-[11px] text-neutral-400 italic">{{ $this->t('no_custom_routes') }}</span>
                                         @endforelse
                                     </div>
                                     @if ($app['folderPath'])
                                         <div class="pt-1 border-t border-neutral-100 dark:border-white/5">
                                             <div class="text-[10px] text-neutral-400 truncate" title="{{ $app['folderPath'] }}">
-                                                <span class="font-medium text-neutral-500">Folder:</span> {{ $app['folderPath'] }}
+                                                <span class="font-medium text-neutral-500">{{ $this->t('lbl_folder') }}</span> {{ $app['folderPath'] }}
                                             </div>
                                         </div>
                                     @endif
@@ -254,10 +254,10 @@
                                             <svg class="size-3.5 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2 1.5 3 3.5 3h9c2 0 3.5-1 3.5-3V7c0-2-1.5-3-3.5-3h-9C5.5 4 4 5 4 7zM4 10h16M4 14h16"/>
                                             </svg>
-                                            <span class="text-[11px] font-semibold uppercase tracking-wider text-neutral-400">Database Migrations</span>
+                                            <span class="text-[11px] font-semibold uppercase tracking-wider text-neutral-400">{{ $this->t('db_migrations') }}</span>
                                         </div>
                                         <span class="rounded-full bg-neutral-100 dark:bg-white/10 px-2 py-0.2 text-[10px] font-medium text-neutral-600 dark:text-neutral-300">
-                                            {{ count($app['migrations']) }} berkas
+                                            {{ $this->t('migrations_count', ['count' => count($app['migrations'])]) }}
                                         </span>
                                     </div>
 
@@ -273,11 +273,11 @@
                                                             <svg class="size-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
                                                             </svg>
-                                                            <span>Applied</span>
+                                                            <span>{{ $this->t('badge_applied') }}</span>
                                                         </span>
                                                     @else
                                                         <span class="inline-flex items-center gap-1 rounded bg-amber-50 dark:bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-medium text-amber-700 dark:text-amber-400 border border-amber-200/80 dark:border-amber-500/20 shrink-0">
-                                                            <span>Pending</span>
+                                                            <span>{{ $this->t('badge_pending') }}</span>
                                                         </span>
                                                     @endif
                                                 </div>
@@ -285,7 +285,7 @@
                                         </div>
                                     @else
                                         <div class="rounded border border-dashed border-neutral-200 dark:border-white/10 p-3 text-center text-[11px] text-neutral-400 italic">
-                                            Tidak ada skema tabel database (migrations) untuk aplikasi ini.
+                                            {{ $this->t('no_migrations') }}
                                         </div>
                                     @endif
                                 </div>
@@ -297,10 +297,10 @@
                                             <svg class="size-3.5 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
                                             </svg>
-                                            <span class="text-[11px] font-semibold uppercase tracking-wider text-neutral-400">Eloquent Models</span>
+                                            <span class="text-[11px] font-semibold uppercase tracking-wider text-neutral-400">{{ $this->t('eloquent_models') }}</span>
                                         </div>
                                         <span class="rounded-full bg-neutral-100 dark:bg-white/10 px-2 py-0.2 text-[10px] font-medium text-neutral-600 dark:text-neutral-300">
-                                            {{ count($app['models']) }} model
+                                            {{ $this->t('models_count', ['count' => count($app['models'])]) }}
                                         </span>
                                     </div>
 
@@ -317,11 +317,11 @@
                                                     <div class="shrink-0 flex items-center gap-1.5">
                                                         @if ($mod['count'] !== null)
                                                             <span class="inline-flex items-center rounded bg-neutral-100 dark:bg-white/5 px-2 py-0.5 text-[10px] font-medium text-neutral-600 dark:text-neutral-300 border border-neutral-200/60 dark:border-white/5">
-                                                                {{ $mod['count'] }} data
+                                                                {{ $this->t('data_count', ['count' => $mod['count']]) }}
                                                             </span>
                                                         @endif
                                                         <span class="inline-flex items-center gap-0.5 rounded bg-emerald-50 dark:bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-medium text-emerald-700 dark:text-emerald-400 border border-emerald-200/80 dark:border-emerald-500/20">
-                                                            Ready
+                                                            {{ $this->t('badge_ready') }}
                                                         </span>
                                                     </div>
                                                 </div>
@@ -329,7 +329,7 @@
                                         </div>
                                     @else
                                         <div class="rounded border border-dashed border-neutral-200 dark:border-white/10 p-3 text-center text-[11px] text-neutral-400 italic">
-                                            Tidak ada model Eloquent khusus yang terdaftar.
+                                            {{ $this->t('no_models') }}
                                         </div>
                                     @endif
                                 </div>
@@ -342,10 +342,10 @@
                                         <svg class="size-3.5 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
                                         </svg>
-                                        <span class="text-[11px] font-semibold uppercase tracking-wider text-neutral-400">Package & Dependencies (Composer)</span>
+                                        <span class="text-[11px] font-semibold uppercase tracking-wider text-neutral-400">{{ $this->t('composer_dependencies') }}</span>
                                     </div>
                                     <span class="rounded-full bg-neutral-100 dark:bg-white/10 px-2 py-0.2 text-[10px] font-medium text-neutral-600 dark:text-neutral-300">
-                                        {{ count($app['packages'] ?? []) }} dependensi
+                                        {{ $this->t('dependencies_count', ['count' => count($app['packages'] ?? [])]) }}
                                     </span>
                                 </div>
 
@@ -362,7 +362,7 @@
                                                     </div>
                                                     @if (! $pkg['installed'])
                                                         <div class="flex items-center gap-1.5 mt-1">
-                                                            <span class="text-[10px] text-neutral-400">Instalasi:</span>
+                                                            <span class="text-[10px] text-neutral-400">{{ $this->t('lbl_install_cmd') }}</span>
                                                             <code class="rounded bg-neutral-100 dark:bg-black/40 px-1.5 py-0.5 font-mono text-[10px] text-neutral-700 dark:text-neutral-300 border border-neutral-200/60 dark:border-white/5 select-all">{{ $pkg['command'] }}</code>
                                                         </div>
                                                     @endif
@@ -374,14 +374,14 @@
                                                             <svg class="size-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
                                                             </svg>
-                                                            <span>Terpasang</span>
+                                                            <span>{{ $this->t('badge_installed') }}</span>
                                                         </span>
                                                     @else
                                                         <span class="inline-flex items-center gap-1 rounded bg-rose-50 dark:bg-rose-500/10 px-2 py-0.5 text-[10px] font-medium text-rose-700 dark:text-rose-400 border border-rose-200/80 dark:border-rose-500/20">
                                                             <svg class="size-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                                                             </svg>
-                                                            <span>Belum Terpasang</span>
+                                                            <span>{{ $this->t('badge_uninstalled') }}</span>
                                                         </span>
 
                                                         <button
@@ -392,7 +392,7 @@
                                                             <svg class="size-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                                                             </svg>
-                                                            <span>Pasang via GUI</span>
+                                                            <span>{{ $this->t('btn_install_gui') }}</span>
                                                         </button>
                                                     @endif
                                                 </div>
@@ -401,7 +401,7 @@
                                     </div>
                                 @else
                                     <div class="rounded border border-dashed border-neutral-200 dark:border-white/10 p-3 text-center text-[11px] text-neutral-400 italic">
-                                        Aplikasi ini berjalan mandiri tanpa paket eksternal khusus.
+                                        {{ $this->t('no_dependencies') }}
                                     </div>
                                 @endif
                             </div>
@@ -416,8 +416,8 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                             </svg>
                         </div>
-                        <p class="text-sm font-medium text-neutral-700 dark:text-neutral-300">Tidak ada aplikasi ditemukan</p>
-                        <p class="text-xs text-neutral-500">Coba ubah kata kunci pencarian atau tab filter di atas.</p>
+                        <p class="text-sm font-medium text-neutral-700 dark:text-neutral-300">{{ $this->t('no_apps_found_title') }}</p>
+                        <p class="text-xs text-neutral-500">{{ $this->t('no_apps_found_desc') }}</p>
                     </div>
                 </div>
             @endforelse
@@ -441,7 +441,7 @@
                     <button
                         type="button"
                         wire:click="dismissStatus"
-                        title="Tutup notifikasi"
+                        title="{{ $this->t('btn_close') }}"
                         class="ml-1 text-neutral-400 hover:text-neutral-700 dark:hover:text-white transition-colors"
                     >
                         <svg class="size-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -452,13 +452,13 @@
             @else
                 <div class="flex items-center gap-2 truncate">
                     <span class="inline-block size-1.5 rounded-full bg-neutral-400 dark:bg-neutral-600 shrink-0"></span>
-                    <span class="truncate">Total: {{ $stats['total'] }} aplikasi ({{ $stats['system'] }} System, {{ $stats['custom'] }} Custom)</span>
+                    <span class="truncate">{{ $this->t('total_apps_status', ['total' => $stats['total'], 'system' => $stats['system'], 'custom' => $stats['custom']]) }}</span>
                 </div>
             @endif
         </div>
 
         <div class="shrink-0 font-medium text-neutral-400 dark:text-neutral-500 text-[11px]">
-            <span>Ukuran: {{ $stats['storage'] }}</span>
+            <span>{{ $this->t('storage_size', ['size' => $stats['storage']]) }}</span>
         </div>
     </footer>
 
@@ -479,8 +479,8 @@
                             </svg>
                         </div>
                         <div>
-                            <h2 class="text-sm font-semibold text-neutral-900 dark:text-white">Pasang Aplikasi dari ZIP</h2>
-                            <p class="text-xs text-neutral-500 dark:text-neutral-400">Unggah paket aplikasi khusus MiniOS</p>
+                            <h2 class="text-sm font-semibold text-neutral-900 dark:text-white">{{ $this->t('modal_upload_title') }}</h2>
+                            <p class="text-xs text-neutral-500 dark:text-neutral-400">{{ $this->t('modal_upload_desc') }}</p>
                         </div>
                     </div>
                     <button
@@ -500,12 +500,12 @@
                         <svg class="size-3.5" style="color: var(--accent-color, {{ $accent['hex'] }});" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
-                        Struktur Paket Aplikasi yang Didukung:
+                        {{ $this->t('package_structure_title') }}
                     </p>
                     <ul class="space-y-1 text-[11px] text-neutral-500 dark:text-neutral-400">
-                        <li>• <span class="text-neutral-800 dark:text-neutral-200">{AppName}App.php</span> (Manifest DesktopApp)</li>
-                        <li>• <span class="text-neutral-800 dark:text-neutral-200">Livewire/</span> (Komponen interaktif Livewire)</li>
-                        <li>• <span class="text-neutral-800 dark:text-neutral-200">views/</span> (Opsional: template Blade aplikasi)</li>
+                        <li>• <span class="text-neutral-800 dark:text-neutral-200">{{ $this->t('structure_manifest') }}</span></li>
+                        <li>• <span class="text-neutral-800 dark:text-neutral-200">{{ $this->t('structure_livewire') }}</span></li>
+                        <li>• <span class="text-neutral-800 dark:text-neutral-200">{{ $this->t('structure_views') }}</span></li>
                     </ul>
                 </div>
 
@@ -526,13 +526,13 @@
 
                         @if ($uploadFile)
                             <div class="mt-3">
-                                <p class="text-xs font-semibold text-emerald-600 dark:text-emerald-400 truncate max-w-xs">{{ method_exists($uploadFile, 'getClientOriginalName') ? $uploadFile->getClientOriginalName() : 'Berkas terpilih' }}</p>
-                                <p class="text-[11px] text-neutral-500 dark:text-neutral-400 mt-0.5">{{ method_exists($uploadFile, 'getSize') ? round($uploadFile->getSize() / 1024, 1) : 0 }} KB • Siap dipasang</p>
+                                <p class="text-xs font-semibold text-emerald-600 dark:text-emerald-400 truncate max-w-xs">{{ method_exists($uploadFile, 'getClientOriginalName') ? $uploadFile->getClientOriginalName() : $this->t('selected_file') }}</p>
+                                <p class="text-[11px] text-neutral-500 dark:text-neutral-400 mt-0.5">{{ method_exists($uploadFile, 'getSize') ? round($uploadFile->getSize() / 1024, 1) : 0 }} KB • {{ $this->t('ready_to_install') }}</p>
                             </div>
                         @else
                             <div class="mt-3">
-                                <p class="text-xs font-medium text-neutral-700 dark:text-neutral-200 group-hover:text-neutral-900 dark:group-hover:text-white">Klik untuk memilih berkas ZIP</p>
-                                <p class="text-[11px] text-neutral-400 dark:text-neutral-500 mt-0.5">Maksimal 50 MB (.zip)</p>
+                                <p class="text-xs font-medium text-neutral-700 dark:text-neutral-200 group-hover:text-neutral-900 dark:group-hover:text-white">{{ $this->t('upload_click_select') }}</p>
+                                <p class="text-[11px] text-neutral-400 dark:text-neutral-500 mt-0.5">{{ $this->t('upload_max_size') }}</p>
                             </div>
                         @endif
                     </label>
@@ -544,7 +544,7 @@
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
                             </svg>
-                            Mengunggah berkas ZIP...
+                            {{ $this->t('uploading_zip') }}
                         </span>
                     </div>
 
@@ -560,7 +560,7 @@
                         wire:click="closeUploadModal"
                         class="rounded-md border border-neutral-300 dark:border-white/10 bg-white dark:bg-[#323232] px-4 py-2 text-xs font-medium text-neutral-700 dark:text-neutral-200 shadow-xs transition-all hover:bg-neutral-100 dark:hover:bg-[#3c3c3c]"
                     >
-                        Batal
+                        {{ $this->t('btn_cancel') }}
                     </button>
 
                     <button
@@ -572,13 +572,13 @@
                         style="background-color: var(--accent-color, {{ $accent['hex'] }});"
                         class="flex items-center gap-2 rounded-md px-5 py-2 text-xs font-medium text-white shadow-xs transition-all hover:brightness-110 active:scale-98 disabled:opacity-50 disabled:pointer-events-none"
                     >
-                        <span wire:loading.remove wire:target="installZip">Pasang Sekarang</span>
+                        <span wire:loading.remove wire:target="installZip">{{ $this->t('btn_install_now') }}</span>
                         <span wire:loading wire:target="installZip" class="inline-flex items-center gap-1.5">
                             <svg class="size-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
                             </svg>
-                            Memasang...
+                            {{ $this->t('btn_installing') }}
                         </span>
                     </button>
                 </div>
@@ -599,8 +599,8 @@
                         </svg>
                     </div>
                     <div>
-                        <h2 class="text-sm font-bold text-neutral-900 dark:text-white">Hapus Aplikasi?</h2>
-                        <p class="text-xs text-neutral-500 dark:text-neutral-400">Konfirmasi uninstall program</p>
+                        <h2 class="text-sm font-bold text-neutral-900 dark:text-white">{{ $this->t('modal_uninstall_title') }}</h2>
+                        <p class="text-xs text-neutral-500 dark:text-neutral-400">{{ $this->t('modal_uninstall_desc') }}</p>
                     </div>
                 </div>
 
@@ -615,7 +615,7 @@
                 </div>
 
                 <p class="mt-4 text-xs text-neutral-600 dark:text-neutral-300 leading-relaxed">
-                    Apakah Anda yakin ingin menghapus aplikasi <strong class="text-neutral-900 dark:text-white">{{ $appToUninstallDetails['name'] }}</strong>? Seluruh berkas kode sumber dan tampilan terkait akan dihapus secara permanen dari MiniOS.
+                    {!! $this->t('uninstall_confirm_msg', ['name' => '<strong class="text-neutral-900 dark:text-white">' . e($appToUninstallDetails['name']) . '</strong>']) !!}
                 </p>
 
                 <div class="mt-6 flex items-center justify-end gap-2 border-t border-neutral-200/80 dark:border-white/5 pt-4">
@@ -624,7 +624,7 @@
                         wire:click="cancelUninstall"
                         class="rounded-md border border-neutral-300 dark:border-white/10 bg-white dark:bg-[#323232] px-4 py-2 text-xs font-medium text-neutral-700 dark:text-neutral-200 shadow-xs transition-all hover:bg-neutral-100 dark:hover:bg-[#3c3c3c]"
                     >
-                        Batal
+                        {{ $this->t('btn_cancel') }}
                     </button>
 
                     <button
@@ -634,13 +634,13 @@
                         wire:target="uninstallApp"
                         class="flex items-center gap-2 rounded-md bg-rose-600 px-5 py-2 text-xs font-medium text-white shadow-xs transition-all hover:bg-rose-500 active:scale-98 disabled:opacity-50"
                     >
-                        <span wire:loading.remove wire:target="uninstallApp">Hapus Aplikasi</span>
+                        <span wire:loading.remove wire:target="uninstallApp">{{ $this->t('btn_uninstall_app') }}</span>
                         <span wire:loading wire:target="uninstallApp" class="inline-flex items-center gap-1.5">
                             <svg class="size-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
                             </svg>
-                            Menghapus...
+                            {{ $this->t('btn_uninstalling') }}
                         </span>
                     </button>
                 </div>
@@ -663,8 +663,8 @@
                             </svg>
                         </div>
                         <div>
-                            <h2 class="text-sm font-bold text-neutral-900 dark:text-white">Instalasi Dependensi Composer</h2>
-                            <p class="text-xs text-neutral-500 dark:text-neutral-400">Aplikasi: {{ $composerAppName }}</p>
+                            <h2 class="text-sm font-bold text-neutral-900 dark:text-white">{{ $this->t('modal_composer_title') }}</h2>
+                            <p class="text-xs text-neutral-500 dark:text-neutral-400">{{ $this->t('modal_composer_app', ['name' => $composerAppName]) }}</p>
                         </div>
                     </div>
                     @if ($composerStatus !== 'running')
@@ -683,7 +683,7 @@
                 {{-- Command preview card --}}
                 <div class="rounded-xl border border-neutral-200/70 dark:border-white/5 bg-neutral-50 dark:bg-black/30 p-3 space-y-1.5">
                     <div class="flex items-center justify-between text-[11px] text-neutral-500">
-                        <span>Perintah yang akan dieksekusi:</span>
+                        <span>{{ $this->t('composer_cmd_label') }}</span>
                         <button
                             type="button"
                             @click="
@@ -696,7 +696,7 @@
                             <svg class="size-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
                             </svg>
-                            <span x-text="copiedCmd ? 'Tersalin!' : 'Salin'"></span>
+                            <span x-text="copiedCmd ? '{{ $this->t('btn_copied') }}' : '{{ $this->t('btn_copy') }}'"></span>
                         </button>
                     </div>
                     <code class="block font-mono text-xs text-indigo-700 dark:text-indigo-400 font-semibold select-all break-all">
@@ -712,7 +712,7 @@
                             <span class="size-2.5 rounded-full bg-amber-500/80 inline-block"></span>
                             <span class="size-2.5 rounded-full bg-emerald-500/80 inline-block"></span>
                         </div>
-                        <span class="text-[10px] font-mono text-neutral-400">Terminal Output — {{ $composerPackage }}</span>
+                        <span class="text-[10px] font-mono text-neutral-400">{{ $this->t('terminal_output_header', ['package' => $composerPackage]) }}</span>
                         <div class="w-8"></div>
                     </div>
 
@@ -728,24 +728,24 @@
                                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
                                 </svg>
-                                Sedang mengeksekusi composer require...
+                                {{ $this->t('composer_executing') }}
                             </span>
                         @elseif ($composerStatus === 'success')
                             <span class="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-medium">
                                 <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                                 </svg>
-                                Selesai terpasang!
+                                {{ $this->t('composer_success') }}
                             </span>
                         @elseif ($composerStatus === 'error')
                             <span class="inline-flex items-center gap-1 text-rose-600 dark:text-rose-400 font-medium">
                                 <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                                 </svg>
-                                Proses instalasi gagal.
+                                {{ $this->t('composer_error') }}
                             </span>
                         @else
-                            <span class="text-neutral-500 text-[11px]">Klik Mulai untuk memasang via latar belakang.</span>
+                            <span class="text-neutral-500 text-[11px]">{{ $this->t('composer_ready_hint') }}</span>
                         @endif
                     </div>
 
@@ -756,7 +756,7 @@
                                 wire:click="closeComposerModal"
                                 class="rounded-lg border border-neutral-300 dark:border-white/10 bg-white dark:bg-[#323232] px-4 py-1.5 text-xs font-medium text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-[#3c3c3c] transition"
                             >
-                                Tutup
+                                {{ $this->t('btn_close') }}
                             </button>
                         @endif
 
@@ -770,7 +770,7 @@
                                 <svg class="size-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                                 </svg>
-                                <span>Mulai Instalasi</span>
+                                <span>{{ $this->t('btn_start_install') }}</span>
                             </button>
                         @endif
                     </div>

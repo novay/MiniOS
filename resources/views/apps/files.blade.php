@@ -49,7 +49,7 @@
             <button
                 type="button"
                 wire:click="goBack"
-                title="Kembali"
+                title="{{ $this->t('btn_back') }}"
                 @disabled(! $this->canGoBack)
                 class="flex size-7 items-center justify-center rounded-md text-neutral-600 dark:text-neutral-300 hover:bg-black/5 dark:hover:bg-white/10 disabled:opacity-30 disabled:pointer-events-none transition-colors"
             >
@@ -60,7 +60,7 @@
             <button
                 type="button"
                 wire:click="goForward"
-                title="Maju"
+                title="{{ $this->t('btn_forward') }}"
                 @disabled(! $this->canGoForward)
                 class="flex size-7 items-center justify-center rounded-md text-neutral-600 dark:text-neutral-300 hover:bg-black/5 dark:hover:bg-white/10 disabled:opacity-30 disabled:pointer-events-none transition-colors"
             >
@@ -71,7 +71,7 @@
             <button
                 type="button"
                 wire:click="navigateUp"
-                title="Ke Folder Induk"
+                title="{{ $this->t('btn_up') }}"
                 @disabled(empty($currentPath))
                 class="flex size-7 items-center justify-center rounded-md text-neutral-600 dark:text-neutral-300 hover:bg-black/5 dark:hover:bg-white/10 disabled:opacity-30 disabled:pointer-events-none transition-colors"
             >
@@ -82,7 +82,7 @@
             <button
                 type="button"
                 wire:click="$refresh"
-                title="Muat Ulang"
+                title="{{ $this->t('btn_refresh') }}"
                 class="flex size-7 items-center justify-center rounded-md text-neutral-600 dark:text-neutral-300 hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
             >
                 <flux:icon name="arrow-path" class="size-3.5" />
@@ -111,7 +111,7 @@
                         wire:click="navigate('{{ $crumb['path'] }}')"
                         class="rounded px-1.5 py-0.5 truncate font-medium transition-colors hover:bg-neutral-100 dark:hover:bg-white/10 {{ $crumb['path'] === $currentPath ? 'font-semibold text-neutral-900 dark:text-white' : 'text-neutral-600 dark:text-neutral-400' }}"
                     >
-                        {{ $crumb['name'] === 'storage' ? 'Penyimpanan' : $crumb['name'] }}
+                        {{ $crumb['name'] === 'storage' ? $this->t('crumb_storage') : $crumb['name'] }}
                     </button>
                 @endforeach
             </nav>
@@ -125,7 +125,7 @@
             <input
                 type="text"
                 wire:model.live.debounce.200ms="searchQuery"
-                placeholder="Cari dalam berkas..."
+                placeholder="{{ $this->t('search_placeholder') }}"
                 class="w-full rounded-md border border-neutral-300/80 dark:border-white/10 bg-white dark:bg-[#202020] py-1 pl-8 pr-7 text-xs text-neutral-900 dark:text-neutral-100 placeholder-neutral-400 dark:placeholder-neutral-500 shadow-2xs transition-all focus:outline-none focus:ring-2 {{ $accent['ring'] }}"
             />
             @if ($searchQuery !== '')
@@ -133,7 +133,7 @@
                     type="button"
                     wire:click="$set('searchQuery', '')"
                     class="absolute inset-y-0 right-0 flex items-center pr-2 text-neutral-400 hover:text-neutral-700 dark:hover:text-white"
-                    title="Hapus pencarian"
+                    title="{{ $this->t('search_clear') }}"
                 >
                     <flux:icon name="x-mark" class="size-3.5" />
                 </button>
@@ -155,7 +155,7 @@
                     class="flex items-center gap-1.5 rounded-md px-3 py-1 text-xs font-medium text-white shadow-2xs hover:brightness-110 active:scale-98 transition-all"
                 >
                     <flux:icon name="plus" class="size-3.5 stroke-[2.5]" />
-                    <span>Baru</span>
+                    <span>{{ $this->t('btn_new') }}</span>
                     <flux:icon name="chevron-down" class="size-3" />
                 </button>
 
@@ -178,7 +178,7 @@
                         class="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-xs text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-white/10 transition-colors"
                     >
                         <flux:icon name="folder-plus" class="size-4 text-amber-500" />
-                        <span>Folder Baru</span>
+                        <span>{{ $this->t('menu_new_folder') }}</span>
                     </button>
                     <button
                         type="button"
@@ -187,7 +187,7 @@
                         class="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-xs text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-white/10 transition-colors"
                     >
                         <flux:icon name="document-plus" class="size-4 text-sky-500" />
-                        <span>Berkas Baru (.txt)</span>
+                        <span>{{ $this->t('menu_new_file') }}</span>
                     </button>
                 </div>
             </div>
@@ -199,7 +199,7 @@
                 class="flex items-center gap-1.5 rounded-md border border-neutral-300/80 dark:border-white/10 bg-white dark:bg-[#2b2b2b] px-3 py-1 text-xs font-medium text-neutral-700 dark:text-neutral-200 shadow-2xs hover:bg-neutral-50 dark:hover:bg-[#333333] transition-all active:scale-98"
             >
                 <flux:icon name="arrow-up-tray" class="size-3.5 text-neutral-500 dark:text-neutral-400" />
-                <span>Unggah</span>
+                <span>{{ $this->t('btn_upload') }}</span>
             </button>
 
             {{-- Action Buttons if Item Selected --}}
@@ -210,40 +210,40 @@
                 <button
                     type="button"
                     wire:click="downloadFile('{{ $selectedPath }}')"
-                    title="Unduh Berkas"
+                    title="{{ $this->t('btn_download') }}"
                     class="flex items-center gap-1.5 rounded-md border border-neutral-300/80 dark:border-white/10 bg-white dark:bg-[#2b2b2b] px-2.5 py-1 text-xs font-medium text-neutral-700 dark:text-neutral-200 shadow-2xs hover:bg-neutral-50 dark:hover:bg-[#333333] transition-all"
                 >
                     <flux:icon name="arrow-down-tray" class="size-3.5 text-neutral-500 dark:text-neutral-400" />
-                    <span class="hidden sm:inline">Unduh</span>
+                    <span class="hidden sm:inline">{{ $this->t('btn_download') }}</span>
                 </button>
 
                 {{-- Ganti Nama --}}
                 <button
                     type="button"
                     wire:click="openRenameModal('{{ $selectedPath }}')"
-                    title="Ganti Nama"
+                    title="{{ $this->t('btn_rename') }}"
                     class="flex items-center gap-1.5 rounded-md border border-neutral-300/80 dark:border-white/10 bg-white dark:bg-[#2b2b2b] px-2.5 py-1 text-xs font-medium text-neutral-700 dark:text-neutral-200 shadow-2xs hover:bg-neutral-50 dark:hover:bg-[#333333] transition-all"
                 >
                     <flux:icon name="pencil-square" class="size-3.5 text-neutral-500 dark:text-neutral-400" />
-                    <span class="hidden sm:inline">Ganti Nama</span>
+                    <span class="hidden sm:inline">{{ $this->t('btn_rename') }}</span>
                 </button>
 
                 {{-- Hapus --}}
                 <button
                     type="button"
                     wire:click="openDeleteModal('{{ $selectedPath }}', false)"
-                    title="Hapus"
+                    title="{{ $this->t('btn_delete') }}"
                     class="flex items-center gap-1.5 rounded-md border border-rose-300/80 dark:border-rose-500/20 bg-rose-50/50 dark:bg-rose-500/10 px-2.5 py-1 text-xs font-medium text-rose-600 dark:text-rose-400 shadow-2xs hover:bg-rose-100 dark:hover:bg-rose-500/20 transition-all"
                 >
                     <flux:icon name="trash" class="size-3.5 text-rose-500" />
-                    <span class="hidden sm:inline">Hapus</span>
+                    <span class="hidden sm:inline">{{ $this->t('btn_delete') }}</span>
                 </button>
 
                 {{-- Batal Seleksi --}}
                 <button
                     type="button"
                     wire:click="$set('selectedPath', null)"
-                    title="Batal Pilih"
+                    title="{{ $this->t('btn_clear_selection') }}"
                     class="text-neutral-400 hover:text-neutral-700 dark:hover:text-white p-1"
                 >
                     <flux:icon name="x-mark" class="size-3.5" />
@@ -258,7 +258,7 @@
                 <button
                     type="button"
                     wire:click="setViewMode('grid')"
-                    title="Tampilan Grid / Ikon"
+                    title="{{ $this->t('title_view_grid') }}"
                     class="flex size-6 items-center justify-center rounded transition-all {{ $viewMode === 'grid' ? 'bg-neutral-200/90 dark:bg-white/15 text-neutral-900 dark:text-white font-medium shadow-2xs' : 'text-neutral-500 hover:text-neutral-800 dark:hover:text-white' }}"
                 >
                     <flux:icon name="squares-2x2" class="size-3.5" />
@@ -266,7 +266,7 @@
                 <button
                     type="button"
                     wire:click="setViewMode('list')"
-                    title="Tampilan List / Detail"
+                    title="{{ $this->t('title_view_list') }}"
                     class="flex size-6 items-center justify-center rounded transition-all {{ $viewMode === 'list' ? 'bg-neutral-200/90 dark:bg-white/15 text-neutral-900 dark:text-white font-medium shadow-2xs' : 'text-neutral-500 hover:text-neutral-800 dark:hover:text-white' }}"
                 >
                     <flux:icon name="list-bullet" class="size-3.5" />
@@ -280,13 +280,13 @@
         <div class="hidden sm:flex items-center gap-1.5 text-[13px] text-neutral-500 dark:text-neutral-400">
             {{-- Sort Options --}}
             <div class="flex items-center gap-1 text-[11px] text-neutral-600 dark:text-neutral-400">
-                <span class="text-neutral-400 dark:text-neutral-500 hidden md:inline">Urutkan:</span>
+                <span class="text-neutral-400 dark:text-neutral-500 hidden md:inline">{{ $this->t('lbl_sort_by') }}</span>
                 <button
                     type="button"
                     wire:click="sort('name')"
                     class="flex items-center gap-1 rounded px-2 py-0.5 transition-colors hover:bg-neutral-200/70 dark:hover:bg-white/10 {{ $sortBy === 'name' ? 'font-semibold text-neutral-900 dark:text-white' : '' }}"
                 >
-                    <span>Nama</span>
+                    <span>{{ $this->t('sort_name') }}</span>
                     @if ($sortBy === 'name')
                         <flux:icon :name="$sortDirection === 'asc' ? 'bars-arrow-up' : 'bars-arrow-down'" class="size-3" />
                     @endif
@@ -297,7 +297,7 @@
                     wire:click="sort('updated_at')"
                     class="flex items-center gap-1 rounded px-2 py-0.5 transition-colors hover:bg-neutral-200/70 dark:hover:bg-white/10 {{ $sortBy === 'updated_at' ? 'font-semibold text-neutral-900 dark:text-white' : '' }}"
                 >
-                    <span>Tanggal</span>
+                    <span>{{ $this->t('sort_date') }}</span>
                     @if ($sortBy === 'updated_at')
                         <flux:icon :name="$sortDirection === 'asc' ? 'bars-arrow-up' : 'bars-arrow-down'" class="size-3" />
                     @endif
@@ -308,7 +308,7 @@
                     wire:click="sort('size')"
                     class="flex items-center gap-1 rounded px-2 py-0.5 transition-colors hover:bg-neutral-200/70 dark:hover:bg-white/10 {{ $sortBy === 'size' ? 'font-semibold text-neutral-900 dark:text-white' : '' }}"
                 >
-                    <span>Ukuran</span>
+                    <span>{{ $this->t('sort_size') }}</span>
                     @if ($sortBy === 'size')
                         <flux:icon :name="$sortDirection === 'asc' ? 'bars-arrow-up' : 'bars-arrow-down'" class="size-3" />
                     @endif
@@ -326,7 +326,7 @@
             {{-- Quick Access Section --}}
             <div>
                 <div class="px-2 text-[10px] font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 mb-1">
-                    Akses Cepat
+                    {{ $this->t('section_quick_access') }}
                 </div>
                 <nav class="flex flex-col gap-0.5">
                     {{-- Storage Root --}}
@@ -342,7 +342,7 @@
                         <div class="flex size-5 items-center justify-center rounded text-neutral-700 dark:text-neutral-300 {{ $isRoot ? $accent['text'] : '' }}">
                             <flux:icon name="computer-desktop" class="size-4" />
                         </div>
-                        <span class="truncate">Storage Root</span>
+                        <span class="truncate">{{ $this->t('nav_storage_root') }}</span>
                     </button>
 
                     {{-- App Data --}}
@@ -358,7 +358,7 @@
                         <div class="flex size-5 items-center justify-center rounded text-amber-500">
                             <flux:icon name="folder" class="size-4" />
                         </div>
-                        <span class="truncate">App Data</span>
+                        <span class="truncate">{{ $this->t('nav_app_data') }}</span>
                     </button>
 
                     {{-- Public Storage --}}
@@ -374,7 +374,7 @@
                         <div class="flex size-5 items-center justify-center rounded text-emerald-500">
                             <flux:icon name="globe-alt" class="size-4" />
                         </div>
-                        <span class="truncate">Public Storage</span>
+                        <span class="truncate">{{ $this->t('nav_public_storage') }}</span>
                     </button>
                 </nav>
             </div>
@@ -382,10 +382,7 @@
             {{-- Cloud Storage Section --}}
             <div>
                 <div class="px-2 text-[10px] font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 mb-1 flex items-center justify-between">
-                    <span>Cloud Storage</span>
-                    {{-- @if ($this->cloudStorageInfo && $this->cloudStorageInfo['is_active'])
-                        <span class="inline-flex items-center px-1.5 py-0.5 rounded-full text-[9px] font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">Default OS</span>
-                    @endif --}}
+                    <span>{{ $this->t('section_cloud_storage') }}</span>
                 </div>
                 <nav class="flex flex-col gap-0.5">
                     @if ($this->cloudStorageInfo)
@@ -399,7 +396,6 @@
                             </div>
                             <div class="min-w-0 flex-1 truncate">
                                 <div class="truncate font-medium text-neutral-800 dark:text-neutral-200">{{ $this->cloudStorageInfo['name'] }}</div>
-                                {{-- <div class="text-[10px] text-neutral-400 dark:text-neutral-500 truncate">{{ $this->cloudStorageInfo['target'] }}</div> --}}
                             </div>
                             <flux:icon name="information-circle" class="size-3.5 text-neutral-400 opacity-60 group-hover:opacity-100 transition-opacity" />
                         </button>
@@ -423,7 +419,7 @@
             {{-- System & Cache Section --}}
             <div>
                 <div class="px-2 text-[10px] font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 mb-1">
-                    Sistem MiniOS
+                    {{ $this->t('section_system') }}
                 </div>
                 <nav class="flex flex-col gap-0.5">
                     {{-- Logs --}}
@@ -439,7 +435,7 @@
                         <div class="flex size-5 items-center justify-center rounded text-rose-500">
                             <flux:icon name="document-text" class="size-4" />
                         </div>
-                        <span class="truncate">Logs Sistem</span>
+                        <span class="truncate">{{ $this->t('nav_system_logs') }}</span>
                     </button>
 
                     {{-- Framework Cache --}}
@@ -455,7 +451,7 @@
                         <div class="flex size-5 items-center justify-center rounded text-indigo-500">
                             <flux:icon name="circle-stack" class="size-4" />
                         </div>
-                        <span class="truncate">Framework Cache</span>
+                        <span class="truncate">{{ $this->t('nav_framework_cache') }}</span>
                     </button>
                 </nav>
             </div>
@@ -467,8 +463,8 @@
                         <flux:icon name="server" class="size-3.5" />
                     </div>
                     <div class="min-w-0 flex-1">
-                        <div class="text-xs font-semibold truncate text-neutral-900 dark:text-white">Penyimpanan Lokal</div>
-                        <div class="text-[10px] text-neutral-500 dark:text-neutral-400">storage/app (Lokal Host)</div>
+                        <div class="text-xs font-semibold truncate text-neutral-900 dark:text-white">{{ $this->t('card_local_storage') }}</div>
+                        <div class="text-[10px] text-neutral-500 dark:text-neutral-400">{{ $this->t('card_local_desc') }}</div>
                     </div>
                 </div>
 
@@ -479,9 +475,9 @@
                             <span class="truncate">{{ $this->cloudStorageInfo['name'] }}</span>
                         </span>
                         @if ($this->cloudStorageInfo['is_active'])
-                            <span class="font-semibold text-emerald-600 dark:text-emerald-400 shrink-0">Aktif</span>
+                            <span class="font-semibold text-emerald-600 dark:text-emerald-400 shrink-0">{{ $this->t('status_active') }}</span>
                         @else
-                            <span class="text-neutral-400 shrink-0">Tersedia</span>
+                            <span class="text-neutral-400 shrink-0">{{ $this->t('status_available') }}</span>
                         @endif
                     </div>
                 @else
@@ -501,8 +497,8 @@
                         <flux:icon name="lock-closed" class="size-8" />
                     </div>
                     <div class="max-w-xs space-y-1">
-                        <h2 class="text-base font-semibold text-neutral-900 dark:text-white">Akses Terkunci</h2>
-                        <p class="text-xs text-neutral-500 dark:text-neutral-400">Aplikasi Files hanya dapat diakses oleh pengguna yang sudah login ke MiniOS.</p>
+                        <h2 class="text-base font-semibold text-neutral-900 dark:text-white">{{ $this->t('locked_title') }}</h2>
+                        <p class="text-xs text-neutral-500 dark:text-neutral-400">{{ $this->t('locked_desc') }}</p>
                     </div>
                 </div>
             @elseif (count($this->items) === 0)
@@ -513,10 +509,10 @@
                     </div>
                     <div class="max-w-xs space-y-0.5">
                         <p class="text-sm font-semibold text-neutral-800 dark:text-neutral-200">
-                            {{ $searchQuery !== '' ? 'Berkas tidak ditemukan' : 'Folder ini kosong' }}
+                            {{ $searchQuery !== '' ? $this->t('empty_search_title') : $this->t('empty_folder_title') }}
                         </p>
                         <p class="text-xs text-neutral-500 dark:text-neutral-400">
-                            {{ $searchQuery !== '' ? 'Tidak ada berkas yang cocok dengan "'.$searchQuery.'"' : 'Tidak ada berkas atau direktori di lokasi ini' }}
+                            {{ $searchQuery !== '' ? $this->t('empty_search_desc', ['query' => $searchQuery]) : $this->t('empty_folder_desc') }}
                         </p>
                     </div>
                     @if ($searchQuery !== '')
@@ -525,7 +521,7 @@
                             wire:click="$set('searchQuery', '')"
                             class="inline-flex items-center gap-1 rounded-md bg-neutral-200/80 dark:bg-white/10 px-3 py-1 text-xs font-medium text-neutral-700 dark:text-neutral-300 hover:bg-neutral-300 dark:hover:bg-white/15 transition-colors"
                         >
-                            Hapus filter pencarian
+                            {{ $this->t('btn_clear_search_filter') }}
                         </button>
                     @endif
                 </div>
@@ -550,7 +546,7 @@
                                     type="button"
                                     @click.stop="openContextMenu($event, { path: '{{ $item['path'] }}', name: '{{ addslashes($item['name']) }}', is_dir: {{ $item['is_dir'] ? 'true' : 'false' }} })"
                                     class="absolute top-2 right-2 flex size-6 items-center justify-center rounded-md bg-white/80 dark:bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-neutral-200 dark:hover:bg-white/20 text-neutral-600 dark:text-neutral-300 shadow-2xs"
-                                    title="Pilihan"
+                                    title="{{ $this->t('title_options') }}"
                                 >
                                     <flux:icon name="ellipsis-horizontal" class="size-3.5" />
                                 </button>
@@ -632,7 +628,7 @@
                                 <tr class="border-b border-neutral-200 dark:border-white/10 text-[11px] font-semibold text-neutral-500 dark:text-neutral-400 select-none">
                                     <th class="py-2 px-3 hover:text-neutral-800 dark:hover:text-white cursor-pointer" wire:click="sort('name')">
                                         <div class="flex items-center gap-1">
-                                            <span>Nama</span>
+                                            <span>{{ $this->t('col_name') }}</span>
                                             @if ($sortBy === 'name')
                                                 <flux:icon :name="$sortDirection === 'asc' ? 'bars-arrow-up' : 'bars-arrow-down'" class="size-3" />
                                             @endif
@@ -640,16 +636,16 @@
                                     </th>
                                     <th class="py-2 px-3 hover:text-neutral-800 dark:hover:text-white cursor-pointer" wire:click="sort('updated_at')">
                                         <div class="flex items-center gap-1">
-                                            <span>Terakhir Diubah</span>
+                                            <span>{{ $this->t('col_modified') }}</span>
                                             @if ($sortBy === 'updated_at')
                                                 <flux:icon :name="$sortDirection === 'asc' ? 'bars-arrow-up' : 'bars-arrow-down'" class="size-3" />
                                             @endif
                                         </div>
                                     </th>
-                                    <th class="py-2 px-3">Tipe</th>
+                                    <th class="py-2 px-3">{{ $this->t('col_type') }}</th>
                                     <th class="py-2 px-3 hover:text-neutral-800 dark:hover:text-white cursor-pointer text-right" wire:click="sort('size')">
                                         <div class="flex items-center justify-end gap-1">
-                                            <span>Ukuran</span>
+                                            <span>{{ $this->t('col_size') }}</span>
                                             @if ($sortBy === 'size')
                                                 <flux:icon :name="$sortDirection === 'asc' ? 'bars-arrow-up' : 'bars-arrow-down'" class="size-3" />
                                             @endif
@@ -745,15 +741,15 @@
     {{-- ========================================================= --}}
     <footer class="flex shrink-0 items-center justify-between border-t border-neutral-200/90 dark:border-white/5 bg-[#f8f8f8]/90 dark:bg-[#202020]/90 px-4 py-1 text-xs text-neutral-500 dark:text-neutral-400 select-none">
         <div class="flex items-center gap-2">
-            <span>{{ count($this->items) }} item</span>
+            <span>{{ $this->t('footer_item_count', ['count' => count($this->items)]) }}</span>
             @if ($selectedPath)
                 <span class="rounded bg-neutral-200 dark:bg-white/10 px-1.5 py-0.2 text-[10px] text-neutral-700 dark:text-neutral-300">
-                    1 item dipilih
+                    {{ $this->t('status_selected_one') }}
                 </span>
             @endif
             @if ($searchQuery !== '')
                 <span class="rounded bg-neutral-200 dark:bg-white/10 px-1.5 py-0.2 text-[10px] text-neutral-700 dark:text-neutral-300">
-                    Hasil pencarian
+                    {{ $this->t('status_search_results') }}
                 </span>
             @endif
         </div>
@@ -810,7 +806,7 @@
             class="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-left text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-white/10 transition-colors"
         >
             <flux:icon name="arrow-top-right-on-square" class="size-3.5 text-neutral-500 dark:text-neutral-400" />
-            <span x-text="contextItem?.is_dir ? 'Buka Folder' : 'Pratinjau Berkas'"></span>
+            <span x-text="contextItem?.is_dir ? '{{ $this->t('ctx_open_folder') }}' : '{{ $this->t('ctx_preview_file') }}'"></span>
         </button>
 
         {{-- Unduh (Jika File) --}}
@@ -821,7 +817,7 @@
                 class="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-left text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-white/10 transition-colors"
             >
                 <flux:icon name="arrow-down-tray" class="size-3.5 text-neutral-500 dark:text-neutral-400" />
-                <span>Unduh Berkas</span>
+                <span>{{ $this->t('ctx_download_file') }}</span>
             </button>
         </template>
 
@@ -832,7 +828,7 @@
             class="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-left text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-white/10 transition-colors"
         >
             <flux:icon name="pencil-square" class="size-3.5 text-neutral-500 dark:text-neutral-400" />
-            <span>Ganti Nama</span>
+            <span>{{ $this->t('ctx_rename') }}</span>
         </button>
 
         {{-- Divider --}}
@@ -845,7 +841,7 @@
             class="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-left text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-colors"
         >
             <flux:icon name="trash" class="size-3.5 text-rose-500" />
-            <span>Hapus</span>
+            <span>{{ $this->t('ctx_delete') }}</span>
         </button>
     </div>
 
@@ -860,19 +856,19 @@
                         <flux:icon name="folder-plus" class="size-5" />
                     </div>
                     <div>
-                        <h3 class="text-sm font-semibold text-neutral-900 dark:text-white">Folder Baru</h3>
-                        <p class="text-xs text-neutral-500 dark:text-neutral-400">Buat folder baru di direktori saat ini.</p>
+                        <h3 class="text-sm font-semibold text-neutral-900 dark:text-white">{{ $this->t('modal_new_folder_title') }}</h3>
+                        <p class="text-xs text-neutral-500 dark:text-neutral-400">{{ $this->t('modal_new_folder_desc') }}</p>
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-1.5">Nama Folder</label>
+                    <label class="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-1.5">{{ $this->t('lbl_folder_name') }}</label>
                     <input
                         type="text"
                         wire:model="newFolderName"
                         wire:keydown.enter="createFolder"
                         autofocus
-                        placeholder="Contoh: Dokumen"
+                        placeholder="{{ $this->t('placeholder_folder_name') }}"
                         class="w-full rounded-md border border-neutral-300/80 dark:border-white/10 bg-white dark:bg-[#202020] px-3 py-1.5 text-xs text-neutral-900 dark:text-white shadow-2xs transition-all focus:outline-none focus:ring-2 {{ $accent['ring'] }}"
                     />
                 </div>
@@ -883,7 +879,7 @@
                         wire:click="closeNewFolderModal"
                         class="rounded-md border border-neutral-300/80 dark:border-white/10 bg-white dark:bg-[#2b2b2b] px-3.5 py-1.5 text-xs font-medium text-neutral-700 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-[#333] transition-all"
                     >
-                        Batal
+                        {{ $this->t('btn_cancel') }}
                     </button>
                     <button
                         type="button"
@@ -891,7 +887,7 @@
                         style="background-color: var(--accent-color, {{ $accent['hex'] }});"
                         class="rounded-md px-4 py-1.5 text-xs font-medium text-white shadow-2xs hover:brightness-110 active:scale-98 transition-all"
                     >
-                        Buat Folder
+                        {{ $this->t('btn_create_folder') }}
                     </button>
                 </div>
             </div>
@@ -909,19 +905,19 @@
                         <flux:icon name="document-plus" class="size-5" />
                     </div>
                     <div>
-                        <h3 class="text-sm font-semibold text-neutral-900 dark:text-white">Berkas Baru</h3>
-                        <p class="text-xs text-neutral-500 dark:text-neutral-400">Buat berkas teks baru di direktori saat ini.</p>
+                        <h3 class="text-sm font-semibold text-neutral-900 dark:text-white">{{ $this->t('modal_new_file_title') }}</h3>
+                        <p class="text-xs text-neutral-500 dark:text-neutral-400">{{ $this->t('modal_new_file_desc') }}</p>
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-1.5">Nama Berkas</label>
+                    <label class="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-1.5">{{ $this->t('lbl_file_name') }}</label>
                     <input
                         type="text"
                         wire:model="newFileName"
                         wire:keydown.enter="createFile"
                         autofocus
-                        placeholder="Contoh: catatan.txt"
+                        placeholder="{{ $this->t('placeholder_file_name') }}"
                         class="w-full rounded-md border border-neutral-300/80 dark:border-white/10 bg-white dark:bg-[#202020] px-3 py-1.5 text-xs text-neutral-900 dark:text-white shadow-2xs transition-all focus:outline-none focus:ring-2 {{ $accent['ring'] }}"
                     />
                 </div>
@@ -932,7 +928,7 @@
                         wire:click="closeNewFileModal"
                         class="rounded-md border border-neutral-300/80 dark:border-white/10 bg-white dark:bg-[#2b2b2b] px-3.5 py-1.5 text-xs font-medium text-neutral-700 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-[#333] transition-all"
                     >
-                        Batal
+                        {{ $this->t('btn_cancel') }}
                     </button>
                     <button
                         type="button"
@@ -940,7 +936,7 @@
                         style="background-color: var(--accent-color, {{ $accent['hex'] }});"
                         class="rounded-md px-4 py-1.5 text-xs font-medium text-white shadow-2xs hover:brightness-110 active:scale-98 transition-all"
                     >
-                        Buat Berkas
+                        {{ $this->t('btn_create_file') }}
                     </button>
                 </div>
             </div>
@@ -958,8 +954,8 @@
                         <flux:icon name="arrow-up-tray" class="size-5" />
                     </div>
                     <div>
-                        <h3 class="text-sm font-semibold text-neutral-900 dark:text-white">Unggah Berkas</h3>
-                        <p class="text-xs text-neutral-500 dark:text-neutral-400">Lokasi: storage/{{ $currentPath ?: '' }}</p>
+                        <h3 class="text-sm font-semibold text-neutral-900 dark:text-white">{{ $this->t('modal_upload_title') }}</h3>
+                        <p class="text-xs text-neutral-500 dark:text-neutral-400">{{ $this->t('modal_upload_location', ['path' => $currentPath ?: '']) }}</p>
                     </div>
                 </div>
 
@@ -967,9 +963,9 @@
                 <div class="relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-neutral-300 dark:border-white/10 p-6 text-center hover:bg-neutral-50 dark:hover:bg-white/5 transition-all">
                     <flux:icon name="cloud-arrow-up" class="size-10 text-neutral-400 dark:text-neutral-500 mb-2" />
                     <label for="files_uploader" class="cursor-pointer text-xs font-semibold text-neutral-800 dark:text-neutral-200 hover:underline">
-                        <span>Pilih berkas dari perangkat Anda</span>
+                        <span>{{ $this->t('upload_dropzone_label') }}</span>
                     </label>
-                    <p class="text-[11px] text-neutral-500 dark:text-neutral-400 mt-0.5">Dapat memilih beberapa berkas sekaligus.</p>
+                    <p class="text-[11px] text-neutral-500 dark:text-neutral-400 mt-0.5">{{ $this->t('upload_dropzone_hint') }}</p>
                     <input
                         id="files_uploader"
                         type="file"
@@ -983,13 +979,13 @@
                 @if (count($uploadedFiles) > 0)
                     <div class="rounded-lg bg-emerald-500/10 border border-emerald-500/20 px-3 py-2 text-xs text-emerald-600 dark:text-emerald-400 flex items-center gap-2">
                         <flux:icon name="check" class="size-3.5 shrink-0" />
-                        <span>{{ count($uploadedFiles) }} berkas terpilih dan siap diunggah.</span>
+                        <span>{{ $this->t('upload_selected_count', ['count' => count($uploadedFiles)]) }}</span>
                     </div>
                 @endif
 
                 <div wire:loading wire:target="uploadedFiles" class="text-xs text-neutral-500 flex items-center gap-2">
                     <flux:icon name="arrow-path" class="size-3.5 animate-spin" />
-                    <span>Memproses berkas...</span>
+                    <span>{{ $this->t('upload_processing') }}</span>
                 </div>
 
                 <div class="flex items-center justify-end gap-2 pt-1">
@@ -998,7 +994,7 @@
                         wire:click="closeUploadModal"
                         class="rounded-md border border-neutral-300/80 dark:border-white/10 bg-white dark:bg-[#2b2b2b] px-3.5 py-1.5 text-xs font-medium text-neutral-700 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-[#333] transition-all"
                     >
-                        Batal
+                        {{ $this->t('btn_cancel') }}
                     </button>
                     <button
                         type="button"
@@ -1007,7 +1003,7 @@
                         style="background-color: var(--accent-color, {{ $accent['hex'] }});"
                         class="rounded-md px-4 py-1.5 text-xs font-medium text-white shadow-2xs hover:brightness-110 active:scale-98 disabled:opacity-40 transition-all"
                     >
-                        Unggah Sekarang
+                        {{ $this->t('btn_upload_now') }}
                     </button>
                 </div>
             </div>
@@ -1025,13 +1021,13 @@
                         <flux:icon name="pencil-square" class="size-5" />
                     </div>
                     <div>
-                        <h3 class="text-sm font-semibold text-neutral-900 dark:text-white">Ganti Nama</h3>
+                        <h3 class="text-sm font-semibold text-neutral-900 dark:text-white">{{ $this->t('modal_rename_title') }}</h3>
                         <p class="text-xs text-neutral-500 dark:text-neutral-400 truncate max-w-56">{{ $renameTargetName }}</p>
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-1.5">Nama Baru</label>
+                    <label class="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-1.5">{{ $this->t('lbl_new_name') }}</label>
                     <input
                         type="text"
                         wire:model="renameNewName"
@@ -1047,7 +1043,7 @@
                         wire:click="closeRenameModal"
                         class="rounded-md border border-neutral-300/80 dark:border-white/10 bg-white dark:bg-[#2b2b2b] px-3.5 py-1.5 text-xs font-medium text-neutral-700 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-[#333] transition-all"
                     >
-                        Batal
+                        {{ $this->t('btn_cancel') }}
                     </button>
                     <button
                         type="button"
@@ -1055,7 +1051,7 @@
                         style="background-color: var(--accent-color, {{ $accent['hex'] }});"
                         class="rounded-md px-4 py-1.5 text-xs font-medium text-white shadow-2xs hover:brightness-110 active:scale-98 transition-all"
                     >
-                        Simpan Nama
+                        {{ $this->t('btn_save_name') }}
                     </button>
                 </div>
             </div>
@@ -1074,14 +1070,14 @@
                     </div>
                     <div>
                         <h3 class="text-sm font-semibold text-neutral-900 dark:text-white">
-                            Hapus {{ $deleteIsDirectory ? 'Folder' : 'Berkas' }}?
+                            {{ $this->t('modal_delete_title', ['type' => $deleteIsDirectory ? $this->t('word_folder') : $this->t('word_file')]) }}
                         </h3>
                         <p class="text-xs text-neutral-500 dark:text-neutral-400 truncate max-w-56">{{ $deleteTargetName }}</p>
                     </div>
                 </div>
 
                 <p class="text-xs text-neutral-600 dark:text-neutral-300">
-                    Apakah Anda yakin ingin menghapus <span class="font-semibold text-neutral-900 dark:text-white">{{ $deleteTargetName }}</span>? Tindakan ini akan menghapus data secara permanen.
+                    {{ $this->t('modal_delete_confirm', ['name' => $deleteTargetName]) }}
                 </p>
 
                 <div class="flex items-center justify-end gap-2 pt-1">
@@ -1090,14 +1086,14 @@
                         wire:click="closeDeleteModal"
                         class="rounded-md border border-neutral-300/80 dark:border-white/10 bg-white dark:bg-[#2b2b2b] px-3.5 py-1.5 text-xs font-medium text-neutral-700 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-[#333] transition-all"
                     >
-                        Batal
+                        {{ $this->t('btn_cancel') }}
                     </button>
                     <button
                         type="button"
                         wire:click="delete"
                         class="rounded-md bg-rose-600 hover:bg-rose-700 px-4 py-1.5 text-xs font-medium text-white shadow-2xs active:scale-98 transition-all"
                     >
-                        Hapus Permanen
+                        {{ $this->t('btn_delete_permanent') }}
                     </button>
                 </div>
             </div>
@@ -1134,7 +1130,7 @@
                                 class="flex items-center gap-1.5 rounded-md px-3 py-1 text-xs font-medium text-white shadow-2xs hover:brightness-110 active:scale-98 transition-all"
                             >
                                 <flux:icon name="check" class="size-3.5 stroke-[2.5]" />
-                                <span>Simpan</span>
+                                <span>{{ $this->t('btn_save') }}</span>
                             </button>
                         @endif
 
@@ -1143,10 +1139,10 @@
                             type="button"
                             wire:click="downloadFile('{{ $previewItem['path'] }}')"
                             class="flex items-center gap-1.5 rounded-md border border-neutral-300/80 dark:border-white/10 bg-white dark:bg-[#2b2b2b] px-2.5 py-1 text-xs font-medium text-neutral-700 dark:text-neutral-200 shadow-2xs hover:bg-neutral-50 dark:hover:bg-[#333] transition-all"
-                            title="Unduh Berkas"
+                            title="{{ $this->t('btn_download') }}"
                         >
                             <flux:icon name="arrow-down-tray" class="size-3.5 text-neutral-500" />
-                            <span class="hidden sm:inline">Unduh</span>
+                            <span class="hidden sm:inline">{{ $this->t('btn_download') }}</span>
                         </button>
 
                         {{-- Tombol Tutup --}}
@@ -1154,7 +1150,7 @@
                             wire:click="closePreview"
                             type="button"
                             class="flex size-7 items-center justify-center rounded-lg text-neutral-500 hover:bg-neutral-200/80 dark:hover:bg-white/10 hover:text-neutral-900 dark:hover:text-white transition-all"
-                            title="Tutup"
+                            title="{{ $this->t('btn_close') }}"
                         >
                             <flux:icon name="x-mark" class="size-4" />
                         </button>
@@ -1180,16 +1176,16 @@
                                 wire:model="previewContent"
                                 rows="18"
                                 class="w-full h-[65vh] p-4 text-xs font-mono rounded-lg bg-white dark:bg-[#111111] text-neutral-900 dark:text-emerald-400 border border-neutral-200 dark:border-white/10 focus:outline-none focus:ring-2 {{ $accent['ring'] }} resize-none select-text leading-relaxed scrollbar-thin"
-                                placeholder="Isi berkas teks..."
+                                placeholder="{{ $this->t('placeholder_text_editor') }}"
                             >{{ $previewContent }}</textarea>
-                            <span class="text-[10px] text-neutral-400">Tekan tombol "Simpan" di sudut kanan atas untuk menyimpan perubahan berkas.</span>
+                            <span class="text-[10px] text-neutral-400">{{ $this->t('preview_save_hint') }}</span>
                         </div>
                     @else
                         <div class="flex flex-col items-center gap-3 text-center text-neutral-400 p-8">
                             <flux:icon name="document" class="size-16 text-neutral-400 dark:text-neutral-600" />
                             <div>
-                                <p class="text-sm font-semibold text-neutral-800 dark:text-neutral-200">Pratinjau tidak tersedia</p>
-                                <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-1">Format {{ strtoupper($previewItem['extension']) }} tidak didukung untuk pratinjau langsung.</p>
+                                <p class="text-sm font-semibold text-neutral-800 dark:text-neutral-200">{{ $this->t('preview_unavailable_title') }}</p>
+                                <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-1">{{ $this->t('preview_unavailable_desc', ['ext' => strtoupper($previewItem['extension'])]) }}</p>
                             </div>
                         </div>
                     @endif
@@ -1211,10 +1207,10 @@
                         </div>
                         <div>
                             <h3 class="text-sm font-semibold text-neutral-900 dark:text-white">
-                                {{ $this->cloudStorageInfo['name'] ?? 'Cloud Storage MiniOS' }}
+                                {{ $this->cloudStorageInfo['name'] ?? $this->t('cloud_modal_title') }}
                             </h3>
                             <p class="text-xs text-neutral-500 dark:text-neutral-400">
-                                Integrasi penyimpanan awan untuk file dan dokumen.
+                                {{ $this->t('cloud_modal_desc') }}
                             </p>
                         </div>
                     </div>
@@ -1222,6 +1218,7 @@
                         type="button"
                         wire:click="closeCloudStorageModal"
                         class="flex size-7 items-center justify-center rounded-lg text-neutral-400 hover:bg-neutral-100 dark:hover:bg-white/10 hover:text-neutral-700 dark:hover:text-white"
+                        title="{{ $this->t('btn_close') }}"
                     >
                         <flux:icon name="x-mark" class="size-4" />
                     </button>
@@ -1231,33 +1228,33 @@
                     <div class="rounded-xl border border-neutral-200/80 dark:border-white/10 bg-neutral-50/60 dark:bg-white/5 p-4 space-y-3">
                         <div class="grid grid-cols-2 gap-2 text-xs">
                             <div>
-                                <span class="text-[10px] text-neutral-400 uppercase tracking-wider font-semibold">Driver</span>
+                                <span class="text-[10px] text-neutral-400 uppercase tracking-wider font-semibold">{{ $this->t('cloud_lbl_driver') }}</span>
                                 <div class="font-medium text-neutral-800 dark:text-neutral-200 font-mono mt-0.5">
                                     {{ strtoupper($this->cloudStorageInfo['driver']) }}
                                 </div>
                             </div>
                             <div>
-                                <span class="text-[10px] text-neutral-400 uppercase tracking-wider font-semibold">Status Default</span>
+                                <span class="text-[10px] text-neutral-400 uppercase tracking-wider font-semibold">{{ $this->t('cloud_lbl_default_status') }}</span>
                                 <div class="mt-0.5">
                                     @if ($this->cloudStorageInfo['is_active'])
                                         <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
                                             <span class="size-1.5 rounded-full bg-emerald-500"></span>
-                                            Disk Default Aktif
+                                            {{ $this->t('cloud_default_active') }}
                                         </span>
                                     @else
-                                        <span class="text-[11px] text-neutral-500">Tersedia (Secondary)</span>
+                                        <span class="text-[11px] text-neutral-500">{{ $this->t('cloud_available_secondary') }}</span>
                                     @endif
                                 </div>
                             </div>
                             <div class="col-span-2 pt-1 border-t border-neutral-200/60 dark:border-white/5">
-                                <span class="text-[10px] text-neutral-400 uppercase tracking-wider font-semibold">Target (Bucket / Zone)</span>
+                                <span class="text-[10px] text-neutral-400 uppercase tracking-wider font-semibold">{{ $this->t('cloud_lbl_target') }}</span>
                                 <div class="font-medium text-neutral-800 dark:text-neutral-200 font-mono mt-0.5">
                                     {{ $this->cloudStorageInfo['target'] }}
                                 </div>
                             </div>
                             @if (! empty($this->cloudStorageInfo['region']))
                                 <div>
-                                    <span class="text-[10px] text-neutral-400 uppercase tracking-wider font-semibold">Region</span>
+                                    <span class="text-[10px] text-neutral-400 uppercase tracking-wider font-semibold">{{ $this->t('cloud_lbl_region') }}</span>
                                     <div class="font-medium text-neutral-800 dark:text-neutral-200 mt-0.5">
                                         {{ $this->cloudStorageInfo['region'] }}
                                     </div>
@@ -1265,7 +1262,7 @@
                             @endif
                             @if (! empty($this->cloudStorageInfo['endpoint']))
                                 <div>
-                                    <span class="text-[10px] text-neutral-400 uppercase tracking-wider font-semibold">Endpoint / CDN URL</span>
+                                    <span class="text-[10px] text-neutral-400 uppercase tracking-wider font-semibold">{{ $this->t('cloud_lbl_endpoint') }}</span>
                                     <div class="font-medium text-neutral-800 dark:text-neutral-200 truncate mt-0.5 font-mono text-[11px]">
                                         {{ $this->cloudStorageInfo['endpoint'] }}
                                     </div>
@@ -1277,15 +1274,15 @@
                     <div class="rounded-lg bg-sky-500/5 dark:bg-sky-500/10 border border-sky-500/20 p-3 text-[11px] text-sky-700 dark:text-sky-300 leading-relaxed flex items-start gap-2">
                         <flux:icon name="information-circle" class="size-4 shrink-0 mt-0.5 text-sky-500" />
                         <div>
-                            Aplikasi Files tetap menelusuri penyimpanan lokal server MiniOS. Operasi berkas eksternal/upload kustom di MiniOS akan otomatis disalurkan ke disk <strong>{{ $this->cloudStorageInfo['name'] }}</strong>.
+                            {{ $this->t('cloud_notice', ['name' => $this->cloudStorageInfo['name']]) }}
                         </div>
                     </div>
                 @else
                     <div class="rounded-xl border border-dashed border-neutral-300 dark:border-white/10 p-6 text-center space-y-2">
                         <flux:icon name="cloud" class="size-8 text-neutral-400 mx-auto" />
-                        <p class="text-xs font-semibold text-neutral-800 dark:text-neutral-200">Belum Ada Cloud Storage Aktif</p>
+                        <p class="text-xs font-semibold text-neutral-800 dark:text-neutral-200">{{ $this->t('cloud_empty_title') }}</p>
                         <p class="text-[11px] text-neutral-500 max-w-xs mx-auto">
-                            Konfigurasikan Amazon S3 atau BunnyCDN di menu Pengaturan &gt; Layanan &amp; Infrastruktur &gt; Filesystem.
+                            {{ $this->t('cloud_empty_desc') }}
                         </p>
                     </div>
                 @endif
@@ -1317,7 +1314,7 @@
                                 <flux:icon name="arrow-path" class="size-3.5 text-sky-500" />
                             </span>
                             <span wire:loading wire:target="testCloudStorageConnection" class="inline-block animate-spin size-3.5 border-2 border-sky-500 border-t-transparent rounded-full"></span>
-                            <span>Uji Koneksi</span>
+                            <span>{{ $this->t('btn_test_connection') }}</span>
                         </button>
                     @else
                         <div></div>
@@ -1328,7 +1325,7 @@
                         wire:click="closeCloudStorageModal"
                         class="rounded-md border border-neutral-300/80 dark:border-white/10 bg-white dark:bg-[#202020] px-4 py-1.5 text-xs font-medium text-neutral-700 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-white/5 transition-all"
                     >
-                        Tutup
+                        {{ $this->t('btn_close') }}
                     </button>
                 </div>
             </div>

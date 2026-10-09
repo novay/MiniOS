@@ -76,7 +76,7 @@
         >
 
             <x-minios.shortcut
-                label="Home"
+                label="{{ __('Home') }}"
                 selected="selectedShortcut === 'home'"
                 @click.stop="selectedShortcut = 'home'"
                 @dblclick="navigate('/files/home')"
@@ -87,7 +87,7 @@
 
 
             <x-minios.shortcut
-                label="Trash"
+                label="{{ __('Trash') }}"
                 selected="selectedShortcut === 'trash'"
                 @click.stop="selectedShortcut = 'trash'"
                 @dblclick="openWindow('files', { url: '/files/trash' })"
@@ -180,7 +180,7 @@
                                         text-neutral-500
                                     "
                                 >
-                                    Application Host placeholder.
+                                    {{ __('Application Host placeholder.') }}
                                 </p>
 
                             </div>
@@ -242,11 +242,11 @@
                     tracking-[0.18em]
                 "
             >
-                Web Desktop
+                {{ __('Web Desktop') }}
             </div>
 
             <div class="mt-0.5 text-[10px]">
-                MiniOS Project
+                {{ __('MiniOS Project') }}
             </div>
 
         </div>

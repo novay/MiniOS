@@ -1,16 +1,16 @@
 <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
     <div class="space-y-0.5">
         <flux:breadcrumbs>
-            <flux:breadcrumbs.item href="#" class="text-xs">Pengaturan</flux:breadcrumbs.item>
-            <flux:breadcrumbs.item class="text-xs">Layanan &amp; Infrastruktur</flux:breadcrumbs.item>
-            <flux:breadcrumbs.item class="text-xs">Mail Delivery</flux:breadcrumbs.item>
+            <flux:breadcrumbs.item href="#" class="text-xs">{{ $this->t('crumb_settings') }}</flux:breadcrumbs.item>
+            <flux:breadcrumbs.item class="text-xs">{{ $this->t('section_services') }}</flux:breadcrumbs.item>
+            <flux:breadcrumbs.item class="text-xs">{{ $this->t('nav_mail') }}</flux:breadcrumbs.item>
         </flux:breadcrumbs>
 
         <h1 class="text-lg font-bold tracking-tight text-neutral-900 dark:text-white">
-            Mail Delivery
+            {{ $this->t('mail_title') }}
         </h1>
         <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
-            Pengaturan driver pengiriman surel sistem untuk pesan aplikasi.
+            {{ $this->t('mail_desc') }}
         </p>
     </div>
 
@@ -20,7 +20,7 @@
         class="self-start sm:self-auto flex items-center gap-2 rounded-md border border-neutral-300/80 dark:border-white/10 bg-white dark:bg-[#2b2b2b] px-3.5 py-1.5 text-xs font-medium text-neutral-700 dark:text-neutral-200 shadow-2xs hover:bg-neutral-50 dark:hover:bg-[#333333] transition-all active:scale-98"
     >
         <flux:icon name="arrow-path" class="size-3.5 text-neutral-500 dark:text-neutral-400" />
-        <span>Reset</span>
+        <span>{{ $this->t('btn_reset') }}</span>
     </button>
 </div>
 
@@ -29,9 +29,9 @@
         <div class="flex items-start gap-3">
             
             <div>
-                <h2 class="text-sm font-semibold text-neutral-900 dark:text-white">Layanan Surel (Mail Delivery)</h2>
+                <h2 class="text-sm font-semibold text-neutral-900 dark:text-white">{{ $this->t('mail_section_title') }}</h2>
                 <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
-                    Pengaturan pengiriman surel sistem.
+                    {{ $this->t('mail_section_desc') }}
                 </p>
             </div>
         </div>
@@ -45,11 +45,11 @@
                 class="cursor-pointer rounded-xl border p-3.5 transition-all {{ $isLog ? 'border-sky-500 bg-sky-500/5 ring-1 ring-sky-500 shadow-2xs' : 'border-neutral-200/90 dark:border-white/10 hover:bg-neutral-50 dark:hover:bg-white/5' }}"
             >
                 <div class="flex items-center justify-between">
-                    <span class="text-xs font-semibold text-neutral-900 dark:text-white">Log Sistem (Dev)</span>
+                    <span class="text-xs font-semibold text-neutral-900 dark:text-white">{{ $this->t('driver_mail_log_title') }}</span>
                     <span class="size-2 rounded-full {{ $isLog ? 'bg-sky-500' : 'bg-transparent' }}"></span>
                 </div>
                 <p class="text-[11px] text-neutral-500 dark:text-neutral-400 mt-1 leading-relaxed">
-                    Mencatat surel ke <code class="font-mono text-[10px]">storage/logs</code> tanpa mengirim email sungguhan.
+                    Direktori <code class="font-mono text-[10px]">storage/logs</code>. {{ $this->t('driver_mail_log_desc') }}
                 </p>
             </div>
 
@@ -60,11 +60,11 @@
                 class="cursor-pointer rounded-xl border p-3.5 transition-all {{ $isSmtp ? 'border-sky-500 bg-sky-500/5 ring-1 ring-sky-500 shadow-2xs' : 'border-neutral-200/90 dark:border-white/10 hover:bg-neutral-50 dark:hover:bg-white/5' }}"
             >
                 <div class="flex items-center justify-between">
-                    <span class="text-xs font-semibold text-neutral-900 dark:text-white">Server SMTP</span>
+                    <span class="text-xs font-semibold text-neutral-900 dark:text-white">{{ $this->t('driver_mail_smtp_title') }}</span>
                     <span class="size-2 rounded-full {{ $isSmtp ? 'bg-sky-500' : 'bg-transparent' }}"></span>
                 </div>
                 <p class="text-[11px] text-neutral-500 dark:text-neutral-400 mt-1 leading-relaxed">
-                    Pengiriman nyata via server SMTP (Gmail, Mailtrap, SES, dll).
+                    {{ $this->t('driver_mail_smtp_desc') }}
                 </p>
             </div>
 
@@ -75,11 +75,11 @@
                 class="cursor-pointer rounded-xl border p-3.5 transition-all {{ $isSendmail ? 'border-sky-500 bg-sky-500/5 ring-1 ring-sky-500 shadow-2xs' : 'border-neutral-200/90 dark:border-white/10 hover:bg-neutral-50 dark:hover:bg-white/5' }}"
             >
                 <div class="flex items-center justify-between">
-                    <span class="text-xs font-semibold text-neutral-900 dark:text-white">Sendmail</span>
+                    <span class="text-xs font-semibold text-neutral-900 dark:text-white">{{ $this->t('driver_mail_sendmail_title') }}</span>
                     <span class="size-2 rounded-full {{ $isSendmail ? 'bg-sky-500' : 'bg-transparent' }}"></span>
                 </div>
                 <p class="text-[11px] text-neutral-500 dark:text-neutral-400 mt-1 leading-relaxed">
-                    Utilitas sendmail binary lokal server host.
+                    {{ $this->t('driver_mail_sendmail_desc') }}
                 </p>
             </div>
 
@@ -90,11 +90,11 @@
                 class="cursor-pointer rounded-xl border p-3.5 transition-all {{ $isResend ? 'border-sky-500 bg-sky-500/5 ring-1 ring-sky-500 shadow-2xs' : 'border-neutral-200/90 dark:border-white/10 hover:bg-neutral-50 dark:hover:bg-white/5' }}"
             >
                 <div class="flex items-center justify-between">
-                    <span class="text-xs font-semibold text-neutral-900 dark:text-white">Resend API</span>
+                    <span class="text-xs font-semibold text-neutral-900 dark:text-white">{{ $this->t('driver_mail_resend_title') }}</span>
                     <span class="size-2 rounded-full {{ $isResend ? 'bg-sky-500' : 'bg-transparent' }}"></span>
                 </div>
                 <p class="text-[11px] text-neutral-500 dark:text-neutral-400 mt-1 leading-relaxed">
-                    Email API modern, cepat &amp; developer-friendly dari Resend.com.
+                    {{ $this->t('driver_mail_resend_desc') }}
                 </p>
             </div>
         </div>
@@ -103,13 +103,13 @@
         @if (($services['mail_driver'] ?? 'log') === 'smtp')
             <div class="mt-4 rounded-xl border border-neutral-200/80 dark:border-white/10 bg-neutral-50/70 dark:bg-white/5 p-4 space-y-3.5">
                 <div class="flex items-center justify-between">
-                    <span class="text-xs font-semibold text-neutral-800 dark:text-neutral-200">Konfigurasi Server SMTP</span>
-                    <span class="text-[10px] text-neutral-500 font-mono">Port Standar: 587 (TLS) / 465 (SSL)</span>
+                    <span class="text-xs font-semibold text-neutral-800 dark:text-neutral-200">{{ $this->t('smtp_config_title') }}</span>
+                    <span class="text-[10px] text-neutral-500 font-mono">{{ $this->t('smtp_ports_hint') }}</span>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div class="sm:col-span-2 space-y-1">
-                        <label class="text-[11px] font-medium text-neutral-700 dark:text-neutral-300">SMTP Host</label>
+                        <label class="text-[11px] font-medium text-neutral-700 dark:text-neutral-300">{{ $this->t('lbl_smtp_host') }}</label>
                         <input
                             type="text"
                             wire:model.live.debounce.300ms="services.smtp_host"
@@ -119,7 +119,7 @@
                     </div>
 
                     <div class="space-y-1">
-                        <label class="text-[11px] font-medium text-neutral-700 dark:text-neutral-300">Port</label>
+                        <label class="text-[11px] font-medium text-neutral-700 dark:text-neutral-300">{{ $this->t('lbl_port') }}</label>
                         <input
                             type="text"
                             wire:model.live.debounce.300ms="services.smtp_port"
@@ -129,16 +129,16 @@
                     </div>
 
                     <div class="space-y-1">
-                        <label class="text-[11px] font-medium text-neutral-700 dark:text-neutral-300">Enkripsi</label>
+                        <label class="text-[11px] font-medium text-neutral-700 dark:text-neutral-300">{{ $this->t('lbl_encryption') }}</label>
                         <flux:select wire:model.live="services.smtp_encryption">
-                            <option value="tls">TLS (Disarankan)</option>
-                            <option value="ssl">SSL</option>
-                            <option value="none">Tanpa Enkripsi</option>
+                            <option value="tls">{{ $this->t('enc_tls') }}</option>
+                            <option value="ssl">{{ $this->t('enc_ssl') }}</option>
+                            <option value="none">{{ $this->t('enc_none') }}</option>
                         </flux:select>
                     </div>
 
                     <div class="space-y-1">
-                        <label class="text-[11px] font-medium text-neutral-700 dark:text-neutral-300">Username</label>
+                        <label class="text-[11px] font-medium text-neutral-700 dark:text-neutral-300">{{ $this->t('lbl_username') }}</label>
                         <input
                             type="text"
                             wire:model.live.debounce.300ms="services.smtp_username"
@@ -148,7 +148,7 @@
                     </div>
 
                     <div class="space-y-1">
-                        <label class="text-[11px] font-medium text-neutral-700 dark:text-neutral-300">Password</label>
+                        <label class="text-[11px] font-medium text-neutral-700 dark:text-neutral-300">{{ $this->t('lbl_password') }}</label>
                         <input
                             type="password"
                             wire:model.live.debounce.300ms="services.smtp_password"
@@ -164,12 +164,12 @@
         @if (($services['mail_driver'] ?? 'log') === 'resend')
             <div class="mt-4 rounded-xl border border-neutral-200/80 dark:border-white/10 bg-neutral-50/70 dark:bg-white/5 p-4 space-y-3.5">
                 <div class="flex items-center justify-between">
-                    <span class="text-xs font-semibold text-neutral-800 dark:text-neutral-200">Konfigurasi Resend Mailer</span>
+                    <span class="text-xs font-semibold text-neutral-800 dark:text-neutral-200">{{ $this->t('resend_config_title') }}</span>
                     <span class="text-[10px] text-neutral-500 font-mono">resend.com/api-keys</span>
                 </div>
 
                 <div class="space-y-1">
-                    <label class="text-[11px] font-medium text-neutral-700 dark:text-neutral-300">Resend API Key</label>
+                    <label class="text-[11px] font-medium text-neutral-700 dark:text-neutral-300">{{ $this->t('lbl_resend_api_key') }}</label>
                     <input
                         type="password"
                         wire:model.live.debounce.300ms="services.resend_api_key"
@@ -177,7 +177,7 @@
                         class="w-full rounded-md border border-neutral-300/80 dark:border-white/10 bg-white dark:bg-[#202020] px-3 py-1.5 text-xs text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-1 focus:ring-sky-500 font-mono"
                     />
                     <p class="text-[11px] text-neutral-500 dark:text-neutral-400 mt-1">
-                        Dapatkan kunci API resmi Anda di dasbor <span class="font-mono text-[10px] text-sky-600 dark:text-sky-400">Resend &gt; API Keys</span>.
+                        {{ $this->t('resend_hint') }}
                     </p>
                 </div>
             </div>
@@ -185,11 +185,11 @@
 
         {{-- Identitas Pengirim Global (Berlaku untuk semua driver selain log) --}}
         <div class="mt-4 rounded-xl border border-neutral-200/80 dark:border-white/10 bg-neutral-50/70 dark:bg-white/5 p-4 space-y-3.5">
-            <span class="text-xs font-semibold text-neutral-800 dark:text-neutral-200">Identitas Pengirim Global (Global Sender)</span>
+            <span class="text-xs font-semibold text-neutral-800 dark:text-neutral-200">{{ $this->t('global_sender_title') }}</span>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div class="space-y-1">
-                    <label class="text-[11px] font-medium text-neutral-700 dark:text-neutral-300">Alamat Pengirim Default (From Email)</label>
+                    <label class="text-[11px] font-medium text-neutral-700 dark:text-neutral-300">{{ $this->t('lbl_from_email') }}</label>
                     <input
                         type="email"
                         wire:model.live.debounce.300ms="services.mail_from_address"
@@ -199,7 +199,7 @@
                 </div>
 
                 <div class="space-y-1">
-                    <label class="text-[11px] font-medium text-neutral-700 dark:text-neutral-300">Nama Pengirim (From Name)</label>
+                    <label class="text-[11px] font-medium text-neutral-700 dark:text-neutral-300">{{ $this->t('lbl_from_name') }}</label>
                     <input
                         type="text"
                         wire:model.live.debounce.300ms="services.mail_from_name"
@@ -222,7 +222,7 @@
                     <flux:icon name="paper-airplane" class="size-3.5 text-sky-600 dark:text-sky-400" />
                 </span>
                 <span wire:loading wire:target="testMailDelivery" class="inline-block animate-spin size-3.5 border-2 border-sky-600 border-t-transparent rounded-full"></span>
-                <span>Kirim Surel Uji Coba</span>
+                <span>{{ $this->t('btn_test_mail') }}</span>
             </button>
 
             @if ($mailTestStatus)

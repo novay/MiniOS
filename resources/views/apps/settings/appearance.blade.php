@@ -1,15 +1,15 @@
 <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
     <div class="space-y-0.5">
         <flux:breadcrumbs>
-            <flux:breadcrumbs.item href="#" class="text-xs">Pengaturan</flux:breadcrumbs.item>
-            <flux:breadcrumbs.item class="text-xs">Tampilan &amp; Personalisasi</flux:breadcrumbs.item>
+            <flux:breadcrumbs.item href="#" class="text-xs">{{ $this->t('crumb_settings') }}</flux:breadcrumbs.item>
+            <flux:breadcrumbs.item class="text-xs">{{ $this->t('appearance_title') }}</flux:breadcrumbs.item>
         </flux:breadcrumbs>
 
         <h1 class="text-lg font-bold tracking-tight text-neutral-900 dark:text-white">
-            Tampilan &amp; Personalisasi
+            {{ $this->t('appearance_title') }}
         </h1>
         <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
-            Atur tema antarmuka, warna aksen, font sistem, dan wallpaper desktop.
+            {{ $this->t('appearance_desc') }}
         </p>
     </div>
 
@@ -19,7 +19,7 @@
         class="self-start sm:self-auto flex items-center gap-2 rounded-md border border-neutral-300/80 dark:border-white/10 bg-white dark:bg-[#2b2b2b] px-3.5 py-1.5 text-xs font-medium text-neutral-700 dark:text-neutral-200 shadow-2xs hover:bg-neutral-50 dark:hover:bg-[#333333] transition-all active:scale-98"
     >
         <flux:icon name="arrow-path" class="size-3.5 text-neutral-500 dark:text-neutral-400" />
-        <span>Reset</span>
+        <span>{{ $this->t('btn_reset') }}</span>
     </button>
 </div>
 
@@ -28,10 +28,10 @@
     <div class="rounded-xl bg-white dark:bg-[#2b2b2b]/70 border border-neutral-200/90 dark:border-white/5 p-4 sm:p-5 shadow-2xs space-y-3">
         <div class="space-y-1">
             <div class="text-sm font-semibold text-neutral-900 dark:text-white">
-                Tema Antarmuka
+                {{ $this->t('theme_title') }}
             </div>
             <p class="text-xs text-neutral-500 dark:text-neutral-400">
-                Pilih palet mode terang, gelap, atau otomatis mengikuti sistem perangkat.
+                {{ $this->t('theme_desc') }}
             </p>
         </div>
 
@@ -41,7 +41,7 @@
                 <input type="radio" wire:model.live="appearance.theme" value="light" class="sr-only" />
                 <flux:icon name="sun" class="size-10 text-amber-500" />
                 <span class="mt-2.5 text-xs font-medium text-neutral-800 dark:text-neutral-200">
-                    {{ __('Terang') }}
+                    {{ $this->t('theme_light') }}
                 </span>
             </label>
 
@@ -49,14 +49,18 @@
             <label class="flex cursor-pointer flex-col items-center justify-between rounded-xl border p-3.5 transition-all {{ ($appearance['theme'] ?? 'system') === 'dark' ? ($accent['radio_card'] ?? 'border-indigo-500 bg-indigo-500/10 ring-1 ring-indigo-500') : 'border-neutral-200/90 dark:border-white/10 bg-neutral-50/70 dark:bg-white/5 hover:border-neutral-300 dark:hover:border-white/20' }}">
                 <input type="radio" wire:model.live="appearance.theme" value="dark" class="sr-only" />
                 <flux:icon name="moon" class="size-10 text-sky-400" />
-                <span class="mt-2.5 text-xs font-medium text-neutral-800 dark:text-neutral-200">Gelap</span>
+                <span class="mt-2.5 text-xs font-medium text-neutral-800 dark:text-neutral-200">
+                    {{ $this->t('theme_dark') }}
+                </span>
             </label>
 
             {{-- Mode Sistem --}}
             <label class="flex cursor-pointer flex-col items-center justify-between rounded-xl border p-3.5 transition-all {{ ($appearance['theme'] ?? 'system') === 'system' ? ($accent['radio_card'] ?? 'border-indigo-500 bg-indigo-500/10 ring-1 ring-indigo-500') : 'border-neutral-200/90 dark:border-white/10 bg-neutral-50/70 dark:bg-white/5 hover:border-neutral-300 dark:hover:border-white/20' }}">
                 <input type="radio" wire:model.live="appearance.theme" value="system" class="sr-only" />
                 <flux:icon name="computer-desktop" class="size-10" />
-                <span class="mt-2.5 text-xs font-medium text-neutral-800 dark:text-neutral-200">Sistem</span>
+                <span class="mt-2.5 text-xs font-medium text-neutral-800 dark:text-neutral-200">
+                    {{ $this->t('theme_system') }}
+                </span>
             </label>
         </div>
     </div>
@@ -65,10 +69,10 @@
     <div class="rounded-xl bg-white dark:bg-[#2b2b2b]/70 border border-neutral-200/90 dark:border-white/5 p-4 sm:p-5 shadow-2xs space-y-3">
         <div class="space-y-1">
             <div class="text-sm font-semibold text-neutral-900 dark:text-white">
-                Warna Aksen
+                {{ $this->t('accent_color_title') }}
             </div>
             <p class="text-xs text-neutral-500 dark:text-neutral-400">
-                Pilih warna sorotan untuk tombol, seleksi, dan elemen aktif di MiniOS.
+                {{ $this->t('accent_color_desc') }}
             </p>
         </div>
 
@@ -106,10 +110,10 @@
     <div class="rounded-xl bg-white dark:bg-[#2b2b2b]/70 border border-neutral-200/90 dark:border-white/5 p-4 sm:p-5 shadow-2xs space-y-3">
         <div class="space-y-1">
             <div class="text-sm font-semibold text-neutral-900 dark:text-white">
-                Font Sistem
+                {{ $this->t('font_title') }}
             </div>
             <p class="text-xs text-neutral-500 dark:text-neutral-400">
-                Pilih tipografi utama untuk desktop, bilah menu, dan seluruh jendela aplikasi.
+                {{ $this->t('font_desc') }}
             </p>
         </div>
 
@@ -182,10 +186,10 @@
     <div class="rounded-xl bg-white dark:bg-[#2b2b2b]/70 border border-neutral-200/90 dark:border-white/5 p-4 sm:p-5 shadow-2xs space-y-3">
         <div class="space-y-1">
             <div class="text-sm font-semibold text-neutral-900 dark:text-white">
-                Wallpaper Desktop
+                {{ $this->t('wallpaper_title') }}
             </div>
             <p class="text-xs text-neutral-500 dark:text-neutral-400">
-                Pilih latar belakang visual untuk desktop MiniOS.
+                {{ $this->t('wallpaper_desc') }}
             </p>
         </div>
 
@@ -211,10 +215,10 @@
     <div class="flex items-center justify-between rounded-xl bg-white dark:bg-[#2b2b2b]/70 border border-neutral-200/90 dark:border-white/5 p-4 sm:p-5 shadow-2xs">
         <div class="space-y-1">
             <div class="text-sm font-semibold text-neutral-900 dark:text-white">
-                Efek Transparansi &amp; Blur Panel
+                {{ $this->t('panel_blur_title') }}
             </div>
             <div class="text-xs text-neutral-500 dark:text-neutral-400">
-                Aktifkan efek kaca (Mica / Backdrop Blur) pada bilah atas dan header jendela.
+                {{ $this->t('panel_blur_desc') }}
             </div>
         </div>
         <flux:switch wire:model.live="appearance.panel_blur" />

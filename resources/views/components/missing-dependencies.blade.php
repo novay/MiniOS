@@ -60,15 +60,15 @@
                 <div class="min-w-0 flex-1 space-y-1">
                     <div class="flex items-center gap-2 flex-wrap">
                         <h3 class="text-sm font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">
-                            Dependensi Diperlukan
+                            {{ __('Dependencies Required') }}
                         </h3>
                         <span class="inline-flex items-center gap-1 rounded-full bg-amber-500/20 dark:bg-amber-400/20 border border-amber-500/30 px-2 py-0.5 text-[11px] font-medium text-amber-800 dark:text-amber-300">
                             <span class="size-1.5 rounded-full bg-amber-500 animate-pulse"></span>
-                            Belum Siap
+                            {{ __('Not Ready') }}
                         </span>
                     </div>
                     <p class="text-xs text-neutral-600 dark:text-neutral-300/90 leading-relaxed">
-                        Aplikasi <strong class="font-semibold text-neutral-900 dark:text-white">{{ $appName }}</strong> membutuhkan paket Composer eksternal sebelum fiturnya dapat digunakan di MiniOS.
+                        {!! str_replace(':app', '<strong class="font-semibold text-neutral-900 dark:text-white">' . e($appName) . '</strong>', e(__('The :app application requires external Composer packages before its features can be used in MiniOS.'))) !!}
                     </p>
                 </div>
             </div>
@@ -92,7 +92,7 @@
                 </div>
             </div>
             <span class="shrink-0 rounded-full bg-neutral-200/70 dark:bg-white/10 px-2.5 py-0.5 text-[11px] font-medium text-neutral-600 dark:text-neutral-300">
-                {{ count($missing) }} paket dibutuhkan
+                {{ __(count($missing) > 1 ? ':count packages required' : ':count package required', ['count' => count($missing)]) }}
             </span>
         </div>
 
@@ -102,10 +102,10 @@
         <div class="overflow-hidden rounded-xl border border-black/[0.08] dark:border-white/[0.08] bg-white/80 dark:bg-[#2b2b2b]/80 shadow-2xs backdrop-blur-md">
             <div class="flex items-center justify-between border-b border-black/[0.06] dark:border-white/[0.06] bg-neutral-50/60 dark:bg-white/[0.02] px-4 py-2.5">
                 <span class="text-xs font-semibold text-neutral-700 dark:text-neutral-200">
-                    Paket yang Belum Terpasang:
+                    {{ __('Uninstalled Packages:') }}
                 </span>
                 <span class="text-[11px] font-medium text-neutral-500 dark:text-neutral-400">
-                    {{ count($missing) }} paket
+                    {{ __(count($missing) > 1 ? ':count packages' : ':count package', ['count' => count($missing)]) }}
                 </span>
             </div>
 
@@ -129,16 +129,16 @@
                             <button
                                 type="button"
                                 @click="copySingle('{{ $pkg }}')"
-                                title="Salin perintah untuk paket ini"
+                                title="{{ __('Copy command for this package') }}"
                                 class="hidden sm:inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
                             >
                                 <svg class="size-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
                                 </svg>
-                                <span x-text="copiedPkg === '{{ $pkg }}' ? 'Tersalin' : 'Salin'"></span>
+                                <span x-text="copiedPkg === '{{ $pkg }}' ? '{{ __('Copied') }}' : '{{ __('Copy') }}'"></span>
                             </button>
                             <span class="rounded-md bg-rose-500/10 px-2 py-0.5 text-[10px] font-semibold text-rose-600 dark:text-rose-400 border border-rose-500/20 uppercase tracking-wider">
-                                Missing
+                                {{ __('Missing') }}
                             </span>
                         </div>
                     </div>
@@ -155,14 +155,14 @@
                     <polyline points="9 11 12 14 22 4"></polyline>
                     <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
                 </svg>
-                <span>Langkah-Langkah Aktivasi:</span>
+                <span>{{ __('Activation Steps:') }}</span>
             </h4>
 
             {{-- Step 1: Windows Terminal Box --}}
             <div class="rounded-xl border border-black/[0.08] dark:border-white/[0.08] bg-white/80 dark:bg-[#2b2b2b]/80 p-4 space-y-3 shadow-2xs backdrop-blur-md">
                 <div class="flex items-center justify-between gap-2">
                     <span class="text-xs font-medium text-neutral-900 dark:text-neutral-100">
-                        1. Pasang paket melalui Terminal atau GUI Control Panel:
+                        {{ __('1. Install package via Terminal or GUI Control Panel:') }}
                     </span>
                     <button
                         type="button"
@@ -179,7 +179,7 @@
                                 <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
                             </svg>
                         </template>
-                        <span x-text="copied ? 'Tersalin!' : 'Salin Perintah'"></span>
+                        <span x-text="copied ? '{{ __('Copied!') }}' : '{{ __('Copy Command') }}'"></span>
                     </button>
                 </div>
 
@@ -222,10 +222,10 @@
                     </div>
                     <div class="space-y-0.5">
                         <div class="text-xs font-semibold text-neutral-900 dark:text-neutral-100">
-                            2. Ingin pasang otomatis via GUI?
+                            {{ __('2. Want to install automatically via GUI?') }}
                         </div>
                         <div class="text-[11px] text-neutral-500 dark:text-neutral-400 leading-normal">
-                            Buka Control Panel &gt; Aplikasi terinstal untuk menjalankan instalasi langsung dari MiniOS.
+                            {{ __('Open Control Panel > Installed Apps to run the installation directly from MiniOS.') }}
                         </div>
                     </div>
                 </div>
@@ -247,7 +247,7 @@
                         <polyline points="15 3 21 3 21 9"></polyline>
                         <line x1="10" y1="14" x2="21" y2="3"></line>
                     </svg>
-                    <span>Buka Control Panel</span>
+                    <span>{{ __('Open Control Panel') }}</span>
                 </button>
             </div>
         </div>
@@ -263,7 +263,7 @@
                 <line x1="12" y1="16" x2="12" y2="12"></line>
                 <line x1="12" y1="8" x2="12.01" y2="8"></line>
             </svg>
-            <span>Setelah paket terpasang di Laravel, segarkan jendela ini:</span>
+            <span>{{ __('After packages are installed in Laravel, refresh this window:') }}</span>
         </div>
 
         {{-- Windows 11 Standard / Secondary Button --}}
@@ -284,7 +284,7 @@
             >
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
             </svg>
-            <span>Periksa Ulang &amp; Segarkan</span>
+            <span>{{ __('Check Again & Refresh') }}</span>
         </button>
     </div>
 </div>

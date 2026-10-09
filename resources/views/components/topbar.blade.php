@@ -35,7 +35,7 @@
             type="button"
             @click.stop="toggleTheme()"
             class="flex size-6 items-center justify-center rounded-md text-neutral-700 dark:text-neutral-200 transition-colors hover:bg-black/10 dark:hover:bg-white/10"
-            :title="isDarkMode ? 'Mode Terang' : 'Mode Gelap'"
+            :title="isDarkMode ? '{{ __('Light Mode') }}' : '{{ __('Dark Mode') }}'"
         >
             <span x-cloak x-show="isDarkMode" class="flex items-center justify-center">
                 <flux:icon name="sun"  class="size-4 text-amber-400" />

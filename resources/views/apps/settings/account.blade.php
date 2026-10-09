@@ -1,15 +1,15 @@
 <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
     <div class="space-y-0.5">
         <flux:breadcrumbs>
-            <flux:breadcrumbs.item href="#" class="text-xs">Pengaturan</flux:breadcrumbs.item>
-            <flux:breadcrumbs.item class="text-xs">Akun &amp; Keamanan</flux:breadcrumbs.item>
+            <flux:breadcrumbs.item href="#" class="text-xs">{{ $this->t('crumb_settings') }}</flux:breadcrumbs.item>
+            <flux:breadcrumbs.item class="text-xs">{{ $this->t('account_title') }}</flux:breadcrumbs.item>
         </flux:breadcrumbs>
 
         <h1 class="text-lg font-bold tracking-tight text-neutral-900 dark:text-white">
-            Akun &amp; Keamanan
+            {{ $this->t('account_title') }}
         </h1>
         <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
-            Informasi identitas akun MiniOS dan konfigurasi keamanan.
+            {{ $this->t('account_desc') }}
         </p>
     </div>
 </div>
@@ -23,7 +23,7 @@
         </div>
         <div class="min-w-0 flex-1">
             <div class="flex items-center gap-2">
-                <h4 class="text-sm font-bold text-neutral-900 dark:text-white truncate">{{ auth()->user()?->name ?? 'Pengguna MiniOS' }}</h4>
+                <h4 class="text-sm font-bold text-neutral-900 dark:text-white truncate">{{ auth()->user()?->name ?? $this->t('default_user_name') }}</h4>
                 <span class="rounded-md bg-neutral-100 dark:bg-white/10 px-2 py-0.5 text-[10px] font-medium text-neutral-600 dark:text-neutral-400">Administrator</span>
             </div>
             <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5 truncate">{{ auth()->user()?->email ?? 'user@minios.local' }}</p>
@@ -33,8 +33,8 @@
     {{-- Edit Profile Card --}}
     <div class="rounded-xl bg-white dark:bg-[#2b2b2b]/70 border border-neutral-200/90 dark:border-white/5 p-5 shadow-2xs space-y-4">
         <div class="space-y-1">
-            <h3 class="text-sm font-semibold text-neutral-900 dark:text-white">Informasi Profil Akun</h3>
-            <p class="text-xs text-neutral-500 dark:text-neutral-400">Perbarui nama pengguna dan alamat email Anda di MiniOS.</p>
+            <h3 class="text-sm font-semibold text-neutral-900 dark:text-white">{{ $this->t('account_profile_title') }}</h3>
+            <p class="text-xs text-neutral-500 dark:text-neutral-400">{{ $this->t('account_profile_desc') }}</p>
         </div>
 
         @if ($profileStatus)
@@ -46,12 +46,12 @@
 
         <div class="space-y-4">
             <div>
-                <label class="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-1.5">Nama Lengkap</label>
+                <label class="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-1.5">{{ $this->t('lbl_full_name') }}</label>
                 <input
                     type="text"
                     wire:model="profile_name"
                     class="w-full rounded-md border border-neutral-300/80 dark:border-white/10 bg-white dark:bg-[#202020] px-2.5 py-1.5 text-sm text-neutral-900 dark:text-white shadow-2xs transition-all focus:outline-none focus:ring-2 {{ $accent['ring'] }}"
-                    placeholder="Nama Lengkap"
+                    placeholder="{{ $this->t('placeholder_full_name') }}"
                 />
                 @error('profile_name')
                     <p class="mt-1 text-[11px] text-rose-500">{{ $message }}</p>
@@ -59,7 +59,7 @@
             </div>
 
             <div>
-                <label class="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-1.5">Alamat Email</label>
+                <label class="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-1.5">{{ $this->t('lbl_email_address') }}</label>
                 <input
                     type="email"
                     wire:model="profile_email"
@@ -80,7 +80,7 @@
                 class="flex items-center gap-2 rounded-md px-4 py-1.5 text-sm font-medium text-white shadow-2xs transition-all hover:brightness-110 active:scale-98"
             >
                 <flux:icon name="check" class="size-3.5 stroke-[2.5]" />
-                <span>Simpan Profil</span>
+                <span>{{ $this->t('btn_save_profile') }}</span>
             </button>
         </div>
     </div>
@@ -88,8 +88,8 @@
     {{-- Ubah Kata Sandi Card --}}
     <div class="rounded-xl bg-white dark:bg-[#2b2b2b]/70 border border-neutral-200/90 dark:border-white/5 p-5 shadow-2xs space-y-4">
         <div class="space-y-1">
-            <h3 class="text-sm font-semibold text-neutral-900 dark:text-white">Ubah Kata Sandi</h3>
-            <p class="text-xs text-neutral-500 dark:text-neutral-400">Pastikan akun Anda menggunakan kata sandi yang panjang dan aman.</p>
+            <h3 class="text-sm font-semibold text-neutral-900 dark:text-white">{{ $this->t('password_title') }}</h3>
+            <p class="text-xs text-neutral-500 dark:text-neutral-400">{{ $this->t('password_desc') }}</p>
         </div>
 
         @if ($passwordStatus)
@@ -101,7 +101,7 @@
 
         <div class="space-y-4">
             <div>
-                <label class="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-1.5">Kata Sandi Saat Ini</label>
+                <label class="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-1.5">{{ $this->t('lbl_current_password') }}</label>
                 <input
                     type="password"
                     wire:model="current_password"
@@ -114,12 +114,12 @@
             </div>
 
             <div>
-                <label class="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-1.5">Kata Sandi Baru</label>
+                <label class="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-1.5">{{ $this->t('lbl_new_password') }}</label>
                 <input
                     type="password"
                     wire:model="password"
                     class="w-full rounded-md border border-neutral-300/80 dark:border-white/10 bg-white dark:bg-[#202020] px-2.5 py-1.5 text-sm text-neutral-900 dark:text-white shadow-2xs transition-all focus:outline-none focus:ring-2 {{ $accent['ring'] }}"
-                    placeholder="Minimal 8 karakter"
+                    placeholder="{{ $this->t('placeholder_new_password') }}"
                 />
                 @error('password')
                     <p class="mt-1 text-[11px] text-rose-500">{{ $message }}</p>
@@ -127,12 +127,12 @@
             </div>
 
             <div>
-                <label class="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-1.5">Konfirmasi Kata Sandi Baru</label>
+                <label class="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-1.5">{{ $this->t('lbl_confirm_password') }}</label>
                 <input
                     type="password"
                     wire:model="password_confirmation"
                     class="w-full rounded-md border border-neutral-300/80 dark:border-white/10 bg-white dark:bg-[#202020] px-2.5 py-1.5 text-sm text-neutral-900 dark:text-white shadow-2xs transition-all focus:outline-none focus:ring-2 {{ $accent['ring'] }}"
-                    placeholder="Ulangi kata sandi baru"
+                    placeholder="{{ $this->t('placeholder_confirm_password') }}"
                 />
                 @error('password_confirmation')
                     <p class="mt-1 text-[11px] text-rose-500">{{ $message }}</p>
@@ -148,7 +148,7 @@
                 class="flex items-center gap-2 rounded-md px-4 py-1.5 text-sm font-medium text-white shadow-2xs transition-all hover:brightness-110 active:scale-98"
             >
                 <flux:icon name="key" class="size-3.5" />
-                <span>Perbarui Kata Sandi</span>
+                <span>{{ $this->t('btn_update_password') }}</span>
             </button>
         </div>
     </div>
@@ -161,8 +161,8 @@
                     <flux:icon name="shield-check" class="size-5" />
                 </div>
                 <div class="space-y-1">
-                    <div class="text-sm font-semibold text-neutral-900 dark:text-white">Pengaturan Keamanan Lanjutan (2FA &amp; Passkeys)</div>
-                    <p class="text-xs text-neutral-500 dark:text-neutral-400">Kelola Autentikasi Dua Faktor (2FA) dan Kunci Sandi Biometrik (Passkey).</p>
+                    <div class="text-sm font-semibold text-neutral-900 dark:text-white">{{ $this->t('security_advanced_title') }}</div>
+                    <p class="text-xs text-neutral-500 dark:text-neutral-400">{{ $this->t('security_advanced_desc') }}</p>
                 </div>
             </div>
             <div class="pt-1">
@@ -171,7 +171,7 @@
                     target="_blank"
                     class="inline-flex items-center gap-2 rounded-md border border-neutral-300/80 dark:border-white/10 bg-white dark:bg-[#2b2b2b] px-3.5 py-1.5 text-xs font-medium text-neutral-700 dark:text-neutral-200 shadow-2xs hover:bg-neutral-50 dark:hover:bg-[#333333] transition-all active:scale-98"
                 >
-                    <span>Buka Portal Keamanan Lanjutan</span>
+                    <span>{{ $this->t('btn_open_security_portal') }}</span>
                     <flux:icon name="arrow-top-right-on-square" class="size-3.5" />
                 </a>
             </div>

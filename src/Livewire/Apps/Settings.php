@@ -9,9 +9,12 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Url;
 use Livewire\Component;
+use Novay\MiniOS\Concerns\HasTranslations;
 
 class Settings extends Component
 {
+    use HasTranslations;
+
     #[Url(as: 'tab')]
     public string $activeTab = 'appearance';
 
@@ -127,7 +130,7 @@ class Settings extends Component
             if (in_array($category, ['appearance', 'dock', 'window_manager', 'locale_time', 'services'])) {
                 os_setting()->set("{$category}.{$key}", $value);
 
-                $this->saveStatus = 'Tersimpan otomatis';
+                $this->saveStatus = $this->trans('saved_auto');
 
                 $this->dispatch('os-setting-updated', [
                     'category' => $category,
@@ -147,7 +150,7 @@ class Settings extends Component
             os_setting()->resetCategory($category);
             $this->loadSettings();
 
-            $this->saveStatus = 'Pengaturan berhasil dikembalikan ke default';
+            $this->saveStatus = $this->trans('reset_success');
 
             $this->dispatch('os-setting-reset', [
                 'category' => $category,
@@ -165,7 +168,7 @@ class Settings extends Component
                 }
             }
             $this->loadSettings();
-            $this->saveStatus = 'Pengaturan filesystem berhasil dikembalikan ke default';
+            $this->saveStatus = $this->trans('reset_filesystem_success');
             $this->dispatch('os-setting-reset', ['category' => 'services']);
         } elseif ($category === 'mail') {
             $defaults = config('minios.settings.services', []);
@@ -181,7 +184,7 @@ class Settings extends Component
                 }
             }
             $this->loadSettings();
-            $this->saveStatus = 'Pengaturan mail delivery berhasil dikembalikan ke default';
+            $this->saveStatus = $this->trans('reset_mail_success');
             $this->dispatch('os-setting-reset', ['category' => 'services']);
         }
     }
@@ -228,14 +231,14 @@ class Settings extends Component
             $retrieved = $disk->get($testFileName);
 
             if ($retrieved !== $testContent) {
-                throw new \Exception('Verifikasi pembacaan konten berkas tidak cocok.');
+                throw new \Exception($this->trans('storage_content_mismatch'));
             }
 
             $disk->delete($testFileName);
 
-            $this->storageTestStatus = "Koneksi penyimpanan disk '{$driver}' berhasil diverifikasi!";
+            $this->storageTestStatus = $this->trans('storage_test_success', ['driver' => $driver]);
         } catch (\Throwable $e) {
-            $this->storageTestError = 'Gagal terhubung ke disk: '.$e->getMessage();
+            $this->storageTestError = $this->trans('storage_test_fail', ['error' => $e->getMessage()]);
         }
     }
 
@@ -255,7 +258,7 @@ class Settings extends Component
 
             if ($driver === 'log') {
                 Log::info("[MiniOS Test Email] Uji coba pengiriman surel ke: {$targetEmail}");
-                $this->mailTestStatus = 'Surel uji coba berhasil dicatat ke dalam file log sistem (driver: log).';
+                $this->mailTestStatus = $this->trans('mail_log_success');
 
                 return;
             }
@@ -263,7 +266,7 @@ class Settings extends Component
             if ($driver === 'resend') {
                 $apiKey = $this->services['resend_api_key'] ?? '';
                 if (empty($apiKey)) {
-                    throw new \Exception('API Key Resend belum diisi.');
+                    throw new \Exception($this->trans('mail_resend_key_empty'));
                 }
                 config([
                     'resend.api_key' => $apiKey,
@@ -274,14 +277,16 @@ class Settings extends Component
                 ]);
             }
 
-            Mail::raw('Halo! Ini adalah pesan pengujian dari Pengaturan Layanan MiniOS.', function ($message) use ($targetEmail) {
-                $message->to($targetEmail)
-                    ->subject('MiniOS: Uji Coba Pengiriman Surel ('.now()->format('H:i:s').')');
+            $subject = $this->trans('mail_subject', ['time' => now()->format('H:i:s')]);
+            $body = $this->trans('mail_body');
+
+            Mail::raw($body, function ($message) use ($targetEmail, $subject) {
+                $message->to($targetEmail)->subject($subject);
             });
 
-            $this->mailTestStatus = "Surel uji coba berhasil dikirim ke {$targetEmail} (driver: {$driver})!";
+            $this->mailTestStatus = $this->trans('mail_test_success', ['email' => $targetEmail, 'driver' => $driver]);
         } catch (\Throwable $e) {
-            $this->mailTestError = 'Gagal mengirim surel: '.$e->getMessage();
+            $this->mailTestError = $this->trans('mail_test_fail', ['error' => $e->getMessage()]);
         }
     }
 
@@ -299,17 +304,17 @@ class Settings extends Component
             'profile_name' => ['required', 'string', 'max:255'],
             'profile_email' => ['required', 'string', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
         ], [
-            'profile_name.required' => 'Nama lengkap wajib diisi.',
-            'profile_email.required' => 'Alamat email wajib diisi.',
-            'profile_email.email' => 'Format email tidak valid.',
-            'profile_email.unique' => 'Alamat email sudah digunakan akun lain.',
+            'profile_name.required' => $this->trans('profile_name_required'),
+            'profile_email.required' => $this->trans('profile_email_required'),
+            'profile_email.email' => $this->trans('profile_email_invalid'),
+            'profile_email.unique' => $this->trans('profile_email_unique'),
         ]);
 
         $user->name = $validated['profile_name'];
         $user->email = $validated['profile_email'];
         $user->save();
 
-        $this->profileStatus = 'Informasi profil berhasil disimpan.';
+        $this->profileStatus = $this->trans('profile_update_success');
     }
 
     /**
@@ -326,18 +331,18 @@ class Settings extends Component
             'current_password' => ['required', 'string', 'current_password'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ], [
-            'current_password.required' => 'Kata sandi saat ini wajib diisi.',
-            'current_password.current_password' => 'Kata sandi saat ini tidak cocok.',
-            'password.required' => 'Kata sandi baru wajib diisi.',
-            'password.min' => 'Kata sandi baru minimal 8 karakter.',
-            'password.confirmed' => 'Konfirmasi kata sandi tidak cocok.',
+            'current_password.required' => $this->trans('password_current_required'),
+            'current_password.current_password' => $this->trans('password_current_wrong'),
+            'password.required' => $this->trans('password_new_required'),
+            'password.min' => $this->trans('password_new_min'),
+            'password.confirmed' => $this->trans('password_confirmed_wrong'),
         ]);
 
         $user->password = Hash::make($validated['password']);
         $user->save();
 
         $this->reset(['current_password', 'password', 'password_confirmation']);
-        $this->passwordStatus = 'Kata sandi akun berhasil diperbarui.';
+        $this->passwordStatus = $this->trans('password_update_success');
     }
 
     /**
@@ -432,55 +437,55 @@ class Settings extends Component
     {
         $items = [
             'appearance' => [
-                'section_label' => 'Preferensi Sistem',
-                'label' => 'Tampilan & Personalisasi',
-                'desc' => 'Tema, warna aksen, font, wallpaper',
+                'section_label' => $this->trans('section_system'),
+                'label' => $this->trans('nav_appearance'),
+                'desc' => $this->trans('nav_appearance_desc'),
                 'icon' => 'paint-brush',
                 'color' => 'bg-pink-500 text-white',
-                'keywords' => ['tampilan', 'personalisasi', 'tema', 'dark', 'light', 'terang', 'gelap', 'aksen', 'font', 'tipografi', 'ubuntu', 'segoe', 'inter', 'google', 'san francisco', 'system-ui', 'wallpaper', 'blur', 'transparansi', 'acrylic', 'mica'],
+                'keywords' => ['tampilan', 'personalisasi', 'tema', 'dark', 'light', 'terang', 'gelap', 'aksen', 'font', 'tipografi', 'ubuntu', 'segoe', 'inter', 'google', 'san francisco', 'system-ui', 'wallpaper', 'blur', 'transparansi', 'acrylic', 'mica', 'appearance', 'theme', 'accent', 'personalization'],
             ],
             'dock' => [
-                'label' => 'Dock & Taskbar',
-                'desc' => 'Ukuran ikon, posisi layar, autohide',
+                'label' => $this->trans('nav_dock'),
+                'desc' => $this->trans('nav_dock_desc'),
                 'icon' => 'rectangle-stack',
                 'color' => 'bg-amber-500 text-white',
-                'keywords' => ['dock', 'taskbar', 'ukuran', 'posisi', 'layar', 'autohide', 'sembunyikan', 'indikator', 'aplikasi'],
+                'keywords' => ['dock', 'taskbar', 'ukuran', 'posisi', 'layar', 'autohide', 'sembunyikan', 'indikator', 'aplikasi', 'size', 'position', 'screen', 'indicators'],
             ],
             'window_manager' => [
-                'label' => 'Sistem & Window',
-                'desc' => 'Sesi jendela, pemulihan posisi',
+                'label' => $this->trans('nav_window_manager'),
+                'desc' => $this->trans('nav_window_manager_desc'),
                 'icon' => 'squares-2x2',
                 'color' => 'bg-sky-500 text-white',
-                'keywords' => ['sistem', 'window', 'jendela', 'manager', 'restore', 'sesi', 'pemulihan', 'posisi', 'ukuran'],
+                'keywords' => ['sistem', 'window', 'jendela', 'manager', 'restore', 'sesi', 'pemulihan', 'posisi', 'ukuran', 'system', 'session', 'coordinates'],
             ],
             'locale_time' => [
-                'label' => 'Waktu & Bahasa',
-                'desc' => 'Bahasa sistem, zona waktu GMT/UTC',
+                'label' => $this->trans('nav_locale_time'),
+                'desc' => $this->trans('nav_locale_time_desc'),
                 'icon' => 'globe-alt',
                 'color' => 'bg-emerald-500 text-white',
-                'keywords' => ['waktu', 'bahasa', 'jam', 'zona', 'locale', 'timezone', 'jakarta', 'makassar', 'jayapura', 'wib', 'wita', 'wit'],
+                'keywords' => ['waktu', 'bahasa', 'jam', 'zona', 'locale', 'timezone', 'jakarta', 'makassar', 'jayapura', 'wib', 'wita', 'wit', 'time', 'language', 'clock', 'date'],
             ],
             'account' => [
-                'label' => 'Akun & Keamanan',
-                'desc' => 'Profil pengguna, kata sandi, email',
+                'label' => $this->trans('nav_account'),
+                'desc' => $this->trans('nav_account_desc'),
                 'icon' => 'user',
                 'color' => 'bg-indigo-500 text-white',
-                'keywords' => ['akun', 'profil', 'nama', 'email', 'kata sandi', 'password', 'keamanan', 'security', '2fa', 'passkey'],
+                'keywords' => ['akun', 'profil', 'nama', 'email', 'kata sandi', 'password', 'keamanan', 'security', '2fa', 'passkey', 'account', 'profile', 'user'],
             ],
             'filesystem' => [
-                'section_label' => 'Layanan & Infrastruktur',
-                'label' => 'Filesystem',
-                'desc' => 'Disk lokal, publik, S3 & cloud storage',
+                'section_label' => $this->trans('section_services'),
+                'label' => $this->trans('nav_filesystem'),
+                'desc' => $this->trans('nav_filesystem_desc'),
                 'icon' => 'server',
                 'color' => 'bg-teal-500 text-white',
-                'keywords' => ['filesystem', 'penyimpanan', 'storage', 'disk', 's3', 'minio', 'r2', 'spaces', 'wasabi', 'upload', 'berkas', 'cloud'],
+                'keywords' => ['filesystem', 'penyimpanan', 'storage', 'disk', 's3', 'minio', 'r2', 'spaces', 'wasabi', 'upload', 'berkas', 'cloud', 'files', 'bunny', 'bunnycdn'],
             ],
             'mail' => [
-                'label' => 'Mail Delivery',
-                'desc' => 'Driver surel, server SMTP, notifikasi',
+                'label' => $this->trans('nav_mail'),
+                'desc' => $this->trans('nav_mail_desc'),
                 'icon' => 'envelope',
                 'color' => 'bg-sky-500 text-white',
-                'keywords' => ['mail', 'delivery', 'email', 'surel', 'smtp', 'log', 'sendmail', 'notifikasi', 'pesan'],
+                'keywords' => ['mail', 'delivery', 'email', 'surel', 'smtp', 'log', 'sendmail', 'notifikasi', 'pesan', 'messages', 'resend'],
             ],
         ];
 

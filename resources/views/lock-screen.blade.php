@@ -9,8 +9,9 @@
         lockDate: '',
         updateLockClock() {
             const now = new Date();
-            this.lockTime = new Intl.DateTimeFormat('id-ID', { hour: '2-digit', minute: '2-digit', hour12: false }).format(now);
-            this.lockDate = new Intl.DateTimeFormat('id-ID', { weekday: 'long', day: 'numeric', month: 'long' }).format(now);
+            const loc = '{{ app()->getLocale() === "en" ? "en-US" : "id-ID" }}';
+            this.lockTime = new Intl.DateTimeFormat(loc, { hour: '2-digit', minute: '2-digit', hour12: false }).format(now);
+            this.lockDate = new Intl.DateTimeFormat(loc, { weekday: 'long', day: 'numeric', month: 'long' }).format(now);
         }
     }"
     x-init="
@@ -56,7 +57,7 @@
                         x-ref="lockPasswordInput"
                         wire:model="password"
                         type="password"
-                        placeholder="Masukkan kata sandi..."
+                        placeholder="{{ __('Enter password...') }}"
                         class="w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-sm text-white placeholder-white/40 shadow-inner backdrop-blur-md outline-none transition-all focus:border-indigo-400 focus:bg-white/15 focus:ring-2 focus:ring-indigo-400/40"
                         autofocus
                     />
@@ -96,7 +97,7 @@
                     <flux:icon name="power" class="size-6 text-rose-400 transition-colors group-hover:text-rose-300" />
                 </div>
                 <span class="text-xs font-medium tracking-wider text-white/70 transition-colors group-hover:text-white">
-                    Logout
+                    {{ __('Logout') }}
                 </span>
             </button>
         </div>

@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Livewire\Component;
 use Livewire\WithFileUploads;
+use Novay\MiniOS\Concerns\HasTranslations;
 use Novay\MiniOS\Contracts\DesktopApp;
 use Novay\MiniOS\Facades\MiniOS;
 use ReflectionClass;
@@ -18,6 +19,7 @@ use ZipArchive;
 
 class ControlPanel extends Component
 {
+    use HasTranslations;
     use WithFileUploads;
 
     public string $activeTab = 'all'; // 'all', 'system', 'custom'
@@ -89,9 +91,9 @@ class ControlPanel extends Component
         $this->validate([
             'uploadFile' => 'required|file|mimes:zip|max:51200',
         ], [
-            'uploadFile.required' => 'Pilih berkas ZIP aplikasi terlebih dahulu.',
-            'uploadFile.mimes' => 'Format berkas harus berupa arsip ZIP (.zip).',
-            'uploadFile.max' => 'Ukuran berkas ZIP maksimal 50 MB.',
+            'uploadFile.required' => $this->trans('val_upload_required'),
+            'uploadFile.mimes' => $this->trans('val_upload_mimes'),
+            'uploadFile.max' => $this->trans('val_upload_max'),
         ]);
 
         $zipPath = $this->uploadFile->getRealPath();
@@ -99,7 +101,7 @@ class ControlPanel extends Component
 
         if ($zip->open($zipPath) !== true) {
             $this->statusType = 'error';
-            $this->statusMessage = 'Gagal membuka berkas ZIP. Pastikan berkas tidak rusak.';
+            $this->statusMessage = $this->trans('err_zip_open');
 
             return;
         }
@@ -114,7 +116,7 @@ class ControlPanel extends Component
             if (str_contains($entryName, '..') || str_starts_with($entryName, '/') || str_starts_with($entryName, '\\')) {
                 $zip->close();
                 $this->statusType = 'error';
-                $this->statusMessage = 'Keamanan: Arsip ZIP mengandung path traversal yang tidak diizinkan.';
+                $this->statusMessage = $this->trans('err_zip_slip');
 
                 return;
             }
@@ -129,7 +131,7 @@ class ControlPanel extends Component
         if (! $manifestEntry) {
             $zip->close();
             $this->statusType = 'error';
-            $this->statusMessage = 'Paket tidak valid: Berkas manifest aplikasi (*App.php) tidak ditemukan dalam ZIP.';
+            $this->statusMessage = $this->trans('err_manifest_missing');
 
             return;
         }
@@ -139,7 +141,7 @@ class ControlPanel extends Component
         if ($manifestContent === false) {
             $zip->close();
             $this->statusType = 'error';
-            $this->statusMessage = 'Gagal membaca berkas manifest dari ZIP.';
+            $this->statusMessage = $this->trans('err_manifest_read');
 
             return;
         }
@@ -153,7 +155,7 @@ class ControlPanel extends Component
         if (MiniOS::isCoreApp($kebabName) || MiniOS::isCoreApp(strtolower($studlyName))) {
             $zip->close();
             $this->statusType = 'error';
-            $this->statusMessage = "Aplikasi '{$studlyName}' adalah aplikasi bawaan sistem MiniOS dan tidak dapat ditimpa.";
+            $this->statusMessage = $this->trans('err_core_app_overwrite', ['name' => $studlyName]);
 
             return;
         }
@@ -290,10 +292,13 @@ class ControlPanel extends Component
         $this->statusType = 'success';
 
         if (! empty($missing)) {
-            $this->statusMessage = "Aplikasi '{$studlyName}' berhasil dipasang! Perhatian: aplikasi memerlukan dependensi Composer: ".implode(', ', $missing).'. Anda dapat memasangnya langsung di bawah.';
+            $this->statusMessage = $this->trans('msg_install_success_missing', [
+                'name' => $studlyName,
+                'packages' => implode(', ', $missing),
+            ]);
             $this->expandedApp = $kebabName;
         } else {
-            $this->statusMessage = "Aplikasi '{$studlyName}' berhasil dipasang dan siap digunakan!";
+            $this->statusMessage = $this->trans('msg_install_success', ['name' => $studlyName]);
         }
 
         $this->dispatch('app-installed', [
@@ -426,7 +431,7 @@ class ControlPanel extends Component
     {
         if (MiniOS::isCoreApp($id)) {
             $this->statusType = 'error';
-            $this->statusMessage = 'Aplikasi bawaan sistem MiniOS tidak dapat dihapus.';
+            $this->statusMessage = $this->trans('err_core_app_uninstall');
 
             return;
         }
@@ -434,7 +439,7 @@ class ControlPanel extends Component
         $app = MiniOS::getApplication($id);
         if (! $app) {
             $this->statusType = 'error';
-            $this->statusMessage = 'Aplikasi tidak ditemukan.';
+            $this->statusMessage = $this->trans('err_app_not_found');
 
             return;
         }
@@ -462,7 +467,7 @@ class ControlPanel extends Component
         $id = $this->appToUninstall;
         if (! $id || MiniOS::isCoreApp($id)) {
             $this->statusType = 'error';
-            $this->statusMessage = 'Aplikasi bawaan sistem MiniOS tidak dapat dihapus.';
+            $this->statusMessage = $this->trans('err_core_app_uninstall');
             $this->cancelUninstall();
 
             return;
@@ -471,7 +476,7 @@ class ControlPanel extends Component
         $app = MiniOS::getApplication($id);
         if (! $app) {
             $this->statusType = 'error';
-            $this->statusMessage = 'Aplikasi tidak ditemukan dalam sistem.';
+            $this->statusMessage = $this->trans('err_app_not_found');
             $this->cancelUninstall();
 
             return;
@@ -492,7 +497,7 @@ class ControlPanel extends Component
 
         if (! $isSafe) {
             $this->statusType = 'error';
-            $this->statusMessage = 'Gagal menghapus: Folder aplikasi berada di luar direktori aman app/MiniOS atau app/Apps.';
+            $this->statusMessage = $this->trans('err_unsafe_app_dir');
             $this->cancelUninstall();
 
             return;
@@ -547,7 +552,7 @@ class ControlPanel extends Component
 
         $this->cancelUninstall();
         $this->statusType = 'success';
-        $this->statusMessage = "Aplikasi '{$appName}' berhasil dihapus dari MiniOS.";
+        $this->statusMessage = $this->trans('msg_uninstall_success', ['name' => $appName]);
 
         $this->dispatch('app-uninstalled', ['id' => $id]);
     }

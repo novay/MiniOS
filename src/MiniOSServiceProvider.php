@@ -187,6 +187,10 @@ class MiniOSServiceProvider extends ServiceProvider
             ], 'minios-src');
 
             $this->publishes([
+                __DIR__.'/../resources/lang' => $this->app->langPath('vendor/minios'),
+            ], 'minios-lang');
+
+            $this->publishes([
                 __DIR__.'/../.agents/skills' => base_path('.agents/skills'),
             ], 'minios-skills');
         }
@@ -196,6 +200,7 @@ class MiniOSServiceProvider extends ServiceProvider
     {
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'minios');
+        $this->loadJsonTranslationsFrom(__DIR__.'/../resources/lang');
 
         Blade::anonymousComponentPath(__DIR__.'/../resources/views/components', 'minios');
 

@@ -6,9 +6,11 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\WithFileUploads;
+use Novay\MiniOS\Concerns\HasTranslations;
 
 class Files extends Component
 {
+    use HasTranslations;
     use WithFileUploads;
 
     public string $currentPath = '';
@@ -387,24 +389,24 @@ class Files extends Component
 
         $name = trim($this->newFolderName);
         if ($name === '' || str_contains($name, '/') || str_contains($name, '\\') || $name === '.' || $name === '..') {
-            $this->notify('Nama folder tidak valid.', 'error');
+            $this->notify($this->trans('error_folder_name_invalid'), 'error');
 
             return;
         }
 
         $targetDir = $this->absolutePath.'/'.$name;
         if (File::exists($targetDir)) {
-            $this->notify('Folder dengan nama tersebut sudah ada.', 'error');
+            $this->notify($this->trans('error_folder_exists'), 'error');
 
             return;
         }
 
         try {
             File::makeDirectory($targetDir, 0755, true);
-            $this->notify("Folder '{$name}' berhasil dibuat.");
+            $this->notify($this->trans('success_folder_created', ['name' => $name]));
             $this->closeNewFolderModal();
         } catch (\Exception $e) {
-            $this->notify('Gagal membuat folder: '.$e->getMessage(), 'error');
+            $this->notify($this->trans('error_folder_failed', ['error' => $e->getMessage()]), 'error');
         }
     }
 
@@ -428,24 +430,24 @@ class Files extends Component
 
         $name = trim($this->newFileName);
         if ($name === '' || str_contains($name, '/') || str_contains($name, '\\') || $name === '.' || $name === '..') {
-            $this->notify('Nama berkas tidak valid.', 'error');
+            $this->notify($this->trans('error_file_name_invalid'), 'error');
 
             return;
         }
 
         $targetFile = $this->absolutePath.'/'.$name;
         if (File::exists($targetFile)) {
-            $this->notify('Berkas dengan nama tersebut sudah ada.', 'error');
+            $this->notify($this->trans('error_file_exists'), 'error');
 
             return;
         }
 
         try {
             File::put($targetFile, '');
-            $this->notify("Berkas '{$name}' berhasil dibuat.");
+            $this->notify($this->trans('success_file_created', ['name' => $name]));
             $this->closeNewFileModal();
         } catch (\Exception $e) {
-            $this->notify('Gagal membuat berkas: '.$e->getMessage(), 'error');
+            $this->notify($this->trans('error_file_failed', ['error' => $e->getMessage()]), 'error');
         }
     }
 
@@ -468,7 +470,7 @@ class Files extends Component
         }
 
         if (empty($this->uploadedFiles)) {
-            $this->notify('Pilih minimal satu berkas untuk diunggah.', 'error');
+            $this->notify($this->trans('error_upload_no_files'), 'error');
 
             return;
         }
@@ -492,7 +494,7 @@ class Files extends Component
             }
         }
 
-        $this->notify("{$uploadedCount} berkas berhasil diunggah.");
+        $this->notify($this->trans('success_files_uploaded', ['count' => $uploadedCount]));
         $this->closeUploadModal();
     }
 
@@ -520,14 +522,14 @@ class Files extends Component
 
         $newName = trim($this->renameNewName);
         if ($newName === '' || str_contains($newName, '/') || str_contains($newName, '\\') || $newName === '.' || $newName === '..') {
-            $this->notify('Nama baru tidak valid.', 'error');
+            $this->notify($this->trans('error_rename_invalid'), 'error');
 
             return;
         }
 
         $oldFullPath = storage_path($this->renameTargetPath);
         if (! File::exists($oldFullPath)) {
-            $this->notify('Item yang akan diubah namanya tidak ditemukan.', 'error');
+            $this->notify($this->trans('error_rename_not_found'), 'error');
 
             return;
         }
@@ -536,17 +538,17 @@ class Files extends Component
         $newFullPath = $parentDir.'/'.$newName;
 
         if (File::exists($newFullPath) && $newFullPath !== $oldFullPath) {
-            $this->notify('Nama tersebut sudah digunakan oleh item lain.', 'error');
+            $this->notify($this->trans('error_rename_exists'), 'error');
 
             return;
         }
 
         try {
             File::move($oldFullPath, $newFullPath);
-            $this->notify("Nama berhasil diubah menjadi '{$newName}'.");
+            $this->notify($this->trans('success_renamed', ['name' => $newName]));
             $this->closeRenameModal();
         } catch (\Exception $e) {
-            $this->notify('Gagal mengubah nama: '.$e->getMessage(), 'error');
+            $this->notify($this->trans('error_rename_failed', ['error' => $e->getMessage()]), 'error');
         }
     }
 
@@ -574,7 +576,7 @@ class Files extends Component
 
         $fullPath = storage_path($this->deleteTargetPath);
         if (! File::exists($fullPath)) {
-            $this->notify('Item tidak ditemukan.', 'error');
+            $this->notify($this->trans('error_delete_not_found'), 'error');
             $this->closeDeleteModal();
 
             return;
@@ -586,13 +588,13 @@ class Files extends Component
             } else {
                 File::delete($fullPath);
             }
-            $this->notify("'{$this->deleteTargetName}' berhasil dihapus.");
+            $this->notify($this->trans('success_deleted', ['name' => $this->deleteTargetName]));
             $this->closeDeleteModal();
             if ($this->selectedPath === $this->deleteTargetPath) {
                 $this->selectedPath = null;
             }
         } catch (\Exception $e) {
-            $this->notify('Gagal menghapus: '.$e->getMessage(), 'error');
+            $this->notify($this->trans('error_delete_failed', ['error' => $e->getMessage()]), 'error');
         }
     }
 
@@ -606,7 +608,7 @@ class Files extends Component
         $fullPath = storage_path($sanitized);
 
         if (! File::exists($fullPath) || File::isDirectory($fullPath)) {
-            $this->notify('Berkas tidak ditemukan untuk diunduh.', 'error');
+            $this->notify($this->trans('error_download_not_found'), 'error');
 
             return null;
         }
@@ -622,7 +624,7 @@ class Files extends Component
 
         $fullPath = storage_path($this->previewItem['path']);
         if (! File::exists($fullPath) || File::isDirectory($fullPath)) {
-            $this->notify('Berkas tidak ditemukan.', 'error');
+            $this->notify($this->trans('error_save_not_found'), 'error');
 
             return;
         }
@@ -632,9 +634,9 @@ class Files extends Component
             $sizeBytes = File::size($fullPath);
             $this->previewItem['size'] = $this->formatBytes($sizeBytes);
             $this->previewItem['data'] = $this->previewContent;
-            $this->notify('Perubahan berkas berhasil disimpan.');
+            $this->notify($this->trans('success_file_saved'));
         } catch (\Exception $e) {
-            $this->notify('Gagal menyimpan berkas: '.$e->getMessage(), 'error');
+            $this->notify($this->trans('error_save_failed', ['error' => $e->getMessage()]), 'error');
         }
     }
 
@@ -792,7 +794,7 @@ class Files extends Component
 
         $info = $this->cloudStorageInfo;
         if (! $info) {
-            $this->cloudStorageTestError = 'Belum ada konfigurasi Cloud Storage.';
+            $this->cloudStorageTestError = $this->trans('error_cloud_not_configured');
 
             return;
         }
@@ -806,9 +808,9 @@ class Files extends Component
             $disk->put($testFileName, $testContent);
             $disk->delete($testFileName);
 
-            $this->cloudStorageTestStatus = "Koneksi ke {$info['name']} ('{$info['target']}') berhasil diverifikasi!";
+            $this->cloudStorageTestStatus = $this->trans('success_cloud_connected', ['name' => $info['name'], 'target' => $info['target']]);
         } catch (\Throwable $e) {
-            $this->cloudStorageTestError = 'Gagal terhubung ke Cloud Storage: '.$e->getMessage();
+            $this->cloudStorageTestError = $this->trans('error_cloud_failed', ['error' => $e->getMessage()]);
         }
     }
 

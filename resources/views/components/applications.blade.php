@@ -16,7 +16,7 @@
     <button
         type="button"
         @click="applicationsOpen = false"
-        title="Tutup (Esc)"
+        title="{{ __('Close (Esc)') }}"
         class="absolute top-5 right-6 z-10 flex size-9 items-center justify-center rounded-full bg-white/10 text-white/70 backdrop-blur-md transition-colors hover:bg-white/20 hover:text-white"
     >
         <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -46,7 +46,7 @@
                     x-ref="searchInput"
                     x-model="searchQuery"
                     type="text"
-                    placeholder="Ketik untuk mencari aplikasi..."
+                    placeholder="{{ __('Type to search applications...') }}"
                     class="w-full border-0 bg-transparent text-sm text-white outline-none placeholder:text-white/40"
                     @keydown.escape.stop="if (searchQuery) searchQuery = ''; else applicationsOpen = false;"
                 >

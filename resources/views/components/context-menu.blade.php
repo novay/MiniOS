@@ -43,7 +43,7 @@
                         class="group flex w-full items-center gap-2.5 rounded px-2.5 py-1.5 text-left transition-colors hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-500"
                     >
                         <flux:icon name="bookmark-slash" class="size-4 text-neutral-500 dark:text-neutral-400 group-hover:text-white" />
-                        <span>Remove from Dock</span>
+                        <span>{{ __('Remove from Dock') }}</span>
                     </button>
 
                     <button
@@ -53,7 +53,7 @@
                         class="group flex w-full items-center gap-2.5 rounded px-2.5 py-1.5 text-left transition-colors hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-500"
                     >
                         <flux:icon name="bookmark" class="size-4 text-neutral-500 dark:text-neutral-400 group-hover:text-white" />
-                        <span>Pin to Dock</span>
+                        <span>{{ __('Pin to Dock') }}</span>
                     </button>
 
                     <div class="my-1 h-px bg-neutral-200/80 dark:bg-white/10"></div>
@@ -65,7 +65,7 @@
                         class="group flex w-full items-center gap-2.5 rounded px-2.5 py-1.5 text-left transition-colors hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-500"
                     >
                         <flux:icon name="eye" class="size-4 text-neutral-500 dark:text-neutral-400 group-hover:text-white" />
-                        <span>Show</span>
+                        <span>{{ __('Show') }}</span>
                     </button>
 
                     {{-- Hide --}}
@@ -75,7 +75,7 @@
                         class="group flex w-full items-center gap-2.5 rounded px-2.5 py-1.5 text-left transition-colors hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-500"
                     >
                         <flux:icon name="eye-slash" class="size-4 text-neutral-500 dark:text-neutral-400 group-hover:text-white" />
-                        <span>Hide</span>
+                        <span>{{ __('Hide') }}</span>
                     </button>
 
                     {{-- Quit --}}
@@ -85,7 +85,7 @@
                         class="group flex w-full items-center gap-2.5 rounded px-2.5 py-1.5 text-left text-rose-600 dark:text-rose-400 transition-colors hover:bg-rose-600 hover:text-white dark:hover:bg-rose-600 dark:hover:text-white"
                     >
                         <flux:icon name="power" class="size-4 text-rose-500 dark:text-rose-400 group-hover:text-white" />
-                        <span>Quit</span>
+                        <span>{{ __('Quit') }}</span>
                     </button>
                 </div>
             </template>
@@ -100,7 +100,7 @@
                         class="group flex w-full items-center gap-2.5 rounded px-2.5 py-1.5 text-left transition-colors hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-500"
                     >
                         <flux:icon name="arrow-top-right-on-square" class="size-4 text-neutral-500 dark:text-neutral-400 group-hover:text-white" />
-                        <span>Open</span>
+                        <span>{{ __('Open') }}</span>
                     </button>
 
                     <div class="my-1 h-px bg-neutral-200/80 dark:bg-white/10"></div>
@@ -112,7 +112,7 @@
                         class="group flex w-full items-center gap-2.5 rounded px-2.5 py-1.5 text-left text-rose-600 dark:text-rose-400 transition-colors hover:bg-rose-600 hover:text-white dark:hover:bg-rose-600 dark:hover:text-white"
                     >
                         <flux:icon name="bookmark-slash" class="size-4 text-rose-500 dark:text-rose-400 group-hover:text-white" />
-                        <span>Remove from Dock</span>
+                        <span>{{ __('Remove from Dock') }}</span>
                     </button>
                 </div>
             </template>
@@ -142,7 +142,7 @@
                 class="group flex w-full items-center gap-2.5 rounded px-2.5 py-1.5 text-left transition-colors hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-500"
             >
                 <flux:icon name="bookmark" class="size-4 text-neutral-500 dark:text-neutral-400 group-hover:text-white" />
-                <span>Pin to Dock</span>
+                <span>{{ __('Pin to Dock') }}</span>
             </button>
 
             <button
@@ -152,7 +152,7 @@
                 class="group flex w-full items-center gap-2.5 rounded px-2.5 py-1.5 text-left transition-colors hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-500"
             >
                 <flux:icon name="bookmark-slash" class="size-4 text-neutral-500 dark:text-neutral-400 group-hover:text-white" />
-                <span>Remove from Dock</span>
+                <span>{{ __('Remove from Dock') }}</span>
             </button>
 
             <div class="my-1 h-px bg-neutral-200/80 dark:bg-white/10"></div>
@@ -164,7 +164,7 @@
                 class="group flex w-full items-center gap-2.5 rounded px-2.5 py-1.5 text-left transition-colors hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-500"
             >
                 <flux:icon name="arrow-top-right-on-square" class="size-4 text-neutral-500 dark:text-neutral-400 group-hover:text-white" />
-                <span>Open</span>
+                <span>{{ __('Open') }}</span>
             </button>
         </div>
     </template>
@@ -182,7 +182,7 @@
                 class="group flex w-full items-center gap-2.5 rounded px-2.5 py-1.5 text-left transition-colors hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-500"
             >
                 <flux:icon name="photo" class="size-4 text-neutral-500 dark:text-neutral-400 group-hover:text-white" />
-                <span>Ubah Wallpaper...</span>
+                <span>{{ __('Change Wallpaper...') }}</span>
             </button>
 
             {{-- Pengaturan Sistem --}}
@@ -192,7 +192,7 @@
                 class="group flex w-full items-center gap-2.5 rounded px-2.5 py-1.5 text-left transition-colors hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-500"
             >
                 <flux:icon name="cog-6-tooth" class="size-4 text-neutral-500 dark:text-neutral-400 group-hover:text-white" />
-                <span>Pengaturan Sistem...</span>
+                <span>{{ __('System Settings...') }}</span>
             </button>
 
             <div class="my-1 h-px bg-neutral-200/80 dark:bg-white/10"></div>
@@ -204,7 +204,7 @@
                 class="group flex w-full items-center gap-2.5 rounded px-2.5 py-1.5 text-left transition-colors hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-500"
             >
                 <flux:icon name="arrow-path" class="size-4 text-neutral-500 dark:text-neutral-400 group-hover:text-white" />
-                <span>Refresh</span>
+                <span>{{ __('Refresh') }}</span>
             </button>
 
             <div class="my-1 h-px bg-neutral-200/80 dark:bg-white/10"></div>
@@ -216,7 +216,7 @@
                 class="group flex w-full items-center gap-2.5 rounded px-2.5 py-1.5 text-left transition-colors hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-500"
             >
                 <flux:icon name="command-line" class="size-4 text-neutral-500 dark:text-neutral-400 group-hover:text-white" />
-                <span>Buka Terminal</span>
+                <span>{{ __('Open Terminal') }}</span>
             </button>
 
             {{-- Manajer Berkas --}}
@@ -226,7 +226,7 @@
                 class="group flex w-full items-center gap-2.5 rounded px-2.5 py-1.5 text-left transition-colors hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-500"
             >
                 <flux:icon name="folder" class="size-4 text-neutral-500 dark:text-neutral-400 group-hover:text-white" />
-                <span>Manajer Berkas</span>
+                <span>{{ __('File Manager') }}</span>
             </button>
 
             <div class="my-1 h-px bg-neutral-200/80 dark:bg-white/10"></div>
@@ -238,7 +238,7 @@
                 class="group flex w-full items-center gap-2.5 rounded px-2.5 py-1.5 text-left transition-colors hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-500"
             >
                 <flux:icon name="information-circle" class="size-4 text-neutral-500 dark:text-neutral-400 group-hover:text-white" />
-                <span>Tentang MiniOS</span>
+                <span>{{ __('About MiniOS') }}</span>
             </button>
         </div>
     </template>

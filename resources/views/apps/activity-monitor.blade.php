@@ -254,11 +254,11 @@
                         @if ($this->systemStats['is_shell_supported'])
                             <span class="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-medium">
                                 <span class="size-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                                Live Host Process
+                                {{ $this->t('live_host_process') }}
                             </span>
                             <span>•</span>
                         @endif
-                        <span>Total <strong>{{ count($this->processes) }}</strong> proses</span>
+                        <span>{{ $this->t('total_processes_count', ['count' => count($this->processes)]) }}</span>
                     </div>
                 </div>
 
@@ -341,7 +341,7 @@
                                     <tr>
                                         <td colspan="7" class="py-8 text-center text-neutral-400">
                                             <flux:icon name="magnifying-glass" class="mx-auto size-6 text-neutral-400 mb-1" />
-                                            <span>Tidak ada proses yang cocok dengan kata kunci.</span>
+                                            <span>{{ $this->t('no_processes_found') }}</span>
                                         </td>
                                     </tr>
                                 @endforelse
@@ -361,7 +361,7 @@
                         <div class="rounded-xl border border-neutral-200/90 dark:border-white/10 bg-white dark:bg-[#202020] p-4 shadow-2xs space-y-2">
                             <div class="flex items-center justify-between text-xs font-semibold text-neutral-500 dark:text-neutral-400">
                                 <span class="truncate">{{ $this->systemStats['cpu_model'] }}</span>
-                                <span class="text-[11px] font-normal shrink-0">{{ $this->systemStats['cpu_cores'] }} Cores</span>
+                                <span class="text-[11px] font-normal shrink-0">{{ $this->t('cpu_cores', ['count' => $this->systemStats['cpu_cores']]) }}</span>
                             </div>
                             <div class="text-2xl font-bold tracking-tight text-neutral-900 dark:text-white" style="color: var(--accent-color, {{ $accent['hex'] }});">
                                 {{ $this->systemStats['cpu_percent'] }}%
@@ -370,15 +370,15 @@
                                 <div class="h-full rounded-full transition-all duration-500" style="width: {{ min(100, max(5, $this->systemStats['cpu_percent'] * 4)) }}%; background-color: var(--accent-color, {{ $accent['hex'] }});"></div>
                             </div>
                             <div class="text-[10px] text-neutral-500 flex justify-between pt-1">
-                                <span class="truncate">Load: {{ $this->systemStats['cpu_load_str'] }}</span>
+                                <span class="truncate">{{ $this->t('load_prefix') }}: {{ $this->systemStats['cpu_load_str'] }}</span>
                             </div>
                         </div>
 
                         {{-- Memory Card --}}
                         <div class="rounded-xl border border-neutral-200/90 dark:border-white/10 bg-white dark:bg-[#202020] p-4 shadow-2xs space-y-2">
                             <div class="flex items-center justify-between text-xs font-semibold text-neutral-500 dark:text-neutral-400">
-                                <span>Memori RAM</span>
-                                <span class="text-[11px] font-normal">Fisik: {{ $this->systemStats['total_ram'] }}</span>
+                                <span>{{ $this->t('ram_memory') }}</span>
+                                <span class="text-[11px] font-normal">{{ $this->t('physical_prefix') }}: {{ $this->systemStats['total_ram'] }}</span>
                             </div>
                             <div class="text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">
                                 {{ $this->systemStats['memory_usage'] }}
@@ -387,16 +387,16 @@
                                 <div class="h-full rounded-full bg-emerald-500" style="width: 25%;"></div>
                             </div>
                             <div class="text-[11px] text-neutral-500 flex justify-between pt-1">
-                                <span>Puncak: {{ $this->systemStats['memory_peak'] }}</span>
-                                <span>Batas PHP: {{ $this->systemStats['memory_limit'] }}</span>
+                                <span>{{ $this->t('peak_prefix') }}: {{ $this->systemStats['memory_peak'] }}</span>
+                                <span>{{ $this->t('php_limit_prefix') }}: {{ $this->systemStats['memory_limit'] }}</span>
                             </div>
                         </div>
 
                         {{-- Storage Card --}}
                         <div class="rounded-xl border border-neutral-200/90 dark:border-white/10 bg-white dark:bg-[#202020] p-4 shadow-2xs space-y-2">
                             <div class="flex items-center justify-between text-xs font-semibold text-neutral-500 dark:text-neutral-400">
-                                <span>Penyimpanan Disk</span>
-                                <span class="text-[11px] font-normal">{{ $this->systemStats['storage_free'] }} Bebas</span>
+                                <span>{{ $this->t('disk_storage') }}</span>
+                                <span class="text-[11px] font-normal">{{ $this->systemStats['storage_free'] }} {{ $this->t('free_suffix') }}</span>
                             </div>
                             <div class="text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">
                                 {{ $this->systemStats['storage_percent'] }}%
@@ -405,8 +405,8 @@
                                 <div class="h-full rounded-full bg-amber-500" style="width: {{ $this->systemStats['storage_percent'] }}%;"></div>
                             </div>
                             <div class="text-[11px] text-neutral-500 flex justify-between pt-1">
-                                <span>Terpakai: {{ $this->systemStats['storage_used'] }}</span>
-                                <span>Total: {{ $this->systemStats['storage_total'] }}</span>
+                                <span>{{ $this->t('used_prefix') }}: {{ $this->systemStats['storage_used'] }}</span>
+                                <span>{{ $this->t('total_prefix') }}: {{ $this->systemStats['storage_total'] }}</span>
                             </div>
                         </div>
                     </div>
@@ -416,9 +416,9 @@
                         <div class="flex items-center justify-between text-xs font-semibold text-neutral-900 dark:text-white">
                             <div class="flex items-center gap-2">
                                 <flux:icon name="presentation-chart-line" class="size-4 text-neutral-500" />
-                                <span>Riwayat Beban CPU &amp; Aktivitas Sistem (60 Detik)</span>
+                                <span>{{ $this->t('cpu_history_title') }}</span>
                             </div>
-                            <span class="text-neutral-500 font-normal">100% Utilisasi</span>
+                            <span class="text-neutral-500 font-normal">{{ $this->t('utilization_max') }}</span>
                         </div>
 
                         {{-- SVG Live Telemetry Graph with Grid Lines --}}
@@ -468,19 +468,19 @@
                         {{-- Details Footer Grid --}}
                         <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-2 text-xs">
                             <div>
-                                <span class="text-neutral-500 block">Utilisasi Terakhir</span>
+                                <span class="text-neutral-500 block">{{ $this->t('last_utilization') }}</span>
                                 <span class="font-bold text-neutral-900 dark:text-white mt-0.5 block">{{ $this->systemStats['cpu_percent'] }}%</span>
                             </div>
                             <div>
-                                <span class="text-neutral-500 block">Status Database</span>
+                                <span class="text-neutral-500 block">{{ $this->t('db_status') }}</span>
                                 <span class="font-bold text-emerald-600 dark:text-emerald-400 mt-0.5 block">{{ $this->systemStats['db_status'] }}</span>
                             </div>
                             <div>
-                                <span class="text-neutral-500 block">OPcache Accelerator</span>
-                                <span class="font-bold text-neutral-900 dark:text-white mt-0.5 block">{{ $this->systemStats['opcache_enabled'] ? 'Aktif' : 'Nonaktif' }}</span>
+                                <span class="text-neutral-500 block">{{ $this->t('opcache_accelerator') }}</span>
+                                <span class="font-bold text-neutral-900 dark:text-white mt-0.5 block">{{ $this->systemStats['opcache_enabled'] ? $this->t('enabled') : $this->t('disabled') }}</span>
                             </div>
                             <div>
-                                <span class="text-neutral-500 block">Waktu Operasional</span>
+                                <span class="text-neutral-500 block">{{ $this->t('uptime') }}</span>
                                 <span class="font-bold text-neutral-900 dark:text-white mt-0.5 block">{{ $this->systemStats['uptime'] }}</span>
                             </div>
                         </div>
@@ -500,11 +500,11 @@
                                     <flux:icon name="server" class="size-5" />
                                 </div>
                                 <div>
-                                    <h3 class="text-sm font-semibold text-neutral-900 dark:text-white">Partisi Utama (storage/)</h3>
-                                    <p class="text-xs text-neutral-500 dark:text-neutral-400">Direktori penyimpanan berkas aplikasi MiniOS</p>
+                                    <h3 class="text-sm font-semibold text-neutral-900 dark:text-white">{{ $this->t('partition_main') }}</h3>
+                                    <p class="text-xs text-neutral-500 dark:text-neutral-400">{{ $this->t('partition_desc') }}</p>
                                 </div>
                             </div>
-                            <span class="text-xl font-bold text-amber-500">{{ $this->systemStats['storage_percent'] }}% Terpakai</span>
+                            <span class="text-xl font-bold text-amber-500">{{ $this->t('used_percent', ['percent' => $this->systemStats['storage_percent']]) }}</span>
                         </div>
 
                         <div class="w-full bg-neutral-200/80 dark:bg-white/10 h-2.5 rounded-full overflow-hidden">
@@ -513,15 +513,15 @@
 
                         <div class="grid grid-cols-3 gap-3 pt-2 text-center text-xs">
                             <div class="p-3 rounded-lg bg-neutral-50 dark:bg-white/5 border border-neutral-200/70 dark:border-white/5">
-                                <span class="text-neutral-500 block">Total Ruang</span>
+                                <span class="text-neutral-500 block">{{ $this->t('total_space') }}</span>
                                 <span class="font-bold text-neutral-900 dark:text-white mt-0.5 block">{{ $this->systemStats['storage_total'] }}</span>
                             </div>
                             <div class="p-3 rounded-lg bg-neutral-50 dark:bg-white/5 border border-neutral-200/70 dark:border-white/5">
-                                <span class="text-neutral-500 block">Ruang Terpakai</span>
+                                <span class="text-neutral-500 block">{{ $this->t('used_space') }}</span>
                                 <span class="font-bold text-amber-500 mt-0.5 block">{{ $this->systemStats['storage_used'] }}</span>
                             </div>
                             <div class="p-3 rounded-lg bg-neutral-50 dark:bg-white/5 border border-neutral-200/70 dark:border-white/5">
-                                <span class="text-neutral-500 block">Ruang Bebas</span>
+                                <span class="text-neutral-500 block">{{ $this->t('free_space') }}</span>
                                 <span class="font-bold text-emerald-500 mt-0.5 block">{{ $this->systemStats['storage_free'] }}</span>
                             </div>
                         </div>
@@ -529,7 +529,7 @@
 
                     {{-- Storage Breakdown by Subdirectories --}}
                     <div class="rounded-xl border border-neutral-200/90 dark:border-white/10 bg-white dark:bg-[#202020] p-5 shadow-2xs space-y-3">
-                        <h4 class="text-xs font-semibold text-neutral-900 dark:text-white uppercase tracking-wider text-neutral-500">Alokasi Direktori</h4>
+                        <h4 class="text-xs font-semibold text-neutral-900 dark:text-white uppercase tracking-wider text-neutral-500">{{ $this->t('dir_allocation') }}</h4>
                         <div class="divide-y divide-neutral-100 dark:divide-white/5 text-xs">
                             @foreach ($this->directorySizes as $dir)
                                 <div class="py-2.5 flex items-center justify-between">
@@ -561,23 +561,23 @@
                                     <flux:icon name="code-bracket" class="size-5" />
                                 </div>
                                 <div>
-                                    <h3 class="text-sm font-semibold text-neutral-900 dark:text-white">PHP Runtime</h3>
+                                    <h3 class="text-sm font-semibold text-neutral-900 dark:text-white">{{ $this->t('php_runtime') }}</h3>
                                     <p class="text-xs text-neutral-500 dark:text-neutral-400">PHP {{ $this->systemStats['php_version'] }}</p>
                                 </div>
                             </div>
                             <div class="space-y-1.5 text-xs text-neutral-600 dark:text-neutral-300 pt-1">
                                 <div class="flex justify-between">
-                                    <span class="text-neutral-500">Batas Memori:</span>
+                                    <span class="text-neutral-500">{{ $this->t('memory_limit_label') }}</span>
                                     <span class="font-medium">{{ $this->systemStats['memory_limit'] }}</span>
                                 </div>
                                 <div class="flex justify-between">
-                                    <span class="text-neutral-500">OPcache:</span>
+                                    <span class="text-neutral-500">{{ $this->t('opcache_label') }}</span>
                                     <span class="font-medium {{ $this->systemStats['opcache_enabled'] ? 'text-emerald-500' : 'text-neutral-400' }}">
-                                        {{ $this->systemStats['opcache_enabled'] ? 'Aktif' : 'Nonaktif' }}
+                                        {{ $this->systemStats['opcache_enabled'] ? $this->t('enabled') : $this->t('disabled') }}
                                     </span>
                                 </div>
                                 <div class="flex justify-between">
-                                    <span class="text-neutral-500">SAPI Server:</span>
+                                    <span class="text-neutral-500">{{ $this->t('sapi_server') }}</span>
                                     <span class="font-medium">{{ php_sapi_name() }}</span>
                                 </div>
                             </div>
@@ -590,21 +590,21 @@
                                     <flux:icon name="command-line" class="size-5" />
                                 </div>
                                 <div>
-                                    <h3 class="text-sm font-semibold text-neutral-900 dark:text-white">Laravel Framework</h3>
+                                    <h3 class="text-sm font-semibold text-neutral-900 dark:text-white">{{ $this->t('laravel_framework') }}</h3>
                                     <p class="text-xs text-neutral-500 dark:text-neutral-400">Laravel v{{ $this->systemStats['laravel_version'] }}</p>
                                 </div>
                             </div>
                             <div class="space-y-1.5 text-xs text-neutral-600 dark:text-neutral-300 pt-1">
                                 <div class="flex justify-between">
-                                    <span class="text-neutral-500">Lingkungan:</span>
+                                    <span class="text-neutral-500">{{ $this->t('environment_label') }}</span>
                                     <span class="font-medium capitalize">{{ app()->environment() }}</span>
                                 </div>
                                 <div class="flex justify-between">
-                                    <span class="text-neutral-500">Status Database:</span>
+                                    <span class="text-neutral-500">{{ $this->t('database_status_label') }}</span>
                                     <span class="font-medium text-emerald-500">{{ $this->systemStats['db_status'] }}</span>
                                 </div>
                                 <div class="flex justify-between">
-                                    <span class="text-neutral-500">OS Host:</span>
+                                    <span class="text-neutral-500">{{ $this->t('host_os_label') }}</span>
                                     <span class="font-medium">{{ $this->systemStats['server_os'] }}</span>
                                 </div>
                             </div>
@@ -619,54 +619,54 @@
                                     <flux:icon name="adjustments-horizontal" class="size-4.5" />
                                 </div>
                                 <div>
-                                    <h3 class="text-sm font-semibold text-neutral-900 dark:text-white">Konfigurasi Lingkungan (Environment)</h3>
-                                    <p class="text-xs text-neutral-500 dark:text-neutral-400">Variabel konfigurasi runtime aplikasi MiniOS</p>
+                                    <h3 class="text-sm font-semibold text-neutral-900 dark:text-white">{{ $this->t('env_config_title') }}</h3>
+                                    <p class="text-xs text-neutral-500 dark:text-neutral-400">{{ $this->t('env_config_desc') }}</p>
                                 </div>
                             </div>
                             <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-neutral-100 dark:bg-white/10 text-neutral-700 dark:text-neutral-300">
                                 <span class="size-2 rounded-full {{ app()->environment('production') ? 'bg-emerald-500' : 'bg-amber-500' }}"></span>
-                                Mode: {{ ucfirst($this->environmentStats['app_env']) }}
+                                {{ $this->t('mode_label', ['mode' => ucfirst($this->environmentStats['app_env'])]) }}
                             </span>
                         </div>
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 pt-1 text-xs">
                             <div class="p-2.5 rounded-lg bg-neutral-50 dark:bg-white/5 border border-neutral-200/60 dark:border-white/5 space-y-1">
-                                <span class="text-[11px] text-neutral-500 block">Mode Debug (APP_DEBUG)</span>
+                                <span class="text-[11px] text-neutral-500 block">{{ $this->t('debug_mode') }}</span>
                                 <span class="font-semibold {{ config('app.debug') ? 'text-amber-600 dark:text-amber-400' : 'text-neutral-700 dark:text-neutral-300' }} block">
                                     {{ $this->environmentStats['app_debug'] }}
                                 </span>
                             </div>
 
                             <div class="p-2.5 rounded-lg bg-neutral-50 dark:bg-white/5 border border-neutral-200/60 dark:border-white/5 space-y-1">
-                                <span class="text-[11px] text-neutral-500 block">URL Aplikasi (APP_URL)</span>
+                                <span class="text-[11px] text-neutral-500 block">{{ $this->t('app_url') }}</span>
                                 <span class="font-medium text-neutral-800 dark:text-neutral-200 block truncate">
                                     {{ $this->environmentStats['app_url'] }}
                                 </span>
                             </div>
 
                             <div class="p-2.5 rounded-lg bg-neutral-50 dark:bg-white/5 border border-neutral-200/60 dark:border-white/5 space-y-1">
-                                <span class="text-[11px] text-neutral-500 block">Zona Waktu (APP_TIMEZONE)</span>
+                                <span class="text-[11px] text-neutral-500 block">{{ $this->t('app_timezone') }}</span>
                                 <span class="font-medium text-neutral-800 dark:text-neutral-200 block">
                                     {{ $this->environmentStats['timezone'] }}
                                 </span>
                             </div>
 
                             <div class="p-2.5 rounded-lg bg-neutral-50 dark:bg-white/5 border border-neutral-200/60 dark:border-white/5 space-y-1">
-                                <span class="text-[11px] text-neutral-500 block">Driver Cache (CACHE_STORE)</span>
+                                <span class="text-[11px] text-neutral-500 block">{{ $this->t('cache_driver') }}</span>
                                 <span class="font-medium text-neutral-800 dark:text-neutral-200 block">
                                     {{ $this->environmentStats['cache_driver'] }}
                                 </span>
                             </div>
 
                             <div class="p-2.5 rounded-lg bg-neutral-50 dark:bg-white/5 border border-neutral-200/60 dark:border-white/5 space-y-1">
-                                <span class="text-[11px] text-neutral-500 block">Driver Sesi (SESSION_DRIVER)</span>
+                                <span class="text-[11px] text-neutral-500 block">{{ $this->t('session_driver') }}</span>
                                 <span class="font-medium text-neutral-800 dark:text-neutral-200 block">
                                     {{ $this->environmentStats['session_driver'] }}
                                 </span>
                             </div>
 
                             <div class="p-2.5 rounded-lg bg-neutral-50 dark:bg-white/5 border border-neutral-200/60 dark:border-white/5 space-y-1">
-                                <span class="text-[11px] text-neutral-500 block">Driver Antrean (QUEUE_CONNECTION)</span>
+                                <span class="text-[11px] text-neutral-500 block">{{ $this->t('queue_driver') }}</span>
                                 <span class="font-medium text-neutral-800 dark:text-neutral-200 block">
                                     {{ $this->environmentStats['queue_connection'] }}
                                 </span>
@@ -683,12 +683,12 @@
                                 </div>
                                 <div>
                                     <div class="flex items-center gap-2">
-                                        <h3 class="text-sm font-semibold text-neutral-900 dark:text-white">Dependensi &amp; Paket (Packages)</h3>
+                                        <h3 class="text-sm font-semibold text-neutral-900 dark:text-white">{{ $this->t('packages_title') }}</h3>
                                         <span class="rounded-full bg-neutral-200/80 dark:bg-white/10 px-2 py-0.5 text-[10px] font-semibold text-neutral-700 dark:text-neutral-300">
-                                            {{ $this->packageCounts['total'] }} paket
+                                            {{ $this->t('packages_count', ['count' => $this->packageCounts['total']]) }}
                                         </span>
                                     </div>
-                                    <p class="text-xs text-neutral-500 dark:text-neutral-400">Pustaka Composer yang terinstal di direktori kerja</p>
+                                    <p class="text-xs text-neutral-500 dark:text-neutral-400">{{ $this->t('packages_desc') }}</p>
                                 </div>
                             </div>
 
@@ -701,21 +701,21 @@
                                         wire:click="setPackageFilter('all')"
                                         class="px-2.5 py-1 rounded-md transition-all {{ $packageTypeFilter === 'all' ? 'bg-white dark:bg-[#333] text-neutral-900 dark:text-white shadow-2xs font-semibold' : 'text-neutral-500 hover:text-neutral-900 dark:hover:text-white' }}"
                                     >
-                                        Semua ({{ $this->packageCounts['total'] }})
+                                        {{ $this->t('pkg_filter_all_count', ['count' => $this->packageCounts['total']]) }}
                                     </button>
                                     <button
                                         type="button"
                                         wire:click="setPackageFilter('prod')"
                                         class="px-2.5 py-1 rounded-md transition-all {{ $packageTypeFilter === 'prod' ? 'bg-white dark:bg-[#333] text-neutral-900 dark:text-white shadow-2xs font-semibold' : 'text-neutral-500 hover:text-neutral-900 dark:hover:text-white' }}"
                                     >
-                                        Prod ({{ $this->packageCounts['prod'] }})
+                                        {{ $this->t('pkg_filter_prod_count', ['count' => $this->packageCounts['prod']]) }}
                                     </button>
                                     <button
                                         type="button"
                                         wire:click="setPackageFilter('dev')"
                                         class="px-2.5 py-1 rounded-md transition-all {{ $packageTypeFilter === 'dev' ? 'bg-white dark:bg-[#333] text-neutral-900 dark:text-white shadow-2xs font-semibold' : 'text-neutral-500 hover:text-neutral-900 dark:hover:text-white' }}"
                                     >
-                                        Dev ({{ $this->packageCounts['dev'] }})
+                                        {{ $this->t('pkg_filter_dev_count', ['count' => $this->packageCounts['dev']]) }}
                                     </button>
                                 </div>
 
@@ -727,7 +727,7 @@
                                     <input
                                         type="text"
                                         wire:model.live.debounce.150ms="searchPackage"
-                                        placeholder="Cari paket..."
+                                        placeholder="{{ $this->t('search_packages_placeholder') }}"
                                         class="w-full rounded-md border border-neutral-300/80 dark:border-white/10 bg-neutral-50 dark:bg-[#1a1a1a] py-1 pl-7 pr-6 text-xs text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-1 {{ $accent['ring'] }}"
                                     />
                                     @if ($searchPackage !== '')
@@ -748,10 +748,10 @@
                             <table class="w-full text-left text-xs border-collapse">
                                 <thead>
                                     <tr class="border-b border-neutral-200/80 dark:border-white/10 text-[11px] font-semibold text-neutral-500 dark:text-neutral-400 bg-neutral-50/70 dark:bg-white/5 select-none">
-                                        <th class="py-2 px-3">Nama Paket</th>
-                                        <th class="py-2 px-3">Versi Terinstal</th>
-                                        <th class="py-2 px-3">Batasan (Constraint)</th>
-                                        <th class="py-2 px-3 text-right">Tipe</th>
+                                        <th class="py-2 px-3">{{ $this->t('th_package_name') }}</th>
+                                        <th class="py-2 px-3">{{ $this->t('th_installed_version') }}</th>
+                                        <th class="py-2 px-3">{{ $this->t('th_constraint') }}</th>
+                                        <th class="py-2 px-3 text-right">{{ $this->t('th_type') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-neutral-100 dark:divide-white/5">
@@ -776,7 +776,7 @@
                                     @empty
                                         <tr>
                                             <td colspan="4" class="py-6 text-center text-neutral-400">
-                                                Tidak ada paket yang sesuai dengan pencarian.
+                                                {{ $this->t('no_packages_found') }}
                                             </td>
                                         </tr>
                                     @endforelse
@@ -791,15 +791,15 @@
         {{-- Footer Status Bar --}}
         <footer class="flex shrink-0 items-center justify-between border-t border-neutral-200/90 dark:border-white/5 bg-[#f8f8f8]/90 dark:bg-[#202020]/90 px-3 py-1.5 text-xs text-neutral-500 dark:text-neutral-400 select-none">
             <div class="flex items-center gap-3">
-                <span>{{ count($this->processes) }} proses</span>
+                <span>{{ $this->t('footer_processes', ['count' => count($this->processes)]) }}</span>
                 <span>•</span>
-                <span>Memori: {{ $this->systemStats['memory_usage'] }}</span>
+                <span>{{ $this->t('footer_memory', ['mem' => $this->systemStats['memory_usage']]) }}</span>
                 <span>•</span>
-                <span>CPU: {{ $this->systemStats['cpu_percent'] }}%</span>
+                <span>{{ $this->t('footer_cpu', ['cpu' => $this->systemStats['cpu_percent']]) }}</span>
             </div>
             <div class="flex items-center gap-1.5 font-medium text-emerald-600 dark:text-emerald-400">
                 <span class="size-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span>Normal</span>
+                <span>{{ $this->t('footer_status_normal') }}</span>
             </div>
         </footer>
     </div>

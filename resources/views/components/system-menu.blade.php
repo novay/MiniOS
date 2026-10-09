@@ -60,7 +60,7 @@
         >
             <div class="flex items-center gap-2.5">
                 <flux:icon name="arrows-pointing-out" class="size-4 text-neutral-500 dark:text-neutral-400 group-hover:text-white" />
-                <span x-text="isFullscreen ? 'Keluar Layar Penuh' : 'Mode Layar Penuh'"></span>
+                <span x-text="isFullscreen ? '{{ __('Exit Fullscreen') }}' : '{{ __('Fullscreen Mode') }}'"></span>
             </div>
             <span class="text-[10px] font-mono opacity-60 group-hover:opacity-100 group-hover:text-white">F11</span>
         </button>
@@ -71,7 +71,7 @@
             class="group flex w-full items-center gap-2.5 rounded px-2.5 py-1.5 text-left transition-colors hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-500"
         >
             <flux:icon name="cog-6-tooth" class="size-4 text-neutral-500 dark:text-neutral-400 group-hover:text-white" />
-            <span>Pengaturan Sistem</span>
+            <span>{{ __('System Settings') }}</span>
         </button>
 
         <button
@@ -80,7 +80,7 @@
             class="group flex w-full items-center gap-2.5 rounded px-2.5 py-1.5 text-left transition-colors hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-500"
         >
             <flux:icon name="folder" class="size-4 text-neutral-500 dark:text-neutral-400 group-hover:text-white" />
-            <span>Berkas Saya</span>
+            <span>{{ __('My Files') }}</span>
         </button>
 
         <button
@@ -89,7 +89,7 @@
             class="group flex w-full items-center gap-2.5 rounded px-2.5 py-1.5 text-left transition-colors hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-500"
         >
             <flux:icon name="command-line" class="size-4 text-neutral-500 dark:text-neutral-400 group-hover:text-white" />
-            <span>Terminal</span>
+            <span>{{ __('Terminal') }}</span>
         </button>
     </div>
 
@@ -103,7 +103,7 @@
             class="group flex w-full items-center gap-2.5 rounded px-2.5 py-1.5 text-left transition-colors hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-500"
         >
             <flux:icon name="lock-closed" class="size-4 text-neutral-500 dark:text-neutral-400 group-hover:text-white" />
-            <span>Kunci Layar</span>
+            <span>{{ __('Lock Screen') }}</span>
         </button>
 
         <form method="POST" action="{{ route('logout') }}" class="w-full">
@@ -113,7 +113,7 @@
                 class="group flex w-full items-center gap-2.5 rounded px-2.5 py-1.5 text-left text-rose-600 dark:text-rose-400 transition-colors hover:bg-rose-600 hover:text-white dark:hover:bg-rose-600 dark:hover:text-white"
             >
                 <flux:icon name="arrow-right-start-on-rectangle" class="size-4 text-rose-500 dark:text-rose-400 group-hover:text-white" />
-                <span>Keluar...</span>
+                <span>{{ __('Log out...') }}</span>
             </button>
         </form>
     </div>

@@ -157,7 +157,7 @@
             <button
                 type="button"
 
-                title="Minimize"
+                title="{{ __('Minimize') }}"
 
                 @pointerdown.stop
 
@@ -196,7 +196,7 @@
                 :title="
                     !isWindowMaximizable(@js($id))
                         ? ''
-                        : (getWindow(@js($id))?.maximized ? 'Restore' : 'Maximize')
+                        : (getWindow(@js($id))?.maximized ? '{{ __('Restore') }}' : '{{ __('Maximize') }}')
                 "
 
                 @pointerdown.stop
@@ -259,7 +259,7 @@
             <button 
                 type="button"
 
-                title="Close"
+                title="{{ __('Close') }}"
 
                 @pointerdown.stop
 

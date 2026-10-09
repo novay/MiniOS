@@ -9,9 +9,9 @@
                 {{ auth()->user()?->initials() ?? 'US' }}
             </div>
             <div class="min-w-0 flex-1">
-                <h2 class="truncate text-sm font-semibold text-neutral-900 dark:text-white">{{ auth()->user()?->name ?? 'Pengguna MiniOS' }}</h2>
+                <h2 class="truncate text-sm font-semibold text-neutral-900 dark:text-white">{{ auth()->user()?->name ?? $this->t('default_user_name') }}</h2>
                 <div class="flex items-center gap-1.5 mt-1">
-                    <p class="truncate text-xs text-neutral-500 dark:text-neutral-400">Akun Lokal • MiniOS</p>
+                    <p class="truncate text-xs text-neutral-500 dark:text-neutral-400">{{ $this->t('local_account') }}</p>
                 </div>
             </div>
         </div>
@@ -25,7 +25,7 @@
                 <input
                     type="text"
                     wire:model.live.debounce.150ms="search"
-                    placeholder="Cari pengaturan..."
+                    placeholder="{{ $this->t('search_placeholder') }}"
                     class="w-full rounded-md border border-neutral-300/80 dark:border-white/10 bg-white dark:bg-[#2b2b2b] py-1.5 pl-9 pr-7 text-sm text-neutral-900 dark:text-neutral-100 placeholder-neutral-400 dark:placeholder-neutral-500 shadow-2xs transition-all focus:outline-none focus:ring-2 {{ $accent['ring'] }}"
                 />
                 @if ($search !== '')
@@ -33,7 +33,7 @@
                         type="button"
                         wire:click="$set('search', '')"
                         class="absolute inset-y-0 right-0 flex items-center pr-2 text-neutral-400 hover:text-neutral-700 dark:hover:text-white"
-                        title="Hapus pencarian"
+                        title="{{ $this->t('search_clear_title') }}"
                     >
                         <flux:icon name="x-mark" class="size-3.5" />
                     </button>
@@ -72,22 +72,19 @@
                     </div>
                     <div class="min-w-0 flex-1">
                         <span class="truncate block {{ $isActive ? 'font-semibold text-neutral-900 dark:text-white' : '' }}">{{ $navItem['label'] }}</span>
-                        {{-- @if ($search !== '')
-                            <span class="truncate block text-[10px] text-neutral-500 dark:text-neutral-400 font-normal">{{ $navItem['desc'] }}</span>
-                        @endif --}}
                     </div>
                 </button>
             @empty
                 <div class="px-3 py-8 text-center">
                     <flux:icon name="magnifying-glass" class="mx-auto size-5 text-neutral-400 dark:text-neutral-500 mb-1.5" />
-                    <p class="text-xs font-semibold text-neutral-800 dark:text-neutral-200">Tidak ada hasil</p>
-                    <p class="text-[11px] text-neutral-500 dark:text-neutral-400 mt-0.5">Tidak ditemukan pengaturan untuk "{{ $search }}"</p>
+                    <p class="text-xs font-semibold text-neutral-800 dark:text-neutral-200">{{ $this->t('no_results_title') }}</p>
+                    <p class="text-[11px] text-neutral-500 dark:text-neutral-400 mt-0.5">{{ $this->t('no_results_desc', ['search' => $search]) }}</p>
                     <button
                         type="button"
                         wire:click="$set('search', '')"
                         class="mt-2.5 inline-flex items-center gap-1 rounded-md bg-neutral-200/80 dark:bg-white/10 px-2.5 py-1 text-[11px] font-medium text-neutral-700 dark:text-neutral-300 hover:bg-neutral-300 dark:hover:bg-white/15 transition-colors"
                     >
-                        Hapus filter
+                        {{ $this->t('clear_filter') }}
                     </button>
                 </div>
             @endforelse
