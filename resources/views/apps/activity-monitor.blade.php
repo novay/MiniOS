@@ -191,16 +191,84 @@
 
         {{-- Main Content Viewer --}}
         <main class="flex-1 overflow-y-auto p-5 sm:p-6 bg-white dark:bg-[#191919]">
+            {{-- Shell Execution Restriction Notice (if server does not support commands) --}}
+            @if (! $this->systemStats['is_shell_supported'])
+                <div class="mb-4 flex items-start gap-3 rounded-xl border border-amber-500/30 bg-amber-500/10 p-3.5 text-xs text-amber-800 dark:text-amber-200 shadow-2xs">
+                    <flux:icon name="exclamation-triangle" class="size-5 shrink-0 text-amber-600 dark:text-amber-400 mt-0.5" />
+                    <div class="min-w-0 flex-1">
+                        <div class="flex items-center gap-2">
+                            <h4 class="font-semibold text-amber-900 dark:text-amber-100">Eksekusi Perintah Sistem Dibatasi</h4>
+                            <span class="rounded bg-amber-500/20 px-1.5 py-0.5 text-[10px] font-medium text-amber-800 dark:text-amber-200">Mode Aman</span>
+                        </div>
+                        <p class="mt-0.5 text-[11px] text-amber-700 dark:text-amber-300 leading-relaxed">
+                            Server hosting ini membatasi fungsi eksekusi shell (<code>shell_exec</code> dinonaktifkan di <code>php.ini</code>). Informasi proses dan kinerja ditampilkan menggunakan telemetri internal PHP Runtime serta layanan virtual MiniOS.
+                        </p>
+                    </div>
+                </div>
+            @endif
+
+            {{-- Action Feedback Banner --}}
+            @if ($feedbackMessage)
+                <div class="mb-4 flex items-center justify-between rounded-xl border p-3 text-xs shadow-2xs transition-all {{ $feedbackType === 'success' ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-800 dark:text-emerald-200' : ($feedbackType === 'error' ? 'border-rose-500/30 bg-rose-500/10 text-rose-800 dark:text-rose-200' : 'border-blue-500/30 bg-blue-500/10 text-blue-800 dark:text-blue-200') }}">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <flux:icon name="{{ $feedbackType === 'success' ? 'check-circle' : ($feedbackType === 'error' ? 'x-circle' : 'information-circle') }}" class="size-4 shrink-0" />
+                        <span class="font-medium truncate">{{ $feedbackMessage }}</span>
+                    </div>
+                    <button type="button" wire:click="$set('feedbackMessage', null)" class="text-neutral-400 hover:text-neutral-700 dark:hover:text-white shrink-0 ml-2">
+                        <flux:icon name="x-mark" class="size-3.5" />
+                    </button>
+                </div>
+            @endif
+
             @if ($activeTab === 'processes')
                 {{-- ========================================================= --}}
                 {{-- TAB 1: PROSES (WINDOWS 11 PROCESSES TABLE)                --}}
                 {{-- ========================================================= --}}
+                {{-- Filter Toolbar --}}
+                <div class="mb-3 flex items-center justify-between flex-wrap gap-2 text-xs">
+                    <div class="flex rounded-lg bg-neutral-100 dark:bg-white/5 p-0.5 text-[11px] border border-neutral-200/60 dark:border-white/5">
+                        <button
+                            type="button"
+                            wire:click="setProcessFilter('all')"
+                            class="px-2.5 py-1 rounded-md transition-all {{ $processFilter === 'all' ? 'bg-white dark:bg-[#333] text-neutral-900 dark:text-white shadow-2xs font-semibold' : 'text-neutral-500 hover:text-neutral-900 dark:hover:text-white' }}"
+                        >
+                            Semua
+                        </button>
+                        <button
+                            type="button"
+                            wire:click="setProcessFilter('system')"
+                            class="px-2.5 py-1 rounded-md transition-all {{ $processFilter === 'system' ? 'bg-white dark:bg-[#333] text-neutral-900 dark:text-white shadow-2xs font-semibold' : 'text-neutral-500 hover:text-neutral-900 dark:hover:text-white' }}"
+                        >
+                            Host OS
+                        </button>
+                        <button
+                            type="button"
+                            wire:click="setProcessFilter('minios')"
+                            class="px-2.5 py-1 rounded-md transition-all {{ $processFilter === 'minios' ? 'bg-white dark:bg-[#333] text-neutral-900 dark:text-white shadow-2xs font-semibold' : 'text-neutral-500 hover:text-neutral-900 dark:hover:text-white' }}"
+                        >
+                            MiniOS Core
+                        </button>
+                    </div>
+
+                    <div class="flex items-center gap-2 text-[11px] text-neutral-500 dark:text-neutral-400">
+                        @if ($this->systemStats['is_shell_supported'])
+                            <span class="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-medium">
+                                <span class="size-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                Live Host Process
+                            </span>
+                            <span>•</span>
+                        @endif
+                        <span>Total <strong>{{ count($this->processes) }}</strong> proses</span>
+                    </div>
+                </div>
+
                 <div class="rounded-xl border border-neutral-200/90 dark:border-white/10 bg-white dark:bg-[#202020] overflow-hidden shadow-2xs">
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-xs border-collapse">
                             <thead>
                                 <tr class="border-b border-neutral-200/90 dark:border-white/10 text-[11px] font-semibold text-neutral-500 dark:text-neutral-400 bg-neutral-50/70 dark:bg-white/5 select-none">
                                     <th class="py-2.5 px-4">Nama Proses</th>
+                                    <th class="py-2.5 px-3">Tipe</th>
                                     <th class="py-2.5 px-3">Status</th>
                                     <th class="py-2.5 px-3 text-right">CPU</th>
                                     <th class="py-2.5 px-3 text-right">Memori (RAM)</th>
@@ -213,17 +281,30 @@
                                     @php
                                         $isSelected = $selectedPid === $proc['pid'];
                                         $cpuVal = $proc['cpu_val'] ?? (float) str_replace('%', '', $proc['cpu']);
+                                        $isMiniosProc = ($proc['type'] ?? '') === 'minios';
                                     @endphp
                                     <tr
                                         wire:click="selectProcess({{ $proc['pid'] }})"
                                         class="cursor-pointer transition-colors {{ $isSelected ? 'bg-neutral-100 dark:bg-white/10 font-medium' : 'hover:bg-neutral-50 dark:hover:bg-white/5' }}"
                                     >
-                                        {{-- Process Name --}}
+                                        {{-- Process Name & Command Snippet --}}
                                         <td class="py-2.5 px-4 flex items-center gap-2.5">
                                             <div class="flex size-7 items-center justify-center rounded-lg bg-neutral-100 dark:bg-white/5 border border-neutral-200/70 dark:border-white/10 text-neutral-600 dark:text-neutral-300 shrink-0">
-                                                <flux:icon name="cpu-chip" class="size-3.5" />
+                                                <flux:icon name="{{ $isMiniosProc ? 'squares-2x2' : 'cpu-chip' }}" class="size-3.5" />
                                             </div>
-                                            <span class="font-medium text-neutral-900 dark:text-white truncate max-w-xs">{{ $proc['name'] }}</span>
+                                            <div class="min-w-0 max-w-xs sm:max-w-md">
+                                                <span class="font-medium text-neutral-900 dark:text-white truncate block">{{ $proc['name'] }}</span>
+                                                @if (! empty($proc['command']) && $proc['command'] !== $proc['name'])
+                                                    <span class="text-[10px] text-neutral-400 dark:text-neutral-500 truncate block" title="{{ $proc['command'] }}">{{ $proc['command'] }}</span>
+                                                @endif
+                                            </div>
+                                        </td>
+
+                                        {{-- Type Badge --}}
+                                        <td class="py-2.5 px-3 whitespace-nowrap">
+                                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium {{ $isMiniosProc ? 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400' : 'bg-neutral-200/70 dark:bg-white/10 text-neutral-700 dark:text-neutral-300' }}">
+                                                {{ $isMiniosProc ? 'MiniOS' : 'Host OS' }}
+                                            </span>
                                         </td>
 
                                         {{-- Status --}}
@@ -258,7 +339,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="6" class="py-8 text-center text-neutral-400">
+                                        <td colspan="7" class="py-8 text-center text-neutral-400">
                                             <flux:icon name="magnifying-glass" class="mx-auto size-6 text-neutral-400 mb-1" />
                                             <span>Tidak ada proses yang cocok dengan kata kunci.</span>
                                         </td>
@@ -279,8 +360,8 @@
                         {{-- CPU Card --}}
                         <div class="rounded-xl border border-neutral-200/90 dark:border-white/10 bg-white dark:bg-[#202020] p-4 shadow-2xs space-y-2">
                             <div class="flex items-center justify-between text-xs font-semibold text-neutral-500 dark:text-neutral-400">
-                                <span>CPU</span>
-                                <span class="text-[11px] font-normal">Beban Sistem</span>
+                                <span class="truncate">{{ $this->systemStats['cpu_model'] }}</span>
+                                <span class="text-[11px] font-normal shrink-0">{{ $this->systemStats['cpu_cores'] }} Cores</span>
                             </div>
                             <div class="text-2xl font-bold tracking-tight text-neutral-900 dark:text-white" style="color: var(--accent-color, {{ $accent['hex'] }});">
                                 {{ $this->systemStats['cpu_percent'] }}%
@@ -288,17 +369,16 @@
                             <div class="w-full bg-neutral-200/80 dark:bg-white/10 h-1.5 rounded-full overflow-hidden">
                                 <div class="h-full rounded-full transition-all duration-500" style="width: {{ min(100, max(5, $this->systemStats['cpu_percent'] * 4)) }}%; background-color: var(--accent-color, {{ $accent['hex'] }});"></div>
                             </div>
-                            <div class="text-[11px] text-neutral-500 flex justify-between pt-1">
-                                <span>Frekuensi: Normal</span>
-                                <span>Thread: 12</span>
+                            <div class="text-[10px] text-neutral-500 flex justify-between pt-1">
+                                <span class="truncate">Load: {{ $this->systemStats['cpu_load_str'] }}</span>
                             </div>
                         </div>
 
                         {{-- Memory Card --}}
                         <div class="rounded-xl border border-neutral-200/90 dark:border-white/10 bg-white dark:bg-[#202020] p-4 shadow-2xs space-y-2">
                             <div class="flex items-center justify-between text-xs font-semibold text-neutral-500 dark:text-neutral-400">
-                                <span>Memori</span>
-                                <span class="text-[11px] font-normal">PHP Alloc</span>
+                                <span>Memori RAM</span>
+                                <span class="text-[11px] font-normal">Fisik: {{ $this->systemStats['total_ram'] }}</span>
                             </div>
                             <div class="text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">
                                 {{ $this->systemStats['memory_usage'] }}
@@ -308,7 +388,7 @@
                             </div>
                             <div class="text-[11px] text-neutral-500 flex justify-between pt-1">
                                 <span>Puncak: {{ $this->systemStats['memory_peak'] }}</span>
-                                <span>Batas: {{ $this->systemStats['memory_limit'] }}</span>
+                                <span>Batas PHP: {{ $this->systemStats['memory_limit'] }}</span>
                             </div>
                         </div>
 
@@ -369,16 +449,18 @@
                                 </defs>
                                 {{-- Area Fill --}}
                                 <path
-                                    d="M 0 150 L 0 110 Q 40 85 80 100 T 160 70 T 240 95 T 320 60 T 400 80 T 460 50 L 500 70 L 500 150 Z"
+                                    d="{{ $this->cpuWavePath['area'] }}"
                                     fill="url(#cpu_wave_grad)"
+                                    class="transition-all duration-700 ease-in-out"
                                 />
                                 {{-- Line Stroke --}}
                                 <path
-                                    d="M 0 110 Q 40 85 80 100 T 160 70 T 240 95 T 320 60 T 400 80 T 460 50 L 500 70"
+                                    d="{{ $this->cpuWavePath['line'] }}"
                                     fill="none"
                                     stroke="var(--accent-color, {{ $accent['hex'] }})"
                                     stroke-width="2.5"
                                     stroke-linecap="round"
+                                    class="transition-all duration-700 ease-in-out"
                                 />
                             </svg>
                         </div>
@@ -446,37 +528,21 @@
                     </div>
 
                     {{-- Storage Breakdown by Subdirectories --}}
-                    <div class="rounded-xl border border-neutral-200/90 dark:border-white/5 bg-white dark:bg-[#202020] p-5 shadow-2xs space-y-3">
+                    <div class="rounded-xl border border-neutral-200/90 dark:border-white/10 bg-white dark:bg-[#202020] p-5 shadow-2xs space-y-3">
                         <h4 class="text-xs font-semibold text-neutral-900 dark:text-white uppercase tracking-wider text-neutral-500">Alokasi Direktori</h4>
                         <div class="divide-y divide-neutral-100 dark:divide-white/5 text-xs">
-                            <div class="py-2.5 flex items-center justify-between">
-                                <div class="flex items-center gap-2">
-                                    <flux:icon name="folder" class="size-4 text-amber-500" />
-                                    <span class="font-medium text-neutral-900 dark:text-white">storage/app</span>
+                            @foreach ($this->directorySizes as $dir)
+                                <div class="py-2.5 flex items-center justify-between">
+                                    <div class="flex items-center gap-2.5 min-w-0">
+                                        <flux:icon name="{{ $dir['icon'] }}" class="size-4 {{ $dir['color'] }} shrink-0" />
+                                        <div class="min-w-0">
+                                            <span class="font-medium text-neutral-900 dark:text-white block truncate">{{ $dir['name'] }}</span>
+                                            <span class="text-[11px] text-neutral-400 block truncate">{{ $dir['desc'] }}</span>
+                                        </div>
+                                    </div>
+                                    <span class="font-semibold text-neutral-700 dark:text-neutral-300 shrink-0 ml-4 font-mono">{{ $dir['formatted'] }}</span>
                                 </div>
-                                <span class="text-neutral-500">Berkas unggahan &amp; data lokal</span>
-                            </div>
-                            <div class="py-2.5 flex items-center justify-between">
-                                <div class="flex items-center gap-2">
-                                    <flux:icon name="globe-alt" class="size-4 text-emerald-500" />
-                                    <span class="font-medium text-neutral-900 dark:text-white">storage/app/public</span>
-                                </div>
-                                <span class="text-neutral-500">Aset publik &amp; media terbuka</span>
-                            </div>
-                            <div class="py-2.5 flex items-center justify-between">
-                                <div class="flex items-center gap-2">
-                                    <flux:icon name="document-text" class="size-4 text-rose-500" />
-                                    <span class="font-medium text-neutral-900 dark:text-white">storage/logs</span>
-                                </div>
-                                <span class="text-neutral-500">Log aktivitas &amp; kesalahan sistem</span>
-                            </div>
-                            <div class="py-2.5 flex items-center justify-between">
-                                <div class="flex items-center gap-2">
-                                    <flux:icon name="circle-stack" class="size-4 text-indigo-500" />
-                                    <span class="font-medium text-neutral-900 dark:text-white">storage/framework</span>
-                                </div>
-                                <span class="text-neutral-500">Cache template, views, &amp; sesi</span>
-                            </div>
+                            @endforeach
                         </div>
                     </div>
                 </div>
@@ -723,7 +789,7 @@
         </main>
 
         {{-- Footer Status Bar --}}
-        <footer class="flex shrink-0 items-center justify-between border-t border-neutral-200/90 dark:border-white/5 bg-[#f8f8f8]/90 dark:bg-[#202020]/90 px-6 py-1.5 text-xs text-neutral-500 dark:text-neutral-400 select-none">
+        <footer class="flex shrink-0 items-center justify-between border-t border-neutral-200/90 dark:border-white/5 bg-[#f8f8f8]/90 dark:bg-[#202020]/90 px-3 py-1.5 text-xs text-neutral-500 dark:text-neutral-400 select-none">
             <div class="flex items-center gap-3">
                 <span>{{ count($this->processes) }} proses</span>
                 <span>•</span>
@@ -733,7 +799,7 @@
             </div>
             <div class="flex items-center gap-1.5 font-medium text-emerald-600 dark:text-emerald-400">
                 <span class="size-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span>Layanan Berjalan Normal</span>
+                <span>Normal</span>
             </div>
         </footer>
     </div>

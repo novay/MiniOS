@@ -12,21 +12,34 @@ class ActivityMonitor extends Component
 
     public string $searchProcess = '';
 
+    public string $processFilter = 'all';
+
     public ?int $selectedPid = null;
 
     public string $searchPackage = '';
 
     public string $packageTypeFilter = 'all';
 
+    public ?string $feedbackMessage = null;
+
+    public ?string $feedbackType = 'info';
+
     public function setTab(string $tab): void
     {
         if (in_array($tab, ['processes', 'performance', 'disk', 'system', 'cpu', 'memory'])) {
-            // Map legacy tab names if needed
             if ($tab === 'cpu' || $tab === 'memory') {
                 $this->activeTab = 'performance';
             } else {
                 $this->activeTab = $tab;
             }
+        }
+    }
+
+    public function setProcessFilter(string $filter): void
+    {
+        if (in_array($filter, ['all', 'system', 'minios'])) {
+            $this->processFilter = $filter;
+            $this->selectedPid = null;
         }
     }
 
@@ -49,9 +62,105 @@ class ActivityMonitor extends Component
             return;
         }
 
+        // Virtual MiniOS process (PID 101 - 107)
+        if ($targetPid >= 101 && $targetPid <= 107) {
+            $this->feedbackMessage = "Layanan virtual MiniOS (PID {$targetPid}) telah direfresh.";
+            $this->feedbackType = 'success';
+            if ($this->selectedPid === $targetPid) {
+                $this->selectedPid = null;
+            }
+
+            return;
+        }
+
+        // Real OS process
+        if ($this->isShellSupported && function_exists('posix_kill')) {
+            try {
+                $res = @posix_kill($targetPid, 15);
+                if ($res) {
+                    $this->feedbackMessage = "Proses PID {$targetPid} berhasil dikirim sinyal penghentian (SIGTERM).";
+                    $this->feedbackType = 'success';
+                } else {
+                    $this->feedbackMessage = "Gagal menghentikan proses PID {$targetPid}: Izin ditolak atau proses dilindungi sistem.";
+                    $this->feedbackType = 'error';
+                }
+            } catch (\Throwable $e) {
+                $this->feedbackMessage = 'Gagal menghentikan proses: '.$e->getMessage();
+                $this->feedbackType = 'error';
+            }
+        } elseif ($this->isShellSupported) {
+            @shell_exec('kill '.(int) $targetPid.' 2>&1');
+            $this->feedbackMessage = "Sinyal terminasi untuk PID {$targetPid} telah dikirim ke sistem.";
+            $this->feedbackType = 'info';
+        } else {
+            $this->feedbackMessage = 'Lingkungan server membatasi eksekusi perintah penghentian proses.';
+            $this->feedbackType = 'warning';
+        }
+
         if ($this->selectedPid === $targetPid) {
             $this->selectedPid = null;
         }
+    }
+
+    public function getIsShellSupportedProperty(): bool
+    {
+        if (! function_exists('shell_exec')) {
+            return false;
+        }
+
+        $disabled = array_map('trim', explode(',', (string) ini_get('disable_functions')));
+        if (in_array('shell_exec', $disabled, true)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function getCpuCoresProperty(): int
+    {
+        if (! $this->isShellSupported) {
+            return 1;
+        }
+
+        $cores = (int) trim((string) @shell_exec('sysctl -n hw.ncpu 2>/dev/null || nproc 2>/dev/null'));
+
+        return $cores > 0 ? $cores : 1;
+    }
+
+    public function getCpuModelProperty(): string
+    {
+        if (! $this->isShellSupported) {
+            return 'Host CPU';
+        }
+
+        $model = trim((string) @shell_exec('sysctl -n machdep.cpu.brand_string 2>/dev/null || grep "model name" /proc/cpuinfo 2>/dev/null | head -n 1 | cut -d: -f2'));
+
+        return $model !== '' ? $model : php_uname('m').' Processor';
+    }
+
+    public function getTotalPhysicalRamProperty(): string
+    {
+        if (! $this->isShellSupported) {
+            return ini_get('memory_limit') ?: 'N/A';
+        }
+
+        $bytes = (int) trim((string) @shell_exec('sysctl -n hw.memsize 2>/dev/null || grep MemTotal /proc/meminfo 2>/dev/null | awk \'{print $2*1024}\''));
+
+        return $bytes > 0 ? $this->formatBytes($bytes) : 'N/A';
+    }
+
+    public function getSystemUptimeProperty(): string
+    {
+        if (! $this->isShellSupported) {
+            return 'Sistem Aktif';
+        }
+
+        $raw = (string) @shell_exec('uptime 2>/dev/null');
+        if (preg_match('/up\s+([^,]+(?:,\s*[^,]+)?),/i', $raw, $matches)) {
+            return trim($matches[1]);
+        }
+
+        return 'Sistem Aktif';
     }
 
     public function getSystemStatsProperty(): array
@@ -72,11 +181,23 @@ class ActivityMonitor extends Component
             $dbStatus = 'Disconnected';
         }
 
-        // Realistic CPU estimation
-        $cpuPercent = round(2.8 + (sin(time()) * 1.2), 1);
+        $cores = $this->cpuCores;
+        $loadAvg = function_exists('sys_getloadavg') ? sys_getloadavg() : null;
+
+        if ($loadAvg && count($loadAvg) >= 3 && $cores > 0) {
+            $cpuPercent = round(min(100, max(0.1, ($loadAvg[0] / $cores) * 100)), 1);
+            $loadStr = round($loadAvg[0], 2).' (1m) • '.round($loadAvg[1], 2).' (5m) • '.round($loadAvg[2], 2).' (15m)';
+        } else {
+            $cpuPercent = 2.5;
+            $loadStr = 'Load Average: N/A';
+        }
 
         return [
             'cpu_percent' => $cpuPercent,
+            'cpu_load_str' => $loadStr,
+            'cpu_model' => $this->cpuModel,
+            'cpu_cores' => $cores,
+            'total_ram' => $this->totalPhysicalRam,
             'php_version' => PHP_VERSION,
             'laravel_version' => app()->version(),
             'memory_usage' => $this->formatBytes($memUsage),
@@ -89,27 +210,168 @@ class ActivityMonitor extends Component
             'db_status' => $dbStatus,
             'opcache_enabled' => function_exists('opcache_get_status') && ! empty(opcache_get_status(false)),
             'server_os' => PHP_OS_FAMILY.' ('.php_uname('m').')',
-            'uptime' => 'Sistem Aktif',
+            'uptime' => $this->systemUptime,
+            'is_shell_supported' => $this->isShellSupported,
         ];
+    }
+
+    public function getCpuWavePathProperty(): array
+    {
+        $cpu = $this->systemStats['cpu_percent'];
+        $baseY = 150 - ($cpu * 1.3);
+        $points = [];
+        for ($i = 0; $i <= 10; $i++) {
+            $x = $i * 50;
+            $offset = ($i % 2 === 0 ? 1 : -1) * min(15, max(2, $cpu * 0.15));
+            $y = max(10, min(140, $baseY + $offset));
+            $points[] = "{$x} {$y}";
+        }
+        $linePath = 'M '.implode(' L ', $points);
+        $areaPath = $linePath.' L 500 150 L 0 150 Z';
+
+        return [
+            'line' => $linePath,
+            'area' => $areaPath,
+        ];
+    }
+
+    public function getDirectorySizesProperty(): array
+    {
+        $directories = [
+            'storage/app' => ['path' => storage_path('app'), 'desc' => 'Berkas unggahan & data lokal', 'icon' => 'folder', 'color' => 'text-amber-500'],
+            'storage/app/public' => ['path' => storage_path('app/public'), 'desc' => 'Aset publik & media terbuka', 'icon' => 'globe-alt', 'color' => 'text-emerald-500'],
+            'storage/logs' => ['path' => storage_path('logs'), 'desc' => 'Log aktivitas & kesalahan sistem', 'icon' => 'document-text', 'color' => 'text-rose-500'],
+            'storage/framework' => ['path' => storage_path('framework'), 'desc' => 'Cache template, views, & sesi', 'icon' => 'circle-stack', 'color' => 'text-indigo-500'],
+        ];
+
+        $results = [];
+        foreach ($directories as $name => $meta) {
+            $size = 0;
+            if (is_dir($meta['path'])) {
+                try {
+                    $iterator = new \RecursiveIteratorIterator(
+                        new \RecursiveDirectoryIterator($meta['path'], \FilesystemIterator::SKIP_DOTS),
+                        \RecursiveIteratorIterator::LEAVES_ONLY
+                    );
+                    foreach ($iterator as $file) {
+                        if ($file->isFile()) {
+                            $size += $file->getSize();
+                        }
+                    }
+                } catch (\Throwable $e) {
+                }
+            }
+
+            $results[] = [
+                'name' => $name,
+                'desc' => $meta['desc'],
+                'icon' => $meta['icon'],
+                'color' => $meta['color'],
+                'raw_bytes' => $size,
+                'formatted' => $this->formatBytes($size),
+            ];
+        }
+
+        return $results;
+    }
+
+    protected function fetchSystemProcesses(): array
+    {
+        if (! $this->isShellSupported) {
+            return [];
+        }
+
+        try {
+            $output = @shell_exec('ps -eo pid,user,%cpu,rss,command -r 2>/dev/null || ps -eo pid,user,%cpu,rss,command --sort=-%cpu 2>/dev/null || ps aux 2>/dev/null');
+            if (! $output) {
+                return [];
+            }
+
+            $lines = explode("\n", trim($output));
+            array_shift($lines);
+
+            $procs = [];
+            foreach (array_slice($lines, 0, 60) as $line) {
+                $line = trim($line);
+                if (! $line) {
+                    continue;
+                }
+                $parts = preg_split('/\s+/', $line, 5);
+                if (count($parts) < 5) {
+                    continue;
+                }
+
+                $pid = (int) $parts[0];
+                $user = $parts[1];
+                $cpuVal = (float) $parts[2];
+                $rssKb = (int) $parts[3];
+                $cmd = $parts[4];
+
+                $cmdParts = explode(' ', $cmd);
+                $bin = basename($cmdParts[0]);
+                $name = $bin;
+
+                if (preg_match('/\/([^\/]+)\.app\//i', $cmd, $matches)) {
+                    $name = $matches[1];
+                } elseif (in_array(strtolower($bin), ['php', 'node', 'python', 'ruby', 'git']) && isset($cmdParts[1])) {
+                    $name = $bin.' '.basename($cmdParts[1]);
+                }
+
+                $memoryFormatted = $rssKb < 1024
+                    ? $rssKb.' KB'
+                    : round($rssKb / 1024, 1).' MB';
+
+                $procs[] = [
+                    'pid' => $pid,
+                    'name' => $name,
+                    'command' => $cmd,
+                    'user' => $user,
+                    'cpu' => number_format($cpuVal, 1).'%',
+                    'cpu_val' => $cpuVal,
+                    'memory' => $memoryFormatted,
+                    'status' => 'Running',
+                    'type' => 'system',
+                ];
+            }
+
+            return $procs;
+        } catch (\Throwable $e) {
+            return [];
+        }
     }
 
     public function getProcessesProperty(): array
     {
-        $all = [
-            ['pid' => 101, 'name' => 'MiniOS Desktop Core', 'user' => 'minios', 'cpu' => '1.8%', 'cpu_val' => 1.8, 'memory' => '24.5 MB', 'status' => 'Running'],
-            ['pid' => 102, 'name' => 'Laravel Vite Dev Server', 'user' => 'minios', 'cpu' => '1.2%', 'cpu_val' => 1.2, 'memory' => '48.1 MB', 'status' => 'Running'],
-            ['pid' => 103, 'name' => 'PHP 8.5 FPM Worker', 'user' => 'www-data', 'cpu' => '0.6%', 'cpu_val' => 0.6, 'memory' => '18.3 MB', 'status' => 'Running'],
-            ['pid' => 104, 'name' => 'SQLite Database Engine', 'user' => 'minios', 'cpu' => '0.2%', 'cpu_val' => 0.2, 'memory' => '12.7 MB', 'status' => 'Running'],
-            ['pid' => 105, 'name' => 'Livewire Reactive Hydrator', 'user' => 'minios', 'cpu' => '0.4%', 'cpu_val' => 0.4, 'memory' => '14.0 MB', 'status' => 'Running'],
-            ['pid' => 106, 'name' => 'Fortify Authentication Guard', 'user' => 'minios', 'cpu' => '0.1%', 'cpu_val' => 0.1, 'memory' => '6.2 MB', 'status' => 'Idle'],
-            ['pid' => 107, 'name' => 'Cache & Session Cleaner', 'user' => 'system', 'cpu' => '0.0%', 'cpu_val' => 0.0, 'memory' => '3.8 MB', 'status' => 'Idle'],
+        $miniosProcesses = [
+            ['pid' => 101, 'name' => 'MiniOS Desktop Core', 'user' => 'minios', 'cpu' => '1.8%', 'cpu_val' => 1.8, 'memory' => '24.5 MB', 'status' => 'Running', 'type' => 'minios'],
+            ['pid' => 102, 'name' => 'Laravel Vite Dev Server', 'user' => 'minios', 'cpu' => '1.2%', 'cpu_val' => 1.2, 'memory' => '48.1 MB', 'status' => 'Running', 'type' => 'minios'],
+            ['pid' => 103, 'name' => 'PHP 8.5 FPM Worker', 'user' => 'www-data', 'cpu' => '0.6%', 'cpu_val' => 0.6, 'memory' => '18.3 MB', 'status' => 'Running', 'type' => 'minios'],
+            ['pid' => 104, 'name' => 'SQLite Database Engine', 'user' => 'minios', 'cpu' => '0.2%', 'cpu_val' => 0.2, 'memory' => '12.7 MB', 'status' => 'Running', 'type' => 'minios'],
+            ['pid' => 105, 'name' => 'Livewire Reactive Hydrator', 'user' => 'minios', 'cpu' => '0.4%', 'cpu_val' => 0.4, 'memory' => '14.0 MB', 'status' => 'Running', 'type' => 'minios'],
+            ['pid' => 106, 'name' => 'Fortify Authentication Guard', 'user' => 'minios', 'cpu' => '0.1%', 'cpu_val' => 0.1, 'memory' => '6.2 MB', 'status' => 'Idle', 'type' => 'minios'],
+            ['pid' => 107, 'name' => 'Cache & Session Cleaner', 'user' => 'system', 'cpu' => '0.0%', 'cpu_val' => 0.0, 'memory' => '3.8 MB', 'status' => 'Idle', 'type' => 'minios'],
         ];
+
+        $systemProcesses = $this->fetchSystemProcesses();
+
+        if ($this->processFilter === 'minios' || ! $this->isShellSupported) {
+            $all = $miniosProcesses;
+        } elseif ($this->processFilter === 'system') {
+            $all = ! empty($systemProcesses) ? $systemProcesses : $miniosProcesses;
+        } else {
+            $all = ! empty($systemProcesses)
+                ? array_merge($miniosProcesses, $systemProcesses)
+                : $miniosProcesses;
+        }
 
         if ($this->searchProcess !== '') {
             $q = strtolower(trim($this->searchProcess));
 
             return array_values(array_filter($all, function ($p) use ($q) {
-                return str_contains(strtolower($p['name']), $q) || str_contains((string) $p['pid'], $q);
+                return str_contains(strtolower($p['name']), $q)
+                    || str_contains(strtolower($p['command'] ?? ''), $q)
+                    || str_contains(strtolower($p['user']), $q)
+                    || str_contains((string) $p['pid'], $q);
             }));
         }
 
