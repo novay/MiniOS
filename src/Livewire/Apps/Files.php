@@ -847,7 +847,7 @@ class Files extends Component
         }
     }
 
-    public function openPreview(string $path): void
+    public function openFile(string $path, ?string $forceApp = null): void
     {
         if ($this->isLocked) {
             return;
@@ -861,39 +861,49 @@ class Files extends Component
             return;
         }
 
+        $appId = $forceApp ?: $this->getAssociatedApp($sanitized);
         $basename = basename($fullPath);
+
+        // Dispatch events for desktop window manager and target application
+        $this->dispatch('open-app', id: $appId, app: $appId, path: $sanitized, name: $basename);
+        $this->dispatch('open-file', id: $appId, app: $appId, path: $sanitized, name: $basename);
+
+        // Populate previewItem for backwards compatibility if needed
         $extension = strtolower(pathinfo($basename, PATHINFO_EXTENSION));
         $sizeBytes = File::size($realPath);
-
-        $imageExts = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg'];
-        $textExts = ['txt', 'log', 'json', 'md', 'php', 'js', 'css', 'html', 'yaml', 'yml', 'gitignore'];
-
-        $type = 'unknown';
-        $data = null;
-        $this->previewContent = null;
-
-        if (in_array($extension, $imageExts)) {
-            $type = 'image';
-            $mime = $extension === 'svg' ? 'image/svg+xml' : 'image/'.$extension;
-            $data = 'data:'.$mime.';base64,'.base64_encode(File::get($realPath));
-        } elseif ($extension === 'pdf') {
-            $type = 'pdf';
-            $data = 'data:application/pdf;base64,'.base64_encode(File::get($realPath));
-        } elseif (in_array($extension, $textExts) || $sizeBytes < 100000) {
-            $type = 'text';
-            $data = File::get($realPath);
-            $this->previewContent = $data;
-        }
-
+        $this->previewContent = in_array($appId, ['textedit']) && $sizeBytes < 100000 ? File::get($realPath) : null;
         $this->previewItem = [
             'name' => $basename,
             'path' => $sanitized,
             'extension' => $extension,
             'size' => $this->formatBytes($sizeBytes),
             'updated_at' => date('d M Y, H:i', File::lastModified($realPath)),
-            'type' => $type,
-            'data' => $data,
+            'type' => $appId,
+            'data' => $this->previewContent,
         ];
+    }
+
+    public function getAssociatedApp(string $path): string
+    {
+        $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+
+        $imageAndPdf = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg', 'bmp', 'ico', 'pdf'];
+        $mediaExts = ['mp3', 'wav', 'ogg', 'm4a', 'flac', 'aac', 'mp4', 'webm', 'mov', 'mkv', 'avi'];
+
+        if (in_array($extension, $imageAndPdf, true)) {
+            return 'preview';
+        }
+
+        if (in_array($extension, $mediaExts, true)) {
+            return 'player';
+        }
+
+        return 'textedit';
+    }
+
+    public function openPreview(string $path): void
+    {
+        $this->openFile($path);
     }
 
     public function closePreview(): void

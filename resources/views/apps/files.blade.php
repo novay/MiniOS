@@ -597,7 +597,7 @@
                             <div
                                 @contextmenu.prevent.stop="openContextMenu($event, { path: '{{ $item['path'] }}', name: '{{ addslashes($item['name']) }}', is_dir: {{ $item['is_dir'] ? 'true' : 'false' }} })"
                                 wire:click="selectItem('{{ $item['path'] }}')"
-                                @dblclick.stop="@if ($item['is_dir']) $wire.navigate('{{ $item['path'] }}') @else $wire.openPreview('{{ $item['path'] }}') @endif"
+                                @dblclick.stop="@if ($item['is_dir']) $wire.navigate('{{ $item['path'] }}') @else $wire.openFile('{{ $item['path'] }}') @endif"
                                 class="group relative flex flex-col items-center gap-1.5 p-3 rounded-xl border transition-all text-center cursor-pointer select-none active:scale-98 {{ $isSelected ? ($accent['radio_card'] ?? 'border-indigo-500 bg-indigo-500/10 ring-1 ring-indigo-500') : 'border-transparent hover:border-neutral-200/80 dark:hover:border-white/10 hover:bg-neutral-100/70 dark:hover:bg-white/5' }}"
                                 @if ($isSelected)
                                     style="border-color: var(--accent-color, {{ $accent['hex'] }}); background-color: color-mix(in srgb, var(--accent-color, {{ $accent['hex'] }}) 14%, transparent); box-shadow: 0 0 0 1px var(--accent-color, {{ $accent['hex'] }});"
@@ -722,7 +722,7 @@
                                     <tr
                                         @contextmenu.prevent.stop="openContextMenu($event, { path: '{{ $item['path'] }}', name: '{{ addslashes($item['name']) }}', is_dir: {{ $item['is_dir'] ? 'true' : 'false' }} })"
                                         wire:click="selectItem('{{ $item['path'] }}')"
-                                        @dblclick.stop="@if ($item['is_dir']) $wire.navigate('{{ $item['path'] }}') @else $wire.openPreview('{{ $item['path'] }}') @endif"
+                                        @dblclick.stop="@if ($item['is_dir']) $wire.navigate('{{ $item['path'] }}') @else $wire.openFile('{{ $item['path'] }}') @endif"
                                         class="group cursor-pointer transition-colors {{ $isSelected ? ($accent['selected_row'] ?? 'bg-indigo-500/10 dark:bg-indigo-500/15 ring-1 ring-inset ring-indigo-500/30 font-medium') : 'hover:bg-neutral-100/70 dark:hover:bg-white/5' }}"
                                         @if ($isSelected)
                                             style="background-color: color-mix(in srgb, var(--accent-color, {{ $accent['hex'] }}) 14%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent-color, {{ $accent['hex'] }}) 35%, transparent);"
@@ -876,11 +876,11 @@
                         @else
                             <button
                                 type="button"
-                                wire:click="openPreview('{{ $item['path'] }}')"
+                                wire:click="openFile('{{ $item['path'] }}')"
                                 class="flex-1 inline-flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg text-xs font-medium text-white shadow-xs transition-opacity hover:opacity-95"
                                 style="background-color: var(--accent-color, {{ $accent['hex'] }});"
                             >
-                                <flux:icon name="eye" class="size-3.5" />
+                                <flux:icon name="arrow-top-right-on-square" class="size-3.5" />
                                 <span>{{ $this->t('btn_preview_file') }}</span>
                             </button>
                         @endif
@@ -1093,8 +1093,8 @@
             {{-- Buka / Pratinjau --}}
             <button
                 type="button"
-                @click="if (contextItem?.is_dir) { $wire.navigate(contextItem.path); } else { $wire.openPreview(contextItem.path); } closeContextMenu()"
-                class="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-left text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-white/10 transition-colors"
+                @click="if (contextItem?.is_dir) { $wire.navigate(contextItem.path); } else { $wire.openFile(contextItem.path); } closeContextMenu()"
+                class="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-left text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-white/10 transition-colors font-medium"
             >
                 <flux:icon name="arrow-top-right-on-square" class="size-3.5 text-neutral-500 dark:text-neutral-400" />
                 <span x-text="contextItem?.is_dir ? '{{ $this->t('ctx_open_folder') }}' : '{{ $this->t('ctx_preview_file') }}'"></span>
@@ -1399,100 +1399,6 @@
                             {{ $this->t('btn_move_to_trash') }}
                         @endif
                     </button>
-                </div>
-            </div>
-        </div>
-    @endif
-
-    {{-- ========================================================= --}}
-    {{-- FILE PREVIEW & INLINE TEXT EDITOR MODAL                   --}}
-    {{-- ========================================================= --}}
-    @if ($previewItem)
-        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 dark:bg-black/70 p-4 sm:p-6 backdrop-blur-xs">
-            <div class="relative flex max-h-[88vh] max-w-4xl w-full flex-col rounded-2xl bg-white dark:bg-[#2b2b2b] border border-neutral-200/90 dark:border-white/10 shadow-2xl overflow-hidden">
-                {{-- Dialog Header --}}
-                <div class="flex items-center justify-between border-b border-neutral-200/90 dark:border-white/10 bg-neutral-50/80 dark:bg-[#303030]/80 px-4 py-3">
-                    <div class="flex items-center gap-2 truncate">
-                        <span class="rounded bg-neutral-200/70 dark:bg-white/10 px-2 py-0.5 text-[10px] font-mono uppercase tracking-wider text-neutral-700 dark:text-neutral-300">
-                            {{ $previewItem['extension'] }}
-                        </span>
-                        <span class="text-sm font-semibold text-neutral-900 dark:text-white truncate">
-                            {{ $previewItem['name'] }}
-                        </span>
-                        <span class="text-xs text-neutral-500 dark:text-neutral-400">
-                            ({{ $previewItem['size'] }})
-                        </span>
-                    </div>
-
-                    <div class="flex items-center gap-2">
-                        {{-- Tombol Simpan jika File Text/Code --}}
-                        @if ($previewItem['type'] === 'text')
-                            <button
-                                type="button"
-                                wire:click="saveTextFile"
-                                style="background-color: var(--accent-color, {{ $accent['hex'] }});"
-                                class="flex items-center gap-1.5 rounded-md px-3 py-1 text-xs font-medium text-white shadow-2xs hover:brightness-110 active:scale-98 transition-all"
-                            >
-                                <flux:icon name="check" class="size-3.5 stroke-[2.5]" />
-                                <span>{{ $this->t('btn_save') }}</span>
-                            </button>
-                        @endif
-
-                        {{-- Tombol Unduh --}}
-                        <button
-                            type="button"
-                            wire:click="downloadFile('{{ $previewItem['path'] }}')"
-                            class="flex items-center gap-1.5 rounded-md border border-neutral-300/80 dark:border-white/10 bg-white dark:bg-[#2b2b2b] px-2.5 py-1 text-xs font-medium text-neutral-700 dark:text-neutral-200 shadow-2xs hover:bg-neutral-50 dark:hover:bg-[#333] transition-all"
-                            title="{{ $this->t('btn_download') }}"
-                        >
-                            <flux:icon name="arrow-down-tray" class="size-3.5 text-neutral-500" />
-                            <span class="hidden sm:inline">{{ $this->t('btn_download') }}</span>
-                        </button>
-
-                        {{-- Tombol Tutup --}}
-                        <button
-                            wire:click="closePreview"
-                            type="button"
-                            class="flex size-7 items-center justify-center rounded-lg text-neutral-500 hover:bg-neutral-200/80 dark:hover:bg-white/10 hover:text-neutral-900 dark:hover:text-white transition-all"
-                            title="{{ $this->t('btn_close') }}"
-                        >
-                            <flux:icon name="x-mark" class="size-4" />
-                        </button>
-                    </div>
-                </div>
-
-                {{-- Dialog Preview Content --}}
-                <div class="flex flex-1 items-center justify-center p-4 overflow-auto min-h-64 max-h-[72vh] bg-neutral-100/50 dark:bg-[#1a1a1a]">
-                    @if ($previewItem['type'] === 'image')
-                        <img
-                            src="{{ $previewItem['data'] }}"
-                            alt="{{ $previewItem['name'] }}"
-                            class="max-h-[68vh] max-w-full rounded-lg object-contain shadow-md"
-                        />
-                    @elseif ($previewItem['type'] === 'pdf')
-                        <iframe
-                            src="{{ $previewItem['data'] }}"
-                            class="h-[68vh] w-full border-none rounded-lg bg-white"
-                        ></iframe>
-                    @elseif ($previewItem['type'] === 'text')
-                        <div class="w-full h-full flex flex-col space-y-1">
-                            <textarea
-                                wire:model="previewContent"
-                                rows="18"
-                                class="w-full h-[65vh] p-4 text-xs font-mono rounded-lg bg-white dark:bg-[#111111] text-neutral-900 dark:text-emerald-400 border border-neutral-200 dark:border-white/10 focus:outline-none focus:ring-2 {{ $accent['ring'] }} resize-none select-text leading-relaxed scrollbar-thin"
-                                placeholder="{{ $this->t('placeholder_text_editor') }}"
-                            >{{ $previewContent }}</textarea>
-                            <span class="text-[10px] text-neutral-400">{{ $this->t('preview_save_hint') }}</span>
-                        </div>
-                    @else
-                        <div class="flex flex-col items-center gap-3 text-center text-neutral-400 p-8">
-                            <flux:icon name="document" class="size-16 text-neutral-400 dark:text-neutral-600" />
-                            <div>
-                                <p class="text-sm font-semibold text-neutral-800 dark:text-neutral-200">{{ $this->t('preview_unavailable_title') }}</p>
-                                <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-1">{{ $this->t('preview_unavailable_desc', ['ext' => strtoupper($previewItem['extension'])]) }}</p>
-                            </div>
-                        </div>
-                    @endif
                 </div>
             </div>
         </div>

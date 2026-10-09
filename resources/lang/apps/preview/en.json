@@ -1,0 +1,16 @@
+{
+    "app_title": "Preview",
+    "empty_title": "No File Opened",
+    "empty_desc": "Select an image or PDF document from the Files app to preview it here.",
+    "btn_zoom_in": "Zoom In",
+    "btn_zoom_out": "Zoom Out",
+    "btn_reset_zoom": "Actual Size",
+    "btn_fit_window": "Fit to Window",
+    "btn_rotate_left": "Rotate Left",
+    "btn_rotate_right": "Rotate Right",
+    "btn_download": "Download File",
+    "btn_close_file": "Close File",
+    "info_zoom": "Zoom: :zoom%",
+    "info_rotation": "Rotation: :deg°",
+    "error_file_not_found": "File not found or inaccessible."
+}

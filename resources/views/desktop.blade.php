@@ -10,7 +10,15 @@
 
     @keydown.escape.window="closeAll()"
 
-    @open-app.window="openApplication($event.detail?.id || $event.detail)"
+    @open-app.window="
+        const targetId = $event.detail?.id || $event.detail;
+        if (targetId) {
+            openApplication(targetId);
+            if ($event.detail?.path) {
+                $dispatch('open-file', $event.detail);
+            }
+        }
+    "
 
     @trash-updated.window="
         const c = $event.detail?.count ?? $event.detail?.[0]?.count ?? (typeof $event.detail === 'number' ? $event.detail : null);

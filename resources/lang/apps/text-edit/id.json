@@ -1,0 +1,18 @@
+{
+    "app_title": "TextEdit",
+    "untitled_file": "Tanpa Judul.txt",
+    "btn_new": "Baru",
+    "btn_save": "Simpan",
+    "btn_saved": "Tersimpan",
+    "btn_word_wrap": "Bungkus Teks",
+    "btn_download": "Unduh",
+    "btn_close_file": "Tutup Berkas",
+    "placeholder_editor": "Mulai mengetik teks di sini...",
+    "status_lines": ":lines baris",
+    "status_chars": ":chars karakter",
+    "status_cursor": "Baris :line, Kolom :col",
+    "status_unsaved": "Belum disimpan",
+    "success_file_saved": "Berkas \":name\" berhasil disimpan.",
+    "error_file_not_found": "Berkas tidak ditemukan atau tidak dapat diakses.",
+    "error_save_failed": "Gagal menyimpan berkas: :error"
+}

@@ -1,0 +1,16 @@
+{
+    "app_title": "Preview",
+    "empty_title": "Tidak Ada Berkas yang Dibuka",
+    "empty_desc": "Pilih berkas gambar atau dokumen PDF dari aplikasi Files untuk melihat pratinjau di sini.",
+    "btn_zoom_in": "Perbesar",
+    "btn_zoom_out": "Perkecil",
+    "btn_reset_zoom": "Ukuran Asli",
+    "btn_fit_window": "Sesuaikan Jendela",
+    "btn_rotate_left": "Putar Kiri",
+    "btn_rotate_right": "Putar Kanan",
+    "btn_download": "Unduh Berkas",
+    "btn_close_file": "Tutup Berkas",
+    "info_zoom": "Perbesaran: :zoom%",
+    "info_rotation": "Rotasi: :deg°",
+    "error_file_not_found": "Berkas tidak ditemukan atau tidak dapat diakses."
+}

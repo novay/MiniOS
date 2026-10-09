@@ -69,6 +69,9 @@ class MiniOSServiceProvider extends ServiceProvider
             Apps\ActivityMonitorApp::class,
             Apps\AboutApp::class,
             Apps\ControlPanelApp::class,
+            Apps\PreviewApp::class,
+            Apps\TextEditApp::class,
+            Apps\PlayerApp::class,
         ]);
 
         // Register additional configured apps from config/minios.php

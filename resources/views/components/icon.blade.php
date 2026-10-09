@@ -43,8 +43,37 @@
                 <path d="M16 17.5h3" stroke="#fff" stroke-width="1.5" />
             </svg>
         </div>
+    @break 
+
+    @case('preview')
+        <div {{ $attributes->merge(['class' => $class . ' flex items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 via-teal-600 to-cyan-700 shadow-md text-white p-1 border border-white/20']) }}>
+            <svg class="size-full p-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" />
+                <circle cx="8.5" cy="8.5" r="1.5" fill="currentColor" stroke="none" />
+                <path d="M21 15l-5-5L5 21" stroke="currentColor" />
+            </svg>
+        </div>
+    @break 
+    
+    @case('textedit')
+        <div {{ $attributes->merge(['class' => $class . ' flex items-center justify-center rounded-2xl bg-gradient-to-br from-sky-500 via-blue-600 to-indigo-700 shadow-md text-white p-1 border border-white/20']) }}>
+            <svg class="size-full p-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+                <line x1="16" y1="13" x2="8" y2="13" />
+                <line x1="16" y1="17" x2="8" y2="17" />
+                <line x1="10" y1="9" x2="8" y2="9" />
+            </svg>
+        </div>
     @break
 
+    @case('player')
+        <div {{ $attributes->merge(['class' => $class . ' flex items-center justify-center rounded-2xl bg-gradient-to-br from-purple-500 via-fuchsia-600 to-rose-600 shadow-md text-white p-1 border border-white/20']) }}>
+            <svg class="size-full p-1" viewBox="0 0 24 24" fill="currentColor">
+                <polygon points="6 4 20 12 6 20 6 4" />
+            </svg>
+        </div>
+    @break
 
     @case('about')
     @case('minios')

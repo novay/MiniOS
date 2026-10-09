@@ -65,6 +65,9 @@ class MiniOS
         'activity-monitor',
         'about',
         'control-panel',
+        'preview',
+        'textedit',
+        'player',
     ];
 
     /**

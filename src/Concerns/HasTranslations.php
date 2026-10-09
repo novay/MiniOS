@@ -193,6 +193,11 @@ trait HasTranslations
             return $packageLangDir;
         }
 
+        $altPackageLangDir = dirname(__DIR__, 2).'/resources/lang/apps/'.strtolower(class_basename(static::class));
+        if (is_dir($altPackageLangDir)) {
+            return $altPackageLangDir;
+        }
+
         return null;
     }
 
