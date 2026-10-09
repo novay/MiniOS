@@ -511,6 +511,23 @@
 
             <!-- Top Hero Details & Big Play Button -->
             <div class="relative z-10 flex items-start gap-4">
+                
+                <!-- Circular Track Count Badge -->
+                <div class="mt-1 size-15 sm:size-17 rounded-full bg-white/80 dark:bg-black/80 border border-black/10 dark:border-white/10 backdrop-blur-md flex flex-col items-center justify-center shrink-0 shadow-lg">
+                    <span class="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-white leading-none" x-text="currentSounds.length"></span>
+                    <span class="text-[8px] sm:text-[9px] font-semibold text-neutral-500 dark:text-neutral-400 tracking-widest uppercase mt-0.5">{{ $this->t('hero_tracks_badge') }}</span>
+                </div>
+
+                <div class="flex-1 min-w-0">
+                    <span class="inline-block text-[10px] font-bold text-[#ff5500] uppercase tracking-widest mb-0.5">{{ $this->t('hero_playlist') }}</span>
+                    <h1 class="text-base sm:text-xl font-bold text-neutral-900 dark:text-white leading-tight truncate drop-shadow-xs dark:drop-shadow-md" x-text="currentTrack.title"></h1>
+                    <p class="text-xs text-neutral-600 dark:text-neutral-300 font-medium mt-0.5 truncate" x-text="currentTrack.artist || currentTrack.uploader"></p>
+                </div>
+            </div>
+
+            <!-- Waveform Visualizer & Track Badge -->
+            <div class="relative z-10 my-3 flex items-center gap-3">
+                
                 <button
                     type="button"
                     @click="togglePlay()"
@@ -524,21 +541,6 @@
                         <svg class="size-6 text-white ml-0.5" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 640 640"><path d="M0 0h640v640H0z" fill="none"/><path fill="currentColor" d="M187.2 100.9c-12.4-6.8-27.4-6.5-39.6.7S128 121.9 128 136v368c0 14.1 7.5 27.2 19.6 34.4s27.2 7.5 39.6.7l336-184c12.8-7 20.8-20.5 20.8-35.1s-8-28.1-20.8-35.1z"/></svg>
                     </template>
                 </button>
-
-                <div class="flex-1 min-w-0">
-                    <span class="inline-block text-[10px] font-bold text-[#ff5500] uppercase tracking-widest mb-0.5">{{ $this->t('hero_playlist') }}</span>
-                    <h1 class="text-base sm:text-xl font-bold text-neutral-900 dark:text-white leading-tight truncate drop-shadow-xs dark:drop-shadow-md" x-text="currentTrack.title"></h1>
-                    <p class="text-xs text-neutral-600 dark:text-neutral-300 font-medium mt-0.5 truncate" x-text="currentTrack.artist || currentTrack.uploader"></p>
-                </div>
-            </div>
-
-            <!-- Waveform Visualizer & Track Badge -->
-            <div class="relative z-10 my-3 flex items-center gap-3">
-                <!-- Circular Track Count Badge -->
-                <div class="size-15 sm:size-17 rounded-full bg-white/80 dark:bg-black/80 border border-black/10 dark:border-white/10 backdrop-blur-md flex flex-col items-center justify-center shrink-0 shadow-lg">
-                    <span class="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-white leading-none" x-text="currentSounds.length"></span>
-                    <span class="text-[8px] sm:text-[9px] font-semibold text-neutral-500 dark:text-neutral-400 tracking-widest uppercase mt-0.5">{{ $this->t('hero_tracks_badge') }}</span>
-                </div>
 
                 <!-- Waveform Bars Container -->
                 <div
@@ -615,6 +617,16 @@
                 </div>
 
                 <div class="flex items-center gap-3">
+
+                    <!-- Open on SoundCloud external link -->
+                    <a
+                        :href="currentTrack.scUrl || 'https://soundcloud.com'"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="bg-white/80 hover:bg-white dark:bg-black/50 dark:hover:bg-black/80 border border-black/10 hover:border-black/20 dark:border-white/20 dark:hover:border-white/40 backdrop-blur-md rounded-full px-2 py-0.5 text-[10px] font-medium text-neutral-700 hover:text-neutral-900 dark:text-neutral-200 dark:hover:text-white transition flex items-center gap-1 shadow-xs"
+                    >
+                        <span>Open on Soundcloud</span>
+                    </a>
                     <!-- Volume Slider -->
                     <div class="flex items-center gap-1.5">
                         <button
@@ -646,16 +658,6 @@
                             class="sc-slider w-14 sm:w-20"
                         />
                     </div>
-
-                    <!-- Open on SoundCloud external link -->
-                    <a
-                        :href="currentTrack.scUrl || 'https://soundcloud.com'"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        class="bg-white/80 hover:bg-white dark:bg-black/50 dark:hover:bg-black/80 border border-black/10 hover:border-black/20 dark:border-white/20 dark:hover:border-white/40 backdrop-blur-md rounded-full px-2 py-0.5 text-[10px] font-medium text-neutral-700 hover:text-neutral-900 dark:text-neutral-200 dark:hover:text-white transition flex items-center gap-1 shadow-xs"
-                    >
-                        <span>Open on SoundCloud</span>
-                    </a>
                 </div>
             </div>
         </div>
