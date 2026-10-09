@@ -9,10 +9,12 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Url;
 use Livewire\Component;
+use Novay\MiniOS\Concerns\HasNotifications;
 use Novay\MiniOS\Concerns\HasTranslations;
 
 class Settings extends Component
 {
+    use HasNotifications;
     use HasTranslations;
 
     #[Url(as: 'tab')]
@@ -68,6 +70,11 @@ class Settings extends Component
     /**
      * @var array<string, mixed>
      */
+    public array $notifications = [];
+
+    /**
+     * @var array<string, mixed>
+     */
     public array $services = [];
 
     /**
@@ -106,6 +113,7 @@ class Settings extends Component
         $this->dock = os_setting()->getCategory('dock');
         $this->window_manager = os_setting()->getCategory('window_manager');
         $this->locale_time = os_setting()->getCategory('locale_time');
+        $this->notifications = os_setting()->getCategory('notifications');
         $this->services = os_setting()->getCategory('services');
     }
 
@@ -127,7 +135,7 @@ class Settings extends Component
         if (count($parts) === 2) {
             [$category, $key] = $parts;
 
-            if (in_array($category, ['appearance', 'dock', 'window_manager', 'locale_time', 'services'])) {
+            if (in_array($category, ['appearance', 'dock', 'window_manager', 'locale_time', 'notifications', 'services'])) {
                 os_setting()->set("{$category}.{$key}", $value);
 
                 $this->saveStatus = $this->trans('saved_auto');
@@ -142,11 +150,22 @@ class Settings extends Component
     }
 
     /**
+     * Dispatch sample notification for user testing.
+     */
+    public function testNotification(): void
+    {
+        $this->success(
+            $this->trans('notif_test_desc'),
+            $this->trans('notif_test_title')
+        );
+    }
+
+    /**
      * Reset a category to system defaults.
      */
     public function resetCategory(string $category): void
     {
-        if (in_array($category, ['appearance', 'dock', 'window_manager', 'locale_time', 'services'])) {
+        if (in_array($category, ['appearance', 'dock', 'window_manager', 'locale_time', 'notifications', 'services'])) {
             os_setting()->resetCategory($category);
             $this->loadSettings();
 
@@ -457,6 +476,13 @@ class Settings extends Component
                 'icon' => 'squares-2x2',
                 'color' => 'bg-sky-500 text-white',
                 'keywords' => ['sistem', 'window', 'jendela', 'manager', 'restore', 'sesi', 'pemulihan', 'posisi', 'ukuran', 'system', 'session', 'coordinates'],
+            ],
+            'notifications' => [
+                'label' => $this->trans('nav_notifications'),
+                'desc' => $this->trans('nav_notifications_desc'),
+                'icon' => 'bell',
+                'color' => 'bg-purple-500 text-white',
+                'keywords' => ['notifikasi', 'toast', 'suara', 'sound', 'chime', 'posisi', 'position', 'alert', 'notifications', 'action center'],
             ],
             'locale_time' => [
                 'label' => $this->trans('nav_locale_time'),

@@ -175,5 +175,27 @@
     "password_new_required": "New password is required.",
     "password_new_min": "New password must be at least 8 characters.",
     "password_confirmed_wrong": "Password confirmation does not match.",
-    "password_update_success": "Account password successfully updated."
+    "password_update_success": "Account password successfully updated.",
+
+    "nav_notifications": "Notifications",
+    "nav_notifications_desc": "Toast position, chime sounds, and system notification center.",
+    "notifications_title": "Notifications & Actions",
+    "notifications_desc": "Customize notification popup position and sound response.",
+    "notif_position_title": "Toast Notification Position",
+    "notif_position_desc": "Choose the screen corner where notification popups will appear.",
+    "notif_pos_bottom_right": "Bottom Right",
+    "notif_pos_bottom_right_desc": "Standard Windows 11 Action Center position.",
+    "notif_pos_top_right": "Top Right",
+    "notif_pos_top_right_desc": "Appears at the top right corner of the screen.",
+    "notif_pos_bottom_left": "Bottom Left",
+    "notif_pos_bottom_left_desc": "Appears at the bottom left corner of the screen.",
+    "notif_pos_top_left": "Top Left",
+    "notif_pos_top_left_desc": "Appears at the top left corner of the screen.",
+    "notif_sound_title": "Notification Sound (Audio Chime)",
+    "notif_sound_desc": "Play a subtle sound effect when new notifications arrive.",
+    "notif_test_header": "Test Notification",
+    "notif_test_header_desc": "Send a sample notification to preview appearance and hear audio.",
+    "btn_test_notification": "Send Test Notification",
+    "notif_test_title": "MiniOS Notification Center",
+    "notif_test_desc": "This is an authentic Windows 11 system notification sample in MiniOS!"
 }

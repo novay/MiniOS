@@ -102,5 +102,17 @@
     "Verify Email": "Verifikasi Email",
     "Please verify your email address by clicking on the link we just emailed to you.": "Harap verifikasi alamat email Anda dengan mengeklik tautan yang baru saja kami kirimkan ke email Anda.",
     "A new verification link has been sent to your email address.": "Tautan verifikasi baru telah dikirimkan ke alamat email Anda.",
-    "Resend verification email": "Kirim ulang email verifikasi"
+    "Resend verification email": "Kirim ulang email verifikasi",
+
+    "Notification Center": "Pusat Notifikasi",
+    "Notifications": "Notifikasi",
+    "Clear all": "Hapus semua",
+    "No new notifications": "Tidak ada notifikasi baru",
+    "You're all caught up!": "Semua sudah Anda lihat!",
+    "Dismiss": "Tutup",
+    "Notification Settings": "Pengaturan Notifikasi",
+    "Toggle Theme": "Alihkan Tema",
+    "Mute Audio": "Bisukan Audio",
+    "Enable Audio": "Aktifkan Audio",
+    "Now": "Baru saja"
 }

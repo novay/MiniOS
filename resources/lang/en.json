@@ -102,5 +102,17 @@
     "Verify Email": "Verify Email",
     "Please verify your email address by clicking on the link we just emailed to you.": "Please verify your email address by clicking on the link we just emailed to you.",
     "A new verification link has been sent to your email address.": "A new verification link has been sent to your email address.",
-    "Resend verification email": "Resend verification email"
+    "Resend verification email": "Resend verification email",
+
+    "Notification Center": "Notification Center",
+    "Notifications": "Notifications",
+    "Clear all": "Clear all",
+    "No new notifications": "No new notifications",
+    "You're all caught up!": "You're all caught up!",
+    "Dismiss": "Dismiss",
+    "Notification Settings": "Notification Settings",
+    "Toggle Theme": "Toggle Theme",
+    "Mute Audio": "Mute Audio",
+    "Enable Audio": "Enable Audio",
+    "Now": "Now"
 }

@@ -6,10 +6,14 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\WithFileUploads;
+use Novay\MiniOS\Concerns\HasNotifications;
 use Novay\MiniOS\Concerns\HasTranslations;
 
 class Files extends Component
 {
+    use HasNotifications {
+        notify as osNotify;
+    }
     use HasTranslations;
     use WithFileUploads;
 
@@ -362,6 +366,14 @@ class Files extends Component
     {
         $this->statusMessage = $message;
         $this->statusType = $type;
+
+        $variant = match ($type) {
+            'error' => 'danger',
+            'warning' => 'warning',
+            default => 'success',
+        };
+
+        $this->osNotify($message, $this->trans('app_title'), $variant);
     }
 
     public function clearNotification(): void

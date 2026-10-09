@@ -175,5 +175,27 @@
     "password_new_required": "Kata sandi baru wajib diisi.",
     "password_new_min": "Kata sandi baru minimal 8 karakter.",
     "password_confirmed_wrong": "Konfirmasi kata sandi tidak cocok.",
-    "password_update_success": "Kata sandi akun berhasil diperbarui."
+    "password_update_success": "Kata sandi akun berhasil diperbarui.",
+
+    "nav_notifications": "Notifikasi",
+    "nav_notifications_desc": "Posisi toast, suara chime, dan pusat notifikasi sistem.",
+    "notifications_title": "Notifikasi & Aksi",
+    "notifications_desc": "Sesuaikan posisi pop-up notifikasi dan respons suara sistem.",
+    "notif_position_title": "Posisi Toast Notifikasi",
+    "notif_position_desc": "Pilih sudut layar tempat pop-up notifikasi akan muncul.",
+    "notif_pos_bottom_right": "Kanan Bawah",
+    "notif_pos_bottom_right_desc": "Posisi standar ala Windows 11 Action Center.",
+    "notif_pos_top_right": "Kanan Atas",
+    "notif_pos_top_right_desc": "Muncul di pojok kanan atas layar.",
+    "notif_pos_bottom_left": "Kiri Bawah",
+    "notif_pos_bottom_left_desc": "Muncul di pojok kiri bawah layar.",
+    "notif_pos_top_left": "Kiri Atas",
+    "notif_pos_top_left_desc": "Muncul di pojok kiri atas layar.",
+    "notif_sound_title": "Suara Notifikasi (Audio Chime)",
+    "notif_sound_desc": "Putar efek suara lembut saat notifikasi baru masuk.",
+    "notif_test_header": "Uji Coba Notifikasi",
+    "notif_test_header_desc": "Kirim notifikasi contoh untuk melihat tampilan dan mendengar suara.",
+    "btn_test_notification": "Kirim Notifikasi Uji Coba",
+    "notif_test_title": "Pusat Notifikasi MiniOS",
+    "notif_test_desc": "Ini adalah contoh notifikasi sistem Windows 11 di MiniOS!"
 }

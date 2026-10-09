@@ -78,8 +78,22 @@ export default function minios(applications = {}, userSettings = {}) {
         activitiesOpen: false,
         applicationsOpen: false,
         systemMenuOpen: false,
+        notificationCenterOpen: false,
+        notifications: [],
+        activeToasts: [],
+        audioContext: null,
+        audioUnlocked: false,
         selectedShortcut: null,
         isFullscreen: false,
+
+        get unreadNotificationsCount() {
+            return this.notifications.filter(n => !n.read).length;
+        },
+
+        get isAudioActive() {
+            const soundSetting = this.settings?.notifications?.sound !== false;
+            return soundSetting && this.audioUnlocked;
+        },
 
         contextMenu: {
             open: false,
@@ -129,6 +143,8 @@ export default function minios(applications = {}, userSettings = {}) {
 
             this.initClock();
             this.initSettingsListener();
+            this.initNotificationListener();
+            this.initAudioSystem();
 
             this.initPointerEvents();
             this.initKeyboardShortcuts();
@@ -2330,6 +2346,240 @@ export default function minios(applications = {}, userSettings = {}) {
 
         /*
         |--------------------------------------------------------------------------
+        | Notifications & Sound Chime
+        |--------------------------------------------------------------------------
+        */
+
+        initNotificationListener() {
+            window.addEventListener('os-notify', (event) => {
+                this.handleOsNotify(event.detail);
+            });
+
+            if (window.Livewire) {
+                Livewire.on('os-notify', (data) => {
+                    this.handleOsNotify(data);
+                });
+            }
+        },
+
+        handleOsNotify(detail) {
+            const data = Array.isArray(detail) ? detail[0] : detail;
+            if (!data) return;
+
+            const notification = {
+                id: data.id || ('notif_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5)),
+                title: data.title || '',
+                text: data.text || data.message || '',
+                variant: data.variant || data.type || 'info',
+                app: data.app || 'MiniOS',
+                timestamp: data.timestamp || new Date().toISOString(),
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                read: false,
+            };
+
+            this.notifications.unshift(notification);
+
+            if (this.notifications.length > 50) {
+                this.notifications = this.notifications.slice(0, 50);
+            }
+
+            // Pop Windows 11 native toast banner
+            this.showToast(notification);
+
+            this.playNotificationChime();
+        },
+
+        showToast(notification) {
+            const toast = {
+                ...notification,
+                timer: null,
+            };
+
+            // Limit active toasts visible at once to 3
+            if (this.activeToasts.length >= 3) {
+                const oldest = this.activeToasts.shift();
+                if (oldest?.timer) clearTimeout(oldest.timer);
+            }
+
+            this.activeToasts.push(toast);
+
+            toast.timer = setTimeout(() => {
+                this.dismissToast(toast.id);
+            }, 5000);
+        },
+
+        dismissToast(id) {
+            const index = this.activeToasts.findIndex(t => t.id === id);
+            if (index !== -1) {
+                if (this.activeToasts[index].timer) {
+                    clearTimeout(this.activeToasts[index].timer);
+                }
+                this.activeToasts.splice(index, 1);
+            }
+        },
+
+        pauseToast(id) {
+            const toast = this.activeToasts.find(t => t.id === id);
+            if (toast && toast.timer) {
+                clearTimeout(toast.timer);
+                toast.timer = null;
+            }
+        },
+
+        resumeToast(id) {
+            const toast = this.activeToasts.find(t => t.id === id);
+            if (toast && !toast.timer) {
+                toast.timer = setTimeout(() => {
+                    this.dismissToast(id);
+                }, 3000);
+            }
+        },
+
+        /*
+        |--------------------------------------------------------------------------
+        | Web Audio System & Autoplay Policy Management
+        |--------------------------------------------------------------------------
+        */
+
+        getAudioContext() {
+            if (!this.audioContext) {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                if (AudioCtx) {
+                    this.audioContext = new AudioCtx();
+                    this.audioContext.onstatechange = () => {
+                        this.audioUnlocked = this.audioContext.state === 'running';
+                    };
+                }
+            }
+            return this.audioContext;
+        },
+
+        checkAudioStatus() {
+            const ctx = this.getAudioContext();
+            if (ctx) {
+                this.audioUnlocked = ctx.state === 'running';
+            }
+        },
+
+        async toggleAudio() {
+            const ctx = this.getAudioContext();
+            if (!ctx) return;
+
+            if (!this.settings) this.settings = {};
+            if (!this.settings.notifications) this.settings.notifications = {};
+
+            if (this.isAudioActive) {
+                // User wants to mute
+                this.settings.notifications.sound = false;
+                this.audioUnlocked = false;
+                try {
+                    await ctx.suspend();
+                } catch (e) {}
+            } else {
+                // User wants to enable audio
+                this.settings.notifications.sound = true;
+                try {
+                    if (ctx.state === 'suspended') {
+                        await ctx.resume();
+                    }
+                    this.audioUnlocked = ctx.state === 'running';
+                } catch (e) {
+                    this.audioUnlocked = false;
+                }
+
+                if (this.audioUnlocked) {
+                    this.playNotificationChime();
+                }
+            }
+
+            if (window.Livewire) {
+                Livewire.dispatch('os-setting-updated', {
+                    category: 'notifications',
+                    key: 'sound',
+                    value: this.settings.notifications.sound,
+                });
+            }
+        },
+
+        initAudioSystem() {
+            this.checkAudioStatus();
+
+            const unlockHandler = () => {
+                const ctx = this.getAudioContext();
+                if (ctx && ctx.state === 'suspended' && this.settings?.notifications?.sound !== false) {
+                    ctx.resume().then(() => {
+                        this.audioUnlocked = ctx.state === 'running';
+                    }).catch(() => {});
+                }
+            };
+
+            window.addEventListener('pointerdown', unlockHandler, { once: true });
+            window.addEventListener('keydown', unlockHandler, { once: true });
+        },
+
+        playNotificationChime() {
+            try {
+                const isSoundEnabled = this.settings?.notifications?.sound !== false;
+                if (!isSoundEnabled) return;
+
+                const ctx = this.getAudioContext();
+                if (!ctx) return;
+
+                if (ctx.state === 'suspended') {
+                    ctx.resume().then(() => {
+                        this.audioUnlocked = ctx.state === 'running';
+                    }).catch(() => {});
+                } else if (ctx.state === 'running') {
+                    this.audioUnlocked = true;
+                }
+
+                const now = ctx.currentTime;
+
+                const playTone = (freq, startTime, duration) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(freq, startTime);
+
+                    gain.gain.setValueAtTime(0, startTime);
+                    gain.gain.linearRampToValueAtTime(0.12, startTime + 0.02);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+
+                    osc.start(startTime);
+                    osc.stop(startTime + duration);
+                };
+
+                // Gentle Windows 11 dual chime: D5 (587.33Hz) -> A5 (880Hz)
+                playTone(587.33, now, 0.18);
+                playTone(880.00, now + 0.09, 0.28);
+            } catch (e) {
+                // Ignore audio context errors gracefully
+            }
+        },
+
+        toggleNotificationCenter() {
+            const willOpen = !this.notificationCenterOpen;
+            this.closeAll();
+            this.notificationCenterOpen = willOpen;
+            if (willOpen) {
+                this.notifications.forEach(n => { n.read = true; });
+            }
+        },
+
+        removeNotification(id) {
+            this.notifications = this.notifications.filter(n => n.id !== id);
+        },
+
+        clearAllNotifications() {
+            this.notifications = [];
+        },
+
+        /*
+        |--------------------------------------------------------------------------
         | Overlay
         |--------------------------------------------------------------------------
         */
@@ -2338,6 +2588,7 @@ export default function minios(applications = {}, userSettings = {}) {
             this.activitiesOpen = false;
             this.applicationsOpen = false;
             this.systemMenuOpen = false;
+            this.notificationCenterOpen = false;
             this.aboutOpen = false;
             this.selectedShortcut = null;
 

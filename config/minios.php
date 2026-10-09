@@ -89,6 +89,11 @@ return [
             'focus_indicators' => true,
         ],
 
+        'notifications' => [
+            'position' => 'bottom end',
+            'sound' => true,
+        ],
+
         'services' => [
             // Filesystem / Storage Driver
             'storage_driver' => 'local',

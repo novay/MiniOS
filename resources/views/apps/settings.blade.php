@@ -109,6 +109,8 @@
             @include(view()->exists('pages.minios.apps.settings.dock') ? 'pages.minios.apps.settings.dock' : 'minios::apps.settings.dock')
         @elseif ($activeTab === 'window_manager')
             @include(view()->exists('pages.minios.apps.settings.window') ? 'pages.minios.apps.settings.window' : 'minios::apps.settings.window')
+        @elseif ($activeTab === 'notifications')
+            @include(view()->exists('pages.minios.apps.settings.notifications') ? 'pages.minios.apps.settings.notifications' : 'minios::apps.settings.notifications')
         @elseif ($activeTab === 'locale_time')
             @include(view()->exists('pages.minios.apps.settings.locale') ? 'pages.minios.apps.settings.locale' : 'minios::apps.settings.locale')
         @elseif ($activeTab === 'account')

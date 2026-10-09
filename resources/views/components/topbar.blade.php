@@ -45,6 +45,38 @@
             </span>
         </button>
 
+        {{-- Audio Toggle --}}
+        <button
+            type="button"
+            @click.stop="toggleAudio()"
+            class="flex size-6 items-center justify-center rounded-md text-neutral-700 dark:text-neutral-200 transition-colors hover:bg-black/10 dark:hover:bg-white/10"
+            :title="isAudioActive ? '{{ __('Mute Audio') }}' : '{{ __('Enable Audio') }}'"
+        >
+            <span x-cloak x-show="isAudioActive" class="flex items-center justify-center">
+                <flux:icon name="speaker-wave" class="size-4 text-neutral-800 dark:text-neutral-200" />
+            </span>
+            <span x-cloak x-show="!isAudioActive" class="flex items-center justify-center">
+                <flux:icon name="speaker-x-mark" class="size-4 text-neutral-400 dark:text-neutral-500" />
+            </span>
+        </button>
+
+        {{-- Notification Center Toggle --}}
+        <button
+            type="button"
+            @click.stop="toggleNotificationCenter()"
+            class="relative flex size-6 items-center justify-center rounded-md text-neutral-700 dark:text-neutral-200 transition-colors hover:bg-black/10 dark:hover:bg-white/10"
+            :class="notificationCenterOpen ? 'bg-black/10 dark:bg-white/15' : ''"
+            :title="'{{ __('Notification Center') }}'"
+        >
+            <flux:icon name="bell" class="size-4 text-neutral-800 dark:text-neutral-200" />
+            <span
+                x-cloak
+                x-show="unreadNotificationsCount > 0"
+                class="absolute -top-0.5 -right-0.5 flex size-3.5 items-center justify-center rounded-full bg-rose-500 text-[9px] font-bold text-white shadow-sm"
+                x-text="unreadNotificationsCount > 9 ? '9+' : unreadNotificationsCount"
+            ></span>
+        </button>
+
         <button
             type="button"
             @click.stop="toggleSystemMenu()"

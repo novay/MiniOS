@@ -25,11 +25,13 @@
 <body class="h-dvh w-screen overflow-hidden bg-white text-neutral-900 dark:bg-black dark:text-white font-sans antialiased">
     {{ $slot }}
 
-    @persist('toast')
-        <flux:toast.group>
-            <flux:toast />
-        </flux:toast.group>
-    @endpersist
+    @if (class_exists(\Flux\Flux::class))
+        @persist('toast')
+            <flux:toast.group :position="function_exists('os_setting') ? os_setting('notifications.position', 'bottom end') : 'bottom end'">
+                <flux:toast />
+            </flux:toast.group>
+        @endpersist
+    @endif
 
     <script>
         if ('serviceWorker' in navigator) {
