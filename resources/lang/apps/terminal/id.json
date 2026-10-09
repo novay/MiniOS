@@ -1,0 +1,10 @@
+{
+    "app_title": "Terminal",
+    "welcome": "MiniOS CLI Shell v2.0 (x86_64-apple-darwin)\nKetik 'help' atau 'minios' untuk bantuan perintah.\n",
+    "help_output": "Perintah MiniOS Terminal yang tersedia:\n  minios      Tampilkan informasi spesifikasi sistem MiniOS\n  whoami        Tampilkan nama pengguna aktif\n  uname         Tampilkan versi sistem dan kernel\n  pwd           Tampilkan direktori kerja saat ini\n  date          Tampilkan tanggal dan waktu sistem saat ini\n  ls            Tampilkan isi file & folder dalam direktori storage\n  artisan       Jalankan perintah Artisan (contoh: artisan inspire, artisan about)\n  echo [teks]   Cetak teks ke layar\n  clear         Bersihkan layar terminal\n",
+    "command_not_found": "command not found: :cmd. Ketik 'help' untuk daftar perintah.\n",
+    "permission_denied": "ls: Permission denied (Guest user). Silakan login terlebih dahulu ke MiniOS.\n",
+    "dir_not_found": "ls: :path: Direktori tidak ditemukan\n",
+    "artisan_restricted": "MiniOS Security: Perintah 'artisan :cmd' dibatasi di Terminal Web. Perintah yang diizinkan: :allowed\n",
+    "artisan_failed": "Gagal menjalankan artisan: :error\n"
+}

@@ -1,0 +1,22 @@
+{
+    "app_title": "Calculator",
+    "standard": "Standard",
+    "history": "Calculation History",
+    "history_tooltip": "Calculation history",
+    "history_empty_title": "No calculation history yet",
+    "history_empty_desc": "Your calculation results will be saved automatically here",
+    "history_recall_tooltip": "Click to use this result",
+    "copy_tooltip": "Copy result (⌘C)",
+    "copied": "Copied!",
+    "backspace_tooltip": "Delete last digit (Backspace)",
+    "clear_history": "Clear",
+    "clear_history_tooltip": "Clear all history",
+    "close_history_tooltip": "Close history (Esc)",
+    "memory_clear": "Memory Clear (MC)",
+    "memory_recall": "Memory Recall (MR)",
+    "memory_add": "Memory Add (M+)",
+    "memory_subtract": "Memory Subtract (M-)",
+    "sqrt_tooltip": "Square Root (√x)",
+    "square_tooltip": "Square (x²)",
+    "cannot_divide_by_zero": "Cannot divide by zero"
+}

@@ -160,16 +160,15 @@ class About extends Component
     public function getCopySpecsTextProperty(): string
     {
         return "MiniOS Web Desktop (Windows 11 Fluent Edition)\n"
-            ."Versi: {$this->miniosVersion} ({$this->buildNumber})\n"
-            ."Perangkat: {$this->hostname}\n"
-            ."Prosesor: {$this->processor}\n"
-            ."Memori: {$this->installedRam}\n"
-            ."Pengguna: {$this->userName}\n"
-            ."Host OS: {$this->hostOs}\n"
-            ."Runtime: PHP {$this->phpVersion} ({$this->phpSapi})\n"
-            ."Framework: Laravel {$this->laravelVersion} & Livewire {$this->livewireVersion}\n"
-            ."UI: Flux UI {$this->fluxVersion} & Tailwind CSS\n"
-            ."Database: {$this->dbConnection}";
+            ."{$this->t('device_name')}: {$this->hostname}\n"
+            ."{$this->t('processor')}: {$this->processor}\n"
+            ."{$this->t('memory')}: {$this->installedRam}\n"
+            ."{$this->t('user')}: {$this->userName}\n"
+            ."{$this->t('host_system')}: {$this->hostOs}\n"
+            ."{$this->t('runtime')}: PHP {$this->phpVersion} ({$this->phpSapi})\n"
+            ."{$this->t('framework')}: Laravel {$this->laravelVersion} & Livewire {$this->livewireVersion}\n"
+            ."{$this->t('ui_components')}: Flux UI {$this->fluxVersion} & Tailwind CSS\n"
+            ."{$this->t('database')}: {$this->dbConnection}";
     }
 
     public function render()

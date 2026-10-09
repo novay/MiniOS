@@ -352,7 +352,7 @@
         <div class="flex items-center justify-between min-h-5 text-xs mb-1">
             <div class="flex items-center gap-1.5 truncate">
                 <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium tracking-wide bg-neutral-200/80 dark:bg-white/10 text-neutral-600 dark:text-neutral-400">
-                    Standard
+                    {{ $this->t('standard') }}
                 </span>
                 <span
                     x-show="hasMemory"
@@ -371,7 +371,7 @@
                     @click="historyOpen = !historyOpen"
                     class="p-1 rounded-md transition-colors relative"
                     :class="historyOpen ? 'bg-amber-500 text-white dark:bg-amber-500' : 'text-neutral-500 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10'"
-                    title="Riwayat perhitungan"
+                    title="{{ $this->t('history_tooltip') }}"
                 >
                     <svg class="size-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -383,7 +383,7 @@
                     type="button"
                     @click="copyDisplay()"
                     class="p-1 rounded-md text-neutral-500 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10 transition-colors relative"
-                    title="Salin hasil (⌘C)"
+                    title="{{ $this->t('copy_tooltip') }}"
                 >
                     <svg class="size-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
@@ -393,7 +393,7 @@
                         x-transition.opacity
                         class="absolute -top-7 right-0 px-2 py-0.5 text-[10px] bg-emerald-600 text-white font-medium rounded-md shadow-md pointer-events-none"
                     >
-                        Tersalin!
+                        {{ $this->t('copied') }}
                     </span>
                 </button>
 
@@ -402,7 +402,7 @@
                     type="button"
                     @click="backspace()"
                     class="p-1 rounded-md text-neutral-500 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
-                    title="Hapus digit terakhir (Backspace)"
+                    title="{{ $this->t('backspace_tooltip') }}"
                 >
                     <svg class="size-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2M3 12l6.414-6.414a2 2 0 011.414-.586H19a2 2 0 012 2v10a2 2 0 01-2 2h-7.172a2 2 0 01-1.414-.586L3 12z" />
@@ -431,7 +431,7 @@
             :disabled="!hasMemory"
             class="py-1 px-1 rounded-lg text-center font-medium transition-all"
             :class="hasMemory ? 'text-neutral-700 dark:text-neutral-300 hover:bg-black/5 dark:hover:bg-white/10 active:scale-95' : 'text-neutral-400/40 dark:text-neutral-600/40 cursor-not-allowed'"
-            title="Memory Clear (MC)"
+            title="{{ $this->t('memory_clear') }}"
         >
             MC
         </button>
@@ -441,7 +441,7 @@
             :disabled="!hasMemory"
             class="py-1 px-1 rounded-lg text-center font-medium transition-all"
             :class="hasMemory ? 'text-amber-600 dark:text-amber-400 font-semibold hover:bg-black/5 dark:hover:bg-white/10 active:scale-95' : 'text-neutral-400/40 dark:text-neutral-600/40 cursor-not-allowed'"
-            title="Memory Recall (MR)"
+            title="{{ $this->t('memory_recall') }}"
         >
             MR
         </button>
@@ -449,7 +449,7 @@
             type="button"
             @click="memoryAdd()"
             class="py-1 px-1 rounded-lg text-center font-medium text-neutral-700 dark:text-neutral-300 hover:bg-black/5 dark:hover:bg-white/10 active:scale-95 transition-all"
-            title="Memory Add (M+)"
+            title="{{ $this->t('memory_add') }}"
         >
             M+
         </button>
@@ -457,7 +457,7 @@
             type="button"
             @click="memorySubtract()"
             class="py-1 px-1 rounded-lg text-center font-medium text-neutral-700 dark:text-neutral-300 hover:bg-black/5 dark:hover:bg-white/10 active:scale-95 transition-all"
-            title="Memory Subtract (M-)"
+            title="{{ $this->t('memory_subtract') }}"
         >
             M−
         </button>
@@ -465,7 +465,7 @@
             type="button"
             @click="sqrt()"
             class="py-1 px-1 rounded-lg text-center font-medium text-neutral-700 dark:text-neutral-300 hover:bg-black/5 dark:hover:bg-white/10 active:scale-95 transition-all"
-            title="Akar Kuadrat (√x)"
+            title="{{ $this->t('sqrt_tooltip') }}"
         >
             √x
         </button>
@@ -473,7 +473,7 @@
             type="button"
             @click="square()"
             class="py-1 px-1 rounded-lg text-center font-medium text-neutral-700 dark:text-neutral-300 hover:bg-black/5 dark:hover:bg-white/10 active:scale-95 transition-all"
-            title="Kuadrat (x²)"
+            title="{{ $this->t('square_tooltip') }}"
         >
             x²
         </button>
@@ -638,7 +638,7 @@
                 <svg class="size-3.5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <span>Riwayat Perhitungan</span>
+                <span>{{ $this->t('history') }}</span>
             </div>
 
             <div class="flex items-center gap-1">
@@ -647,15 +647,15 @@
                     x-show="history.length > 0"
                     @click="clearHistory()"
                     class="px-2 py-0.5 rounded text-[11px] text-rose-600 dark:text-rose-400 hover:bg-rose-500/10 transition-colors"
-                    title="Hapus semua riwayat"
+                    title="{{ $this->t('clear_history_tooltip') }}"
                 >
-                    Hapus
+                    {{ $this->t('clear_history') }}
                 </button>
                 <button
                     type="button"
                     @click="historyOpen = false"
                     class="p-1 rounded-md text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
-                    title="Tutup riwayat (Esc)"
+                    title="{{ $this->t('close_history_tooltip') }}"
                 >
                     <svg class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -671,8 +671,8 @@
                     <svg class="size-8 mb-2 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                     </svg>
-                    <p class="text-xs">Belum ada riwayat perhitungan</p>
-                    <p class="text-[11px] text-neutral-400/80 mt-0.5">Hasil hitungan Anda akan tersimpan otomatis di sini</p>
+                    <p class="text-xs">{{ $this->t('history_empty_title') }}</p>
+                    <p class="text-[11px] text-neutral-400/80 mt-0.5">{{ $this->t('history_empty_desc') }}</p>
                 </div>
             </template>
 
@@ -681,7 +681,7 @@
                     type="button"
                     @click="recallHistory(item)"
                     class="w-full text-right p-2.5 rounded-xl hover:bg-white/80 dark:hover:bg-white/[0.08] border border-transparent hover:border-black/5 dark:hover:border-white/5 transition-all group select-none"
-                    title="Klik untuk gunakan hasil ini"
+                    title="{{ $this->t('history_recall_tooltip') }}"
                 >
                     <div class="text-[11px] text-neutral-500 dark:text-neutral-400 font-mono tracking-tight" x-text="item.expression + ' =' "></div>
                     <div class="text-lg font-semibold font-mono tabular-nums text-neutral-900 dark:text-white group-hover:text-amber-500 dark:group-hover:text-amber-400 transition-colors" x-text="formatNumber(item.result)"></div>

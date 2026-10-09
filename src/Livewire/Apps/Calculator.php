@@ -3,9 +3,11 @@
 namespace Novay\MiniOS\Livewire\Apps;
 
 use Livewire\Component;
+use Novay\MiniOS\Concerns\HasTranslations;
 
 class Calculator extends Component
 {
+    use HasTranslations;
     public function getAccentProperty(): array
     {
         $name = os_setting()->get('appearance.accent_color', 'indigo');

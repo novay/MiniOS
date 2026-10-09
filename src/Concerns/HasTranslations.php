@@ -3,6 +3,7 @@
 namespace Novay\MiniOS\Concerns;
 
 use Illuminate\Support\Str;
+use Livewire\Attributes\On;
 
 trait HasTranslations
 {
@@ -12,6 +13,35 @@ trait HasTranslations
      * @var array<string, array<string, string>>
      */
     protected static array $translationsCache = [];
+
+    /**
+     * Re-render component when OS locale setting is updated.
+     */
+    #[On('os-setting-updated')]
+    public function onOsSettingUpdated(mixed ...$args): void
+    {
+        $payload = $args[0] ?? $args;
+        $category = is_array($payload) ? ($payload['category'] ?? null) : null;
+        $key = is_array($payload) ? ($payload['key'] ?? null) : null;
+
+        if ($category === 'locale_time' && $key === 'locale') {
+            static::flushTranslationsCache();
+        }
+    }
+
+    /**
+     * Re-render component when OS setting category is reset.
+     */
+    #[On('os-setting-reset')]
+    public function onOsSettingReset(mixed ...$args): void
+    {
+        $payload = $args[0] ?? $args;
+        $category = is_array($payload) ? ($payload['category'] ?? null) : null;
+
+        if ($category === 'locale_time') {
+            static::flushTranslationsCache();
+        }
+    }
 
     /**
      * Translate the given key according to active MiniOS locale.
@@ -75,7 +105,12 @@ trait HasTranslations
         if (function_exists('os_setting')) {
             $locale = os_setting('locale_time.locale');
             if (is_string($locale) && in_array(strtolower($locale), ['id', 'en'], true)) {
-                return strtolower($locale);
+                $resolved = strtolower($locale);
+                if (app()->getLocale() !== $resolved) {
+                    app()->setLocale($resolved);
+                }
+
+                return $resolved;
             }
         }
 

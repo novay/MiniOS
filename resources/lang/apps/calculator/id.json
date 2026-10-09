@@ -1,0 +1,22 @@
+{
+    "app_title": "Kalkulator",
+    "standard": "Standar",
+    "history": "Riwayat Perhitungan",
+    "history_tooltip": "Riwayat perhitungan",
+    "history_empty_title": "Belum ada riwayat perhitungan",
+    "history_empty_desc": "Hasil hitungan Anda akan tersimpan otomatis di sini",
+    "history_recall_tooltip": "Klik untuk gunakan hasil ini",
+    "copy_tooltip": "Salin hasil (⌘C)",
+    "copied": "Tersalin!",
+    "backspace_tooltip": "Hapus digit terakhir (Backspace)",
+    "clear_history": "Hapus",
+    "clear_history_tooltip": "Hapus semua riwayat",
+    "close_history_tooltip": "Tutup riwayat (Esc)",
+    "memory_clear": "Memory Clear (MC)",
+    "memory_recall": "Memory Recall (MR)",
+    "memory_add": "Memory Add (M+)",
+    "memory_subtract": "Memory Subtract (M-)",
+    "sqrt_tooltip": "Akar Kuadrat (√x)",
+    "square_tooltip": "Kuadrat (x²)",
+    "cannot_divide_by_zero": "Tidak bisa dibagi 0"
+}
