@@ -197,11 +197,11 @@
                     <flux:icon name="exclamation-triangle" class="size-5 shrink-0 text-amber-600 dark:text-amber-400 mt-0.5" />
                     <div class="min-w-0 flex-1">
                         <div class="flex items-center gap-2">
-                            <h4 class="font-semibold text-amber-900 dark:text-amber-100">Eksekusi Perintah Sistem Dibatasi</h4>
-                            <span class="rounded bg-amber-500/20 px-1.5 py-0.5 text-[10px] font-medium text-amber-800 dark:text-amber-200">Mode Aman</span>
+                            <h4 class="font-semibold text-amber-900 dark:text-amber-100">{{ $this->t('safe_mode_title') }}</h4>
+                            <span class="rounded bg-amber-500/20 px-1.5 py-0.5 text-[10px] font-medium text-amber-800 dark:text-amber-200">{{ $this->t('safe_mode_badge') }}</span>
                         </div>
                         <p class="mt-0.5 text-[11px] text-amber-700 dark:text-amber-300 leading-relaxed">
-                            Server hosting ini membatasi fungsi eksekusi shell (<code>shell_exec</code> dinonaktifkan di <code>php.ini</code>). Informasi proses dan kinerja ditampilkan menggunakan telemetri internal PHP Runtime serta layanan virtual MiniOS.
+                            {{ $this->t('safe_mode_desc') }}
                         </p>
                     </div>
                 </div>
@@ -232,21 +232,21 @@
                             wire:click="setProcessFilter('all')"
                             class="px-2.5 py-1 rounded-md transition-all {{ $processFilter === 'all' ? 'bg-white dark:bg-[#333] text-neutral-900 dark:text-white shadow-2xs font-semibold' : 'text-neutral-500 hover:text-neutral-900 dark:hover:text-white' }}"
                         >
-                            Semua
+                            {{ $this->t('filter_all') }}
                         </button>
                         <button
                             type="button"
                             wire:click="setProcessFilter('system')"
                             class="px-2.5 py-1 rounded-md transition-all {{ $processFilter === 'system' ? 'bg-white dark:bg-[#333] text-neutral-900 dark:text-white shadow-2xs font-semibold' : 'text-neutral-500 hover:text-neutral-900 dark:hover:text-white' }}"
                         >
-                            Host OS
+                            {{ $this->t('filter_system') }}
                         </button>
                         <button
                             type="button"
                             wire:click="setProcessFilter('minios')"
                             class="px-2.5 py-1 rounded-md transition-all {{ $processFilter === 'minios' ? 'bg-white dark:bg-[#333] text-neutral-900 dark:text-white shadow-2xs font-semibold' : 'text-neutral-500 hover:text-neutral-900 dark:hover:text-white' }}"
                         >
-                            MiniOS Core
+                            {{ $this->t('filter_minios') }}
                         </button>
                     </div>
 
@@ -267,13 +267,13 @@
                         <table class="w-full text-left text-xs border-collapse">
                             <thead>
                                 <tr class="border-b border-neutral-200/90 dark:border-white/10 text-[11px] font-semibold text-neutral-500 dark:text-neutral-400 bg-neutral-50/70 dark:bg-white/5 select-none">
-                                    <th class="py-2.5 px-4">Nama Proses</th>
-                                    <th class="py-2.5 px-3">Tipe</th>
-                                    <th class="py-2.5 px-3">Status</th>
-                                    <th class="py-2.5 px-3 text-right">CPU</th>
-                                    <th class="py-2.5 px-3 text-right">Memori (RAM)</th>
-                                    <th class="py-2.5 px-3 text-right">PID</th>
-                                    <th class="py-2.5 px-3 text-right">Pengguna</th>
+                                    <th class="py-2.5 px-4">{{ $this->t('th_process_name') }}</th>
+                                    <th class="py-2.5 px-3">{{ $this->t('th_type') }}</th>
+                                    <th class="py-2.5 px-3">{{ $this->t('th_status') }}</th>
+                                    <th class="py-2.5 px-3 text-right">{{ $this->t('th_cpu') }}</th>
+                                    <th class="py-2.5 px-3 text-right">{{ $this->t('th_memory') }}</th>
+                                    <th class="py-2.5 px-3 text-right">{{ $this->t('th_pid') }}</th>
+                                    <th class="py-2.5 px-3 text-right">{{ $this->t('th_user') }}</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-neutral-100 dark:divide-white/5">
