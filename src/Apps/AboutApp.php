@@ -3,6 +3,7 @@
 namespace Novay\MiniOS\Apps;
 
 use Novay\MiniOS\Contracts\DesktopApp;
+use Novay\MiniOS\Livewire\Apps\About;
 use Novay\MiniOS\Support\WindowConfig;
 
 class AboutApp implements DesktopApp
@@ -32,6 +33,11 @@ class AboutApp implements DesktopApp
         return ['/desktop/about'];
     }
 
+    public function version(): string
+    {
+        return '1.0.0';
+    }
+
     public function isPinned(): bool
     {
         return false;
@@ -39,14 +45,16 @@ class AboutApp implements DesktopApp
 
     public function component(): ?string
     {
-        return 'minios.about-window';
+        return class_exists(About::class) ? About::class : 'apps.about';
     }
 
     public function window(): WindowConfig
     {
         return WindowConfig::make()
-            ->size(460, 620)
-            ->min(380, 620)
+            ->size(480, 720)
+            ->min(400, 560)
+            ->resizable(false)
+            ->maximizable(false)
             ->center(true);
     }
 }

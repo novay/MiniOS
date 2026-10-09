@@ -1,54 +1,10 @@
-@php
-    $accentColor = os_setting()->get('appearance.accent_color', 'indigo');
-    $accentHex = match ($accentColor) {
-        'zinc' => '#27272a',
-        'emerald' => '#10b981',
-        'sky' => '#0ea5e9',
-        'amber' => '#f59e0b',
-        'rose' => '#f43f5e',
-        default => '#4f46e5',
-    };
-    $accentText = match ($accentColor) {
-        'zinc' => 'text-zinc-600 dark:text-zinc-400',
-        'emerald' => 'text-emerald-600 dark:text-emerald-400',
-        'sky' => 'text-sky-600 dark:text-sky-400',
-        'amber' => 'text-amber-600 dark:text-amber-400',
-        'rose' => 'text-rose-600 dark:text-rose-400',
-        default => 'text-indigo-600 dark:text-indigo-400',
-    };
-    $accentBg = match ($accentColor) {
-        'zinc' => 'bg-zinc-700',
-        'emerald' => 'bg-emerald-600',
-        'sky' => 'bg-sky-500',
-        'amber' => 'bg-amber-500',
-        'rose' => 'bg-rose-500',
-        default => 'bg-indigo-600',
-    };
-
-    $userName = auth()->user()->name ?? 'Pengguna MiniOS';
-    $userEmail = auth()->user()->email ?? 'user@minios.local';
-    $hostOs = PHP_OS_FAMILY . ' (' . php_uname('m') . ')';
-    $phpVersion = PHP_VERSION;
-    $laravelVersion = app()->version();
-    $dbConnection = config('database.default', 'sqlite');
-
-    $copySpecs = "MiniOS Web Desktop (Windows 11 Fluent Edition)\n"
-        . "Versi: 1.0 (Build 2026.10)\n"
-        . "Pengguna: {$userName}\n"
-        . "Host OS: {$hostOs}\n"
-        . "Runtime: PHP {$phpVersion} (" . php_sapi_name() . ")\n"
-        . "Framework: Laravel v{$laravelVersion} & Livewire 4\n"
-        . "UI: Flux UI 2 & Tailwind CSS\n"
-        . "Database: {$dbConnection}";
-@endphp
-
 <div
     x-data="{
-        tab: 'specs',
+        tab: @entangle('activeTab'),
         copied: false,
         copySpecs() {
             if (navigator.clipboard) {
-                navigator.clipboard.writeText(@js($copySpecs)).then(() => {
+                navigator.clipboard.writeText(@js($this->copySpecsText)).then(() => {
                     this.copied = true;
                     setTimeout(() => { this.copied = false; }, 2200);
                 });
@@ -65,16 +21,16 @@
             {{-- Ambient Glow --}}
             <div
                 class="pointer-events-none absolute -right-6 -top-6 size-28 rounded-full blur-2xl opacity-20 dark:opacity-30"
-                style="background-color: var(--accent-color, {{ $accentHex }});"
+                style="background-color: var(--accent-color, {{ $accent['hex'] }});"
             ></div>
 
             <div class="flex items-center gap-4">
                 {{-- MiniOS Logo with Accent Ring --}}
                 <div class="relative flex size-14 sm:size-16 shrink-0 items-center justify-center rounded-2xl bg-white dark:bg-[#1a1a1a] p-2 shadow-md border border-neutral-200/70 dark:border-white/10">
-                    <img src="{{ asset('minios/images/logo.png') }}" alt="MiniOS Logo" class="size-full object-contain drop-shadow" />
+                    <img src="{{ asset('minios/images/logo.png') }}" alt="MiniOS Logo" class="size-full object-contain drop-shadow" onerror="this.src='/minios/images/logo.png'" />
                     <span
                         class="absolute -bottom-1 -right-1 flex size-4 items-center justify-center rounded-full text-white text-[9px] shadow-2xs"
-                        style="background-color: var(--accent-color, {{ $accentHex }});"
+                        style="background-color: var(--accent-color, {{ $accent['hex'] }});"
                     >
                         <flux:icon name="check" class="size-2.5" />
                     </span>
@@ -87,14 +43,14 @@
                             MiniOS
                         </h2>
                         <span class="inline-flex items-center rounded-full bg-neutral-200/80 dark:bg-white/10 px-2 py-0.5 text-[10px] font-semibold text-neutral-700 dark:text-neutral-300">
-                            Fluent Edition
+                            {{ $this->trans('edition') }}
                         </span>
                     </div>
-                    <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5 font-medium">
-                        Sistem Operasi Web Desktop Modern
+                    <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5 font-medium truncate">
+                        {{ $this->trans('tagline') }}
                     </p>
                     <p class="text-[11px] text-neutral-400 dark:text-neutral-500 mt-0.5">
-                        Versi 1.0 • Build 2026.10
+                        Versi {{ $this->miniosVersion }} • {{ $this->buildNumber }}
                     </p>
                 </div>
             </div>
@@ -106,6 +62,7 @@
         <div class="flex rounded-xl bg-neutral-200/70 dark:bg-white/5 p-1 text-xs font-medium border border-neutral-200/60 dark:border-white/5">
             <button
                 type="button"
+                wire:click="setTab('specs')"
                 @click="tab = 'specs'"
                 :class="tab === 'specs'
                     ? 'bg-white dark:bg-[#2c2c2c] text-neutral-900 dark:text-white shadow-2xs font-semibold'
@@ -113,11 +70,12 @@
                 class="flex flex-1 items-center justify-center gap-1.5 rounded-lg py-1.5 transition-all"
             >
                 <flux:icon name="cpu-chip" class="size-3.5" />
-                <span>Spesifikasi</span>
+                <span>{{ $this->trans('tab_specs') }}</span>
             </button>
 
             <button
                 type="button"
+                wire:click="setTab('about')"
                 @click="tab = 'about'"
                 :class="tab === 'about'
                     ? 'bg-white dark:bg-[#2c2c2c] text-neutral-900 dark:text-white shadow-2xs font-semibold'
@@ -125,67 +83,94 @@
                 class="flex flex-1 items-center justify-center gap-1.5 rounded-lg py-1.5 transition-all"
             >
                 <flux:icon name="information-circle" class="size-3.5" />
-                <span>Lisensi &amp; Info</span>
+                <span>{{ $this->trans('tab_about') }}</span>
             </button>
         </div>
 
         {{-- ========================================================= --}}
-        {{-- TAB CONTENT 1: SPESIFIKASI SISTEM                         --}}
+        {{-- TAB CONTENT 1: SPESIFIKASI SISTEM (SPECS)                 --}}
         {{-- ========================================================= --}}
         <div x-show="tab === 'specs'" class="space-y-3">
             <div class="overflow-hidden rounded-xl border border-neutral-200/80 dark:border-white/10 bg-white/90 dark:bg-white/5 shadow-2xs divide-y divide-neutral-100 dark:divide-white/5 text-xs">
+                {{-- Device Name --}}
+                <div class="flex items-center justify-between px-3.5 py-2.5">
+                    <span class="flex items-center gap-2 text-neutral-500 dark:text-neutral-400 font-medium">
+                        <flux:icon name="computer-desktop" class="size-3.5 text-neutral-400 shrink-0" />
+                        <span>{{ $this->trans('device_name') }}</span>
+                    </span>
+                    <span class="font-semibold text-neutral-800 dark:text-neutral-200 text-[11px] font-mono">{{ $this->hostname }}</span>
+                </div>
+
+                {{-- Processor --}}
+                <div class="flex items-center justify-between px-3.5 py-2.5">
+                    <span class="flex items-center gap-2 text-neutral-500 dark:text-neutral-400 font-medium">
+                        <flux:icon name="cpu-chip" class="size-3.5 text-neutral-400 shrink-0" />
+                        <span>{{ $this->trans('processor') }}</span>
+                    </span>
+                    <span class="font-semibold text-neutral-800 dark:text-neutral-200 text-right truncate max-w-[200px] sm:max-w-xs" title="{{ $this->processor }}">{{ $this->processor }}</span>
+                </div>
+
+                {{-- Installed RAM --}}
+                <div class="flex items-center justify-between px-3.5 py-2.5">
+                    <span class="flex items-center gap-2 text-neutral-500 dark:text-neutral-400 font-medium">
+                        <flux:icon name="chart-bar-square" class="size-3.5 text-neutral-400 shrink-0" />
+                        <span>{{ $this->trans('memory') }}</span>
+                    </span>
+                    <span class="font-semibold text-neutral-800 dark:text-neutral-200">{{ $this->installedRam }}</span>
+                </div>
+
                 {{-- Host OS --}}
                 <div class="flex items-center justify-between px-3.5 py-2.5">
                     <span class="flex items-center gap-2 text-neutral-500 dark:text-neutral-400 font-medium">
-                        <flux:icon name="server" class="size-3.5 text-neutral-400" />
-                        <span>Sistem Host</span>
+                        <flux:icon name="server" class="size-3.5 text-neutral-400 shrink-0" />
+                        <span>{{ $this->trans('host_system') }}</span>
                     </span>
-                    <span class="font-semibold text-neutral-800 dark:text-neutral-200 text-[11px]">{{ $hostOs }}</span>
+                    <span class="font-semibold text-neutral-800 dark:text-neutral-200 text-[11px]">{{ $this->hostOs }}</span>
                 </div>
 
                 {{-- User --}}
                 <div class="flex items-center justify-between px-3.5 py-2.5">
                     <span class="flex items-center gap-2 text-neutral-500 dark:text-neutral-400 font-medium">
-                        <flux:icon name="user" class="size-3.5 text-neutral-400" />
-                        <span>Pengguna</span>
+                        <flux:icon name="user" class="size-3.5 text-neutral-400 shrink-0" />
+                        <span>{{ $this->trans('user') }}</span>
                     </span>
-                    <span class="font-semibold text-neutral-800 dark:text-neutral-200">{{ $userName }}</span>
+                    <span class="font-semibold text-neutral-800 dark:text-neutral-200">{{ $this->userName }}</span>
                 </div>
 
                 {{-- Framework --}}
                 <div class="flex items-center justify-between px-3.5 py-2.5">
                     <span class="flex items-center gap-2 text-neutral-500 dark:text-neutral-400 font-medium">
-                        <flux:icon name="cube" class="size-3.5 text-neutral-400" />
-                        <span>Kerangka Kerja</span>
+                        <flux:icon name="cube" class="size-3.5 text-neutral-400 shrink-0" />
+                        <span>{{ $this->trans('framework') }}</span>
                     </span>
-                    <span class="font-semibold text-neutral-800 dark:text-neutral-200">Laravel v{{ $laravelVersion }} &amp; Livewire 4</span>
+                    <span class="font-semibold text-neutral-800 dark:text-neutral-200">Laravel {{ $this->laravelVersion }} &amp; Livewire {{ $this->livewireVersion }}</span>
                 </div>
 
                 {{-- UI Components --}}
                 <div class="flex items-center justify-between px-3.5 py-2.5">
                     <span class="flex items-center gap-2 text-neutral-500 dark:text-neutral-400 font-medium">
-                        <flux:icon name="squares-plus" class="size-3.5 text-neutral-400" />
-                        <span>Komponen UI</span>
+                        <flux:icon name="squares-plus" class="size-3.5 text-neutral-400 shrink-0" />
+                        <span>{{ $this->trans('ui_components') }}</span>
                     </span>
-                    <span class="font-semibold text-neutral-800 dark:text-neutral-200">Flux UI 2 &amp; Tailwind CSS</span>
+                    <span class="font-semibold text-neutral-800 dark:text-neutral-200">Flux UI {{ $this->fluxVersion }} &amp; Tailwind CSS</span>
                 </div>
 
                 {{-- PHP Runtime --}}
                 <div class="flex items-center justify-between px-3.5 py-2.5">
                     <span class="flex items-center gap-2 text-neutral-500 dark:text-neutral-400 font-medium">
-                        <flux:icon name="code-bracket" class="size-3.5 text-neutral-400" />
-                        <span>Runtime Mesin</span>
+                        <flux:icon name="code-bracket" class="size-3.5 text-neutral-400 shrink-0" />
+                        <span>{{ $this->trans('runtime') }}</span>
                     </span>
-                    <span class="font-semibold text-neutral-800 dark:text-neutral-200">PHP {{ $phpVersion }}</span>
+                    <span class="font-semibold text-neutral-800 dark:text-neutral-200">PHP {{ $this->phpVersion }} ({{ $this->phpSapi }})</span>
                 </div>
 
                 {{-- Database Engine --}}
                 <div class="flex items-center justify-between px-3.5 py-2.5">
                     <span class="flex items-center gap-2 text-neutral-500 dark:text-neutral-400 font-medium">
-                        <flux:icon name="circle-stack" class="size-3.5 text-neutral-400" />
-                        <span>Basis Data</span>
+                        <flux:icon name="circle-stack" class="size-3.5 text-neutral-400 shrink-0" />
+                        <span>{{ $this->trans('database') }}</span>
                     </span>
-                    <span class="font-semibold text-neutral-800 dark:text-neutral-200 uppercase text-[11px]">{{ $dbConnection }}</span>
+                    <span class="font-semibold text-neutral-800 dark:text-neutral-200 uppercase text-[11px]">{{ $this->dbConnection }}</span>
                 </div>
             </div>
         </div>
@@ -198,8 +183,8 @@
                 {{-- Author / Creator --}}
                 <div class="flex items-center justify-between px-3.5 py-2.5">
                     <span class="flex items-center gap-2 text-neutral-500 dark:text-neutral-400 font-medium">
-                        <flux:icon name="user-circle" class="size-3.5 text-neutral-400" />
-                        <span>Pengembang</span>
+                        <flux:icon name="user-circle" class="size-3.5 text-neutral-400 shrink-0" />
+                        <span>{{ $this->trans('author') }}</span>
                     </span>
                     <span class="font-semibold text-neutral-800 dark:text-neutral-200">Enter(wind) / Novay</span>
                 </div>
@@ -207,8 +192,8 @@
                 {{-- License --}}
                 <div class="flex items-center justify-between px-3.5 py-2.5">
                     <span class="flex items-center gap-2 text-neutral-500 dark:text-neutral-400 font-medium">
-                        <flux:icon name="shield-check" class="size-3.5 text-neutral-400" />
-                        <span>Lisensi Perangkat</span>
+                        <flux:icon name="shield-check" class="size-3.5 text-neutral-400 shrink-0" />
+                        <span>{{ $this->trans('license') }}</span>
                     </span>
                     <span class="font-semibold text-neutral-800 dark:text-neutral-200">MIT Open Source</span>
                 </div>
@@ -216,8 +201,8 @@
                 {{-- UI Inspiration --}}
                 <div class="flex items-center justify-between px-3.5 py-2.5">
                     <span class="flex items-center gap-2 text-neutral-500 dark:text-neutral-400 font-medium">
-                        <flux:icon name="sparkles" class="size-3.5 text-neutral-400" />
-                        <span>Desain UI</span>
+                        <flux:icon name="sparkles" class="size-3.5 text-neutral-400 shrink-0" />
+                        <span>{{ $this->trans('ui_design') }}</span>
                     </span>
                     <span class="font-semibold text-neutral-800 dark:text-neutral-200">Windows 11 Fluent Design</span>
                 </div>
@@ -225,8 +210,8 @@
                 {{-- Ecosystem --}}
                 <div class="flex items-center justify-between px-3.5 py-2.5">
                     <span class="flex items-center gap-2 text-neutral-500 dark:text-neutral-400 font-medium">
-                        <flux:icon name="globe-alt" class="size-3.5 text-neutral-400" />
-                        <span>Ekosistem</span>
+                        <flux:icon name="globe-alt" class="size-3.5 text-neutral-400 shrink-0" />
+                        <span>{{ $this->trans('ecosystem') }}</span>
                     </span>
                     <span class="font-semibold text-neutral-800 dark:text-neutral-200">Laravel Web Desktop</span>
                 </div>
@@ -248,13 +233,13 @@
                 <template x-if="!copied">
                     <span class="flex items-center gap-1.5">
                         <flux:icon name="clipboard-document" class="size-3.5 text-neutral-500" />
-                        <span>Salin Spesifikasi</span>
+                        <span>{{ $this->trans('copy_specs') }}</span>
                     </span>
                 </template>
                 <template x-if="copied">
                     <span class="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-semibold">
                         <flux:icon name="check" class="size-3.5" />
-                        <span>Tersalin ke Clipboard!</span>
+                        <span>{{ $this->trans('copied') }}</span>
                     </span>
                 </template>
             </button>
@@ -267,7 +252,7 @@
                 title="Buka Pengaturan Sistem"
             >
                 <flux:icon name="cog-6-tooth" class="size-3.5 text-neutral-500" />
-                <span class="hidden sm:inline">Pengaturan</span>
+                <span class="hidden sm:inline">{{ $this->trans('settings') }}</span>
             </button>
 
             {{-- Close Button --}}
@@ -275,9 +260,9 @@
                 type="button"
                 @click="closeWindow('about')"
                 class="flex items-center justify-center rounded-lg px-3.5 py-2 text-xs font-medium text-white shadow-2xs active:scale-98 transition-all"
-                style="background-color: var(--accent-color, {{ $accentHex }});"
+                style="background-color: var(--accent-color, {{ $accent['hex'] }});"
             >
-                Tutup
+                {{ $this->trans('close') }}
             </button>
         </div>
 
