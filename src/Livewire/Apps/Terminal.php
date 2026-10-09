@@ -5,9 +5,12 @@ namespace Novay\MiniOS\Livewire\Apps;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
+use Novay\MiniOS\Concerns\HasTranslations;
 
 class Terminal extends Component
 {
+    use HasTranslations;
+
     public array $history = [];
 
     public string $command = '';
@@ -18,7 +21,7 @@ class Terminal extends Component
     {
         $this->history[] = [
             'type' => 'welcome',
-            'output' => "MiniOS CLI Shell v2.0 (x86_64-apple-darwin)\nKetik 'help' atau 'minios' untuk bantuan perintah.\n",
+            'output' => $this->trans('welcome'),
         ];
     }
 
@@ -50,16 +53,7 @@ class Terminal extends Component
             case 'help':
                 $this->history[] = [
                     'type' => 'output',
-                    'output' => "Perintah MiniOS Terminal yang tersedia:\n".
-                        "  minios      Tampilkan informasi spesifikasi sistem MiniOS\n".
-                        "  whoami        Tampilkan nama pengguna aktif\n".
-                        "  uname         Tampilkan versi sistem dan kernel\n".
-                        "  pwd           Tampilkan direktori kerja saat ini\n".
-                        "  date          Tampilkan tanggal dan waktu sistem saat ini\n".
-                        "  ls            Tampilkan isi file & folder dalam direktori storage\n".
-                        "  artisan       Jalankan perintah Artisan (contoh: artisan inspire, artisan about)\n".
-                        "  echo [teks]   Cetak teks ke layar\n".
-                        "  clear         Bersihkan layar terminal\n",
+                    'output' => $this->trans('help_output'),
                 ];
                 break;
 
@@ -103,7 +97,7 @@ class Terminal extends Component
                 if (! Auth::check()) {
                     $this->history[] = [
                         'type' => 'error',
-                        'output' => "ls: Permission denied (Guest user). Silakan login terlebih dahulu ke MiniOS.\n",
+                        'output' => $this->trans('permission_denied'),
                     ];
                     break;
                 }
@@ -124,7 +118,7 @@ class Terminal extends Component
                 } else {
                     $this->history[] = [
                         'type' => 'error',
-                        'output' => "ls: {$path}: Direktori tidak ditemukan\n",
+                        'output' => $this->trans('dir_not_found', ['path' => $path]),
                     ];
                 }
                 break;
@@ -166,7 +160,7 @@ ASCII;
                 if (! in_array($baseArtisan, $allowed)) {
                     $this->history[] = [
                         'type' => 'error',
-                        'output' => "MiniOS Security: Perintah 'artisan {$baseArtisan}' dibatasi di Terminal Web. Perintah yang diizinkan: ".implode(', ', $allowed)."\n",
+                        'output' => $this->trans('artisan_restricted', ['cmd' => $baseArtisan, 'allowed' => implode(', ', $allowed)]),
                     ];
                 } else {
                     try {
@@ -179,7 +173,7 @@ ASCII;
                     } catch (\Exception $e) {
                         $this->history[] = [
                             'type' => 'error',
-                            'output' => 'Gagal menjalankan artisan: '.$e->getMessage()."\n",
+                            'output' => $this->trans('artisan_failed', ['error' => $e->getMessage()]),
                         ];
                     }
                 }
@@ -250,7 +244,7 @@ MATRIX;
             default:
                 $this->history[] = [
                     'type' => 'error',
-                    'output' => "command not found: {$input}. Ketik 'help' untuk daftar perintah.\n",
+                    'output' => $this->trans('command_not_found', ['cmd' => $input]),
                 ];
                 break;
         }

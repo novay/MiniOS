@@ -5,9 +5,12 @@ namespace Novay\MiniOS\Livewire\Apps;
 use Composer\InstalledVersions;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
+use Novay\MiniOS\Concerns\HasTranslations;
 
 class ActivityMonitor extends Component
 {
+    use HasTranslations;
+
     public string $activeTab = 'processes';
 
     public string $searchProcess = '';
@@ -64,7 +67,7 @@ class ActivityMonitor extends Component
 
         // Virtual MiniOS process (PID 101 - 107)
         if ($targetPid >= 101 && $targetPid <= 107) {
-            $this->feedbackMessage = "Layanan virtual MiniOS (PID {$targetPid}) telah direfresh.";
+            $this->feedbackMessage = $this->trans('msg_virtual_refreshed', ['pid' => $targetPid]);
             $this->feedbackType = 'success';
             if ($this->selectedPid === $targetPid) {
                 $this->selectedPid = null;
@@ -78,22 +81,22 @@ class ActivityMonitor extends Component
             try {
                 $res = @posix_kill($targetPid, 15);
                 if ($res) {
-                    $this->feedbackMessage = "Proses PID {$targetPid} berhasil dikirim sinyal penghentian (SIGTERM).";
+                    $this->feedbackMessage = $this->trans('msg_kill_success', ['pid' => $targetPid]);
                     $this->feedbackType = 'success';
                 } else {
-                    $this->feedbackMessage = "Gagal menghentikan proses PID {$targetPid}: Izin ditolak atau proses dilindungi sistem.";
+                    $this->feedbackMessage = $this->trans('msg_kill_denied', ['pid' => $targetPid]);
                     $this->feedbackType = 'error';
                 }
             } catch (\Throwable $e) {
-                $this->feedbackMessage = 'Gagal menghentikan proses: '.$e->getMessage();
+                $this->feedbackMessage = $this->trans('msg_kill_error', ['error' => $e->getMessage()]);
                 $this->feedbackType = 'error';
             }
         } elseif ($this->isShellSupported) {
             @shell_exec('kill '.(int) $targetPid.' 2>&1');
-            $this->feedbackMessage = "Sinyal terminasi untuk PID {$targetPid} telah dikirim ke sistem.";
+            $this->feedbackMessage = $this->trans('msg_kill_sent', ['pid' => $targetPid]);
             $this->feedbackType = 'info';
         } else {
-            $this->feedbackMessage = 'Lingkungan server membatasi eksekusi perintah penghentian proses.';
+            $this->feedbackMessage = $this->trans('msg_shell_restricted');
             $this->feedbackType = 'warning';
         }
 

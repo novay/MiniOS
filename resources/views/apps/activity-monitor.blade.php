@@ -10,8 +10,8 @@
                 <flux:icon name="chart-bar" class="size-4" />
             </div>
             <div class="min-w-0 flex-1">
-                <h2 class="text-xs font-bold tracking-tight text-neutral-900 dark:text-white truncate">Task Manager</h2>
-                <p class="text-[10px] text-neutral-500 dark:text-neutral-400 truncate">Pengelola Tugas MiniOS</p>
+                <h2 class="text-xs font-bold tracking-tight text-neutral-900 dark:text-white truncate">{{ $this->t('app_title') }}</h2>
+                <p class="text-[10px] text-neutral-500 dark:text-neutral-400 truncate">{{ $this->t('app_subtitle') }}</p>
             </div>
         </div>
 
@@ -31,7 +31,7 @@
                     <flux:icon name="squares-2x2" class="size-4" />
                 </div>
                 <div class="min-w-0 flex-1">
-                    <span class="block truncate">Proses</span>
+                    <span class="block truncate">{{ $this->t('tab_processes') }}</span>
                 </div>
             </button>
 
@@ -49,7 +49,7 @@
                     <flux:icon name="presentation-chart-line" class="size-4" />
                 </div>
                 <div class="min-w-0 flex-1">
-                    <span class="block truncate">Performa</span>
+                    <span class="block truncate">{{ $this->t('tab_performance') }}</span>
                 </div>
             </button>
 
@@ -67,7 +67,7 @@
                     <flux:icon name="server" class="size-4" />
                 </div>
                 <div class="min-w-0 flex-1">
-                    <span class="block truncate">Penyimpanan</span>
+                    <span class="block truncate">{{ $this->t('tab_disk') }}</span>
                 </div>
             </button>
 
@@ -85,7 +85,7 @@
                     <flux:icon name="information-circle" class="size-4" />
                 </div>
                 <div class="min-w-0 flex-1">
-                    <span class="block truncate">Detail Sistem</span>
+                    <span class="block truncate">{{ $this->t('tab_system') }}</span>
                 </div>
             </button>
         </nav>
@@ -93,15 +93,15 @@
         {{-- Bottom Telemetry Widget --}}
         <div class="mt-auto rounded-xl bg-white/70 dark:bg-white/5 border border-neutral-200/90 dark:border-white/5 p-3 space-y-2 shadow-2xs">
             <div class="flex items-center justify-between text-[11px]">
-                <span class="text-neutral-500 dark:text-neutral-400 font-medium">Status Sistem</span>
+                <span class="text-neutral-500 dark:text-neutral-400 font-medium">{{ $this->t('system_status') }}</span>
                 <span class="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-semibold text-[10px]">
                     <span class="size-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                    Normal
+                    {{ $this->t('normal') }}
                 </span>
             </div>
             <div class="space-y-1">
                 <div class="flex justify-between text-[10px] text-neutral-500">
-                    <span>Memori</span>
+                    <span>{{ $this->t('memory') }}</span>
                     <span>{{ $this->systemStats['memory_usage'] }}</span>
                 </div>
                 <div class="w-full bg-neutral-200/80 dark:bg-white/10 h-1 rounded-full overflow-hidden">
@@ -120,21 +120,21 @@
             <div>
                 {{-- Windows 11 Breadcrumb --}}
                 <div class="flex items-center gap-1.5 text-[11px] font-medium text-neutral-500 dark:text-neutral-400">
-                    <span>Task Manager</span>
+                    <span>{{ $this->t('app_title') }}</span>
                     <flux:icon name="chevron-right" class="size-2.5 text-neutral-400" />
                     <span class="text-neutral-700 dark:text-neutral-300 capitalize">
-                        @if ($activeTab === 'processes') Proses Aktif
-                        @elseif ($activeTab === 'performance' || $activeTab === 'cpu' || $activeTab === 'memory') Telemetri Performa
-                        @elseif ($activeTab === 'disk') Kapasitas Disk
-                        @else Spesifikasi Sistem
+                        @if ($activeTab === 'processes') {{ $this->t('crumb_processes') }}
+                        @elseif ($activeTab === 'performance' || $activeTab === 'cpu' || $activeTab === 'memory') {{ $this->t('crumb_performance') }}
+                        @elseif ($activeTab === 'disk') {{ $this->t('crumb_disk') }}
+                        @else {{ $this->t('crumb_system') }}
                         @endif
                     </span>
                 </div>
                 <h1 class="text-base font-bold tracking-tight text-neutral-900 dark:text-white mt-0.5">
-                    @if ($activeTab === 'processes') Proses &amp; Layanan
-                    @elseif ($activeTab === 'performance' || $activeTab === 'cpu' || $activeTab === 'memory') Grafik &amp; Telemetri Sistem
-                    @elseif ($activeTab === 'disk') Penggunaan Penyimpanan
-                    @else Informasi Kernel &amp; Lingkungan
+                    @if ($activeTab === 'processes') {{ $this->t('header_processes') }}
+                    @elseif ($activeTab === 'performance' || $activeTab === 'cpu' || $activeTab === 'memory') {{ $this->t('header_performance') }}
+                    @elseif ($activeTab === 'disk') {{ $this->t('header_disk') }}
+                    @else {{ $this->t('header_system') }}
                     @endif
                 </h1>
             </div>
@@ -150,7 +150,7 @@
                         <input
                             type="text"
                             wire:model.live.debounce.150ms="searchProcess"
-                            placeholder="Cari proses atau PID..."
+                            placeholder="{{ $this->t('search_processes_placeholder') }}"
                             class="w-full rounded-md border border-neutral-300/80 dark:border-white/10 bg-white dark:bg-[#202020] py-1 pl-8 pr-7 text-xs text-neutral-900 dark:text-white placeholder-neutral-400 shadow-2xs focus:outline-none focus:ring-2 {{ $accent['ring'] }}"
                         />
                         @if ($searchProcess !== '')
@@ -172,7 +172,7 @@
                             class="flex items-center gap-1.5 rounded-md bg-rose-600 hover:bg-rose-700 px-3 py-1 text-xs font-medium text-white shadow-2xs active:scale-98 transition-all"
                         >
                             <flux:icon name="x-circle" class="size-3.5" />
-                            <span>Akhiri Tugas</span>
+                            <span>{{ $this->t('end_task') }}</span>
                         </button>
                     @endif
                 @endif
@@ -181,7 +181,7 @@
                 <button
                     type="button"
                     wire:click="$refresh"
-                    title="Segarkan data"
+                    title="{{ $this->t('refresh') }}"
                     class="flex size-7 items-center justify-center rounded-md border border-neutral-300/80 dark:border-white/10 bg-white dark:bg-[#2b2b2b] text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-[#333] shadow-2xs transition-all"
                 >
                     <flux:icon name="arrow-path" class="size-3.5" />

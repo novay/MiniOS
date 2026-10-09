@@ -1,0 +1,10 @@
+{
+    "app_title": "Terminal",
+    "welcome": "MiniOS CLI Shell v2.0 (x86_64-apple-darwin)\nType 'help' or 'minios' for command assistance.\n",
+    "help_output": "Available MiniOS Terminal commands:\n  minios      Display MiniOS system specifications info\n  whoami        Display active username\n  uname         Display system and kernel version\n  pwd           Display current working directory\n  date          Display current system date and time\n  ls            List files & folders in storage directory\n  artisan       Execute Artisan commands (e.g. artisan inspire, artisan about)\n  echo [text]   Print text to the screen\n  clear         Clear the terminal screen\n",
+    "command_not_found": "command not found: :cmd. Type 'help' for command list.\n",
+    "permission_denied": "ls: Permission denied (Guest user). Please log in to MiniOS first.\n",
+    "dir_not_found": "ls: :path: Directory not found\n",
+    "artisan_restricted": "MiniOS Security: Command 'artisan :cmd' is restricted in Web Terminal. Allowed commands: :allowed\n",
+    "artisan_failed": "Failed to execute artisan: :error\n"
+}
