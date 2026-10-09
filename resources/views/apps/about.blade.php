@@ -186,7 +186,7 @@
                         <flux:icon name="user-circle" class="size-3.5 text-neutral-400 shrink-0" />
                         <span>{{ $this->trans('author') }}</span>
                     </span>
-                    <span class="font-semibold text-neutral-800 dark:text-neutral-200">Enter(wind) / Novay</span>
+                    <span class="font-semibold text-neutral-800 dark:text-neutral-200">Novianto Rahmadi (novay@btekno.id)</span>
                 </div>
 
                 {{-- License --}}
