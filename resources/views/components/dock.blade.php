@@ -50,22 +50,33 @@
         >
             {{-- SHOW APPLICATIONS (Windows 11 Start Menu Button) --}}
             <div
-                class="flex"
-                :class="{
-                    'order-first': (settings?.dock?.position ?? 'bottom') === 'bottom',
-                    'order-last mt-auto': (settings?.dock?.position ?? 'bottom') !== 'bottom',
-                }"
+                class="flex order-first"
             >
                 <x-minios.dock-item
-                    label="Start Menu"
+                    label="MiniOS"
                     @click.stop="toggleApplications()"
                 >
                     <x-minios.icon
-                        name="windows"
-                        class="text-[#0078d4]"
+                        name="minios"
                     />
                 </x-minios.dock-item>
             </div>
+
+            {{-- WINDOWS 11 TASKBAR SEPARATOR --}}
+            <div
+                class="shrink-0 select-none rounded-full transition-all duration-150 order-first"
+                :class="{
+                    'mx-1 w-px bg-neutral-400/40 dark:bg-white/15 self-center': (settings?.dock?.position ?? 'bottom') === 'bottom',
+                    'my-1 h-px bg-neutral-400/40 dark:bg-white/15 self-center': (settings?.dock?.position ?? 'bottom') !== 'bottom',
+                    'h-5': (settings?.dock?.position ?? 'bottom') === 'bottom' && (settings?.dock?.size ?? 'medium') === 'small',
+                    'h-6': (settings?.dock?.position ?? 'bottom') === 'bottom' && (settings?.dock?.size ?? 'medium') === 'medium',
+                    'h-8': (settings?.dock?.position ?? 'bottom') === 'bottom' && (settings?.dock?.size ?? 'medium') === 'large',
+                    'w-5': (settings?.dock?.position ?? 'bottom') !== 'bottom' && (settings?.dock?.size ?? 'medium') === 'small',
+                    'w-6': (settings?.dock?.position ?? 'bottom') !== 'bottom' && (settings?.dock?.size ?? 'medium') === 'medium',
+                    'w-8': (settings?.dock?.position ?? 'bottom') !== 'bottom' && (settings?.dock?.size ?? 'medium') === 'large',
+                }"
+                aria-hidden="true"
+            ></div>
 
             {{-- DOCK APPLICATIONS (PINNED & RUNNING) --}}
             @foreach (config('desktop.applications') as $id => $application)

@@ -6,33 +6,12 @@
 @switch($name)
 
     @case('browser')
-        <svg {{ $attributes->merge(['class' => $class]) }} xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 190.5 190.5"><path d="M0 0h190.5v190.5H0z" fill="none"/><path fill="#fff" d="M95.252 142.873c26.304 0 47.627-21.324 47.627-47.628s-21.323-47.628-47.627-47.628s-47.627 21.324-47.627 47.628s21.323 47.628 47.627 47.628"/><path fill="#229342" d="m54.005 119.07l-41.24-71.43a95.23 95.23 0 0 0-.003 95.25a95.23 95.23 0 0 0 82.496 47.61l41.24-71.43v-.011a47.6 47.6 0 0 1-17.428 17.443a47.62 47.62 0 0 1-47.632.007a47.6 47.6 0 0 1-17.433-17.437z"/><path fill="#fbc116" d="m136.495 119.067l-41.239 71.43a95.23 95.23 0 0 0 82.489-47.622A95.24 95.24 0 0 0 190.5 95.248a95.24 95.24 0 0 0-12.772-47.623H95.249l-.01.007a47.6 47.6 0 0 1 23.819 6.372a47.6 47.6 0 0 1 17.439 17.431a47.62 47.62 0 0 1-.001 47.633z"/><path fill="#1a73e8" d="M95.252 132.961c20.824 0 37.705-16.881 37.705-37.706S116.076 57.55 95.252 57.55S57.547 74.431 57.547 95.255s16.881 37.706 37.705 37.706"/><path fill="#e33b2e" d="M95.252 47.628h82.479A95.24 95.24 0 0 0 142.87 12.76A95.23 95.23 0 0 0 95.245 0a95.2 95.2 0 0 0-47.623 12.767a95.23 95.23 0 0 0-34.856 34.872l41.24 71.43l.011.006a47.62 47.62 0 0 1-.015-47.633a47.61 47.61 0 0 1 41.252-23.815z"/></svg>
+        <img {{ $attributes->merge(['class' => $class]) }} src="https://demo.pixelcave.com/freebies/45-windows-11-tailwind/assets/icons/edge.png">
     @break
 
 
     @case('files')
-        <svg
-            {{ $attributes->merge(['class' => $class]) }}
-            viewBox="0 0 48 48"
-            fill="none"
-        >
-            <path
-                d="M7 14C7 11.8 8.8 10 11 10H20L24 14H37C39.2 14 41 15.8 41 18V35C41 37.2 39.2 39 37 39H11C8.8 39 7 37.2 7 35V14Z"
-                fill="#E9A14A"
-            />
-
-            <path
-                d="M7 18H41V35C41 37.2 39.2 39 37 39H11C8.8 39 7 37.2 7 35V18Z"
-                fill="#D97B29"
-            />
-
-            <path
-                d="M10 21H38"
-                stroke="white"
-                stroke-opacity=".35"
-                stroke-width="2"
-            />
-        </svg>
+        <img {{ $attributes->merge(['class' => $class]) }} src="https://demo.pixelcave.com/freebies/45-windows-11-tailwind/assets/icons/folder.png">
     @break
 
     @case('calculator')
@@ -53,7 +32,6 @@
         <img src="{{ asset('minios/images/ic-settings.webp') }}" alt="" {{ $attributes->merge(['class' => $class]) }} />
     @break
 
-
     @case('control-panel')
         <div {{ $attributes->merge(['class' => $class . ' flex items-center justify-center rounded-2xl bg-gradient-to-br from-slate-800 via-sky-900 to-indigo-950 shadow-md text-white p-1 border border-white/15']) }}>
             <svg class="size-full p-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -72,6 +50,8 @@
     @case('minios')
     @case('logo')
         <img src="{{ asset('minios/images/logo.png') }}" alt="MiniOS" {{ $attributes->merge(['class' => $class]) }} />
+    @break
+
     @case('windows')
     @case('start')
         <svg

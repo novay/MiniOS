@@ -9,7 +9,7 @@
         top: ${contextMenu.y}px;
         display: ${contextMenu.open ? 'block' : 'none'};
     `"
-    class="fixed z-[9999] w-[210px] origin-top-left overflow-hidden rounded-xl border border-black/10 dark:border-white/10 bg-white/90 dark:bg-[#1e1e1e]/90 p-1.5 text-[13px] font-medium text-neutral-800 dark:text-neutral-200 shadow-2xl backdrop-blur-2xl select-none"
+    class="fixed z-[9999] w-[210px] origin-top-left overflow-hidden rounded-md border border-black/10 dark:border-white/10 bg-white/90 dark:bg-[#1e1e1e]/90 p-1.5 text-[13px] font-medium text-neutral-800 dark:text-neutral-200 shadow-2xl backdrop-blur-2xl select-none"
     x-transition:enter="transition ease-out duration-100"
     x-transition:enter-start="opacity-0 scale-95"
     x-transition:enter-end="opacity-100 scale-100"
@@ -23,7 +23,7 @@
     <template x-if="contextMenu.type === 'dock'">
         <div class="flex flex-col">
             {{-- App Title Header --}}
-            <div class="flex items-center justify-between px-2.5 py-1 text-[11px] font-semibold text-neutral-400 dark:text-neutral-500 border-b border-black/5 dark:border-white/5 mb-1">
+            <div class="flex items-center justify-between px-2 py-1 text-[11px] font-semibold text-neutral-400 dark:text-neutral-500">
                 <span class="truncate" x-text="applications[contextMenu.appId]?.name || contextMenu.appId"></span>
                 <span
                     x-show="isWindowRunning(contextMenu.appId)"
@@ -40,7 +40,7 @@
                         type="button"
                         x-show="isAppPinned(contextMenu.appId)"
                         @click="unpinApp(contextMenu.appId); closeContextMenu()"
-                        class="group flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-left transition-colors hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-500"
+                        class="group flex w-full items-center gap-2.5 rounded px-2.5 py-1.5 text-left transition-colors hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-500"
                     >
                         <flux:icon name="bookmark-slash" class="size-4 text-neutral-500 dark:text-neutral-400 group-hover:text-white" />
                         <span>Remove from Dock</span>
@@ -50,7 +50,7 @@
                         type="button"
                         x-show="!isAppPinned(contextMenu.appId)"
                         @click="pinApp(contextMenu.appId); closeContextMenu()"
-                        class="group flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-left transition-colors hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-500"
+                        class="group flex w-full items-center gap-2.5 rounded px-2.5 py-1.5 text-left transition-colors hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-500"
                     >
                         <flux:icon name="bookmark" class="size-4 text-neutral-500 dark:text-neutral-400 group-hover:text-white" />
                         <span>Pin to Dock</span>
@@ -62,7 +62,7 @@
                     <button
                         type="button"
                         @click="openApplication(contextMenu.appId); closeContextMenu()"
-                        class="group flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-left transition-colors hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-500"
+                        class="group flex w-full items-center gap-2.5 rounded px-2.5 py-1.5 text-left transition-colors hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-500"
                     >
                         <flux:icon name="eye" class="size-4 text-neutral-500 dark:text-neutral-400 group-hover:text-white" />
                         <span>Show</span>
@@ -72,7 +72,7 @@
                     <button
                         type="button"
                         @click="minimizeWindow(contextMenu.appId); closeContextMenu()"
-                        class="group flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-left transition-colors hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-500"
+                        class="group flex w-full items-center gap-2.5 rounded px-2.5 py-1.5 text-left transition-colors hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-500"
                     >
                         <flux:icon name="eye-slash" class="size-4 text-neutral-500 dark:text-neutral-400 group-hover:text-white" />
                         <span>Hide</span>
@@ -82,7 +82,7 @@
                     <button
                         type="button"
                         @click="closeWindow(contextMenu.appId); closeContextMenu()"
-                        class="group flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-left text-rose-600 dark:text-rose-400 transition-colors hover:bg-rose-600 hover:text-white dark:hover:bg-rose-600 dark:hover:text-white"
+                        class="group flex w-full items-center gap-2.5 rounded px-2.5 py-1.5 text-left text-rose-600 dark:text-rose-400 transition-colors hover:bg-rose-600 hover:text-white dark:hover:bg-rose-600 dark:hover:text-white"
                     >
                         <flux:icon name="power" class="size-4 text-rose-500 dark:text-rose-400 group-hover:text-white" />
                         <span>Quit</span>
@@ -97,7 +97,7 @@
                     <button
                         type="button"
                         @click="openApplication(contextMenu.appId); closeContextMenu()"
-                        class="group flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-left transition-colors hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-500"
+                        class="group flex w-full items-center gap-2.5 rounded px-2.5 py-1.5 text-left transition-colors hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-500"
                     >
                         <flux:icon name="arrow-top-right-on-square" class="size-4 text-neutral-500 dark:text-neutral-400 group-hover:text-white" />
                         <span>Open</span>
@@ -109,7 +109,7 @@
                     <button
                         type="button"
                         @click="unpinApp(contextMenu.appId); closeContextMenu()"
-                        class="group flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-left text-rose-600 dark:text-rose-400 transition-colors hover:bg-rose-600 hover:text-white dark:hover:bg-rose-600 dark:hover:text-white"
+                        class="group flex w-full items-center gap-2.5 rounded px-2.5 py-1.5 text-left text-rose-600 dark:text-rose-400 transition-colors hover:bg-rose-600 hover:text-white dark:hover:bg-rose-600 dark:hover:text-white"
                     >
                         <flux:icon name="bookmark-slash" class="size-4 text-rose-500 dark:text-rose-400 group-hover:text-white" />
                         <span>Remove from Dock</span>
@@ -139,7 +139,7 @@
                 type="button"
                 x-show="!isAppPinned(contextMenu.appId)"
                 @click="pinApp(contextMenu.appId); closeContextMenu()"
-                class="group flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-left transition-colors hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-500"
+                class="group flex w-full items-center gap-2.5 rounded px-2.5 py-1.5 text-left transition-colors hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-500"
             >
                 <flux:icon name="bookmark" class="size-4 text-neutral-500 dark:text-neutral-400 group-hover:text-white" />
                 <span>Pin to Dock</span>
@@ -149,7 +149,7 @@
                 type="button"
                 x-show="isAppPinned(contextMenu.appId)"
                 @click="unpinApp(contextMenu.appId); closeContextMenu()"
-                class="group flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-left transition-colors hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-500"
+                class="group flex w-full items-center gap-2.5 rounded px-2.5 py-1.5 text-left transition-colors hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-500"
             >
                 <flux:icon name="bookmark-slash" class="size-4 text-neutral-500 dark:text-neutral-400 group-hover:text-white" />
                 <span>Remove from Dock</span>
@@ -161,7 +161,7 @@
             <button
                 type="button"
                 @click="openApplication(contextMenu.appId); applicationsOpen = false; closeContextMenu()"
-                class="group flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-left transition-colors hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-500"
+                class="group flex w-full items-center gap-2.5 rounded px-2.5 py-1.5 text-left transition-colors hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-500"
             >
                 <flux:icon name="arrow-top-right-on-square" class="size-4 text-neutral-500 dark:text-neutral-400 group-hover:text-white" />
                 <span>Open</span>
@@ -174,23 +174,12 @@
     {{-- ========================================================= --}}
     <template x-if="!contextMenu.type || contextMenu.type === 'desktop'">
         <div class="flex flex-col">
-            {{-- Muat Ulang / Refresh --}}
-            <button
-                type="button"
-                @click="closeContextMenu(); window.location.reload()"
-                class="group flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-left transition-colors hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-500"
-            >
-                <flux:icon name="arrow-path" class="size-4 text-neutral-500 dark:text-neutral-400 group-hover:text-white" />
-                <span>Muat Ulang Desktop</span>
-            </button>
-
-            <div class="my-1 h-px bg-neutral-200/80 dark:bg-white/10"></div>
-
+            
             {{-- Ubah Wallpaper --}}
             <button
                 type="button"
                 @click="closeContextMenu(); openApplication('settings')"
-                class="group flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-left transition-colors hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-500"
+                class="group flex w-full items-center gap-2.5 rounded px-2.5 py-1.5 text-left transition-colors hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-500"
             >
                 <flux:icon name="photo" class="size-4 text-neutral-500 dark:text-neutral-400 group-hover:text-white" />
                 <span>Ubah Wallpaper...</span>
@@ -200,10 +189,22 @@
             <button
                 type="button"
                 @click="closeContextMenu(); openApplication('settings')"
-                class="group flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-left transition-colors hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-500"
+                class="group flex w-full items-center gap-2.5 rounded px-2.5 py-1.5 text-left transition-colors hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-500"
             >
                 <flux:icon name="cog-6-tooth" class="size-4 text-neutral-500 dark:text-neutral-400 group-hover:text-white" />
                 <span>Pengaturan Sistem...</span>
+            </button>
+
+            <div class="my-1 h-px bg-neutral-200/80 dark:bg-white/10"></div>
+
+            {{-- Muat Ulang / Refresh --}}
+            <button
+                type="button"
+                @click="closeContextMenu(); window.location.reload()"
+                class="group flex w-full items-center gap-2.5 rounded px-2.5 py-1.5 text-left transition-colors hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-500"
+            >
+                <flux:icon name="arrow-path" class="size-4 text-neutral-500 dark:text-neutral-400 group-hover:text-white" />
+                <span>Refresh</span>
             </button>
 
             <div class="my-1 h-px bg-neutral-200/80 dark:bg-white/10"></div>
@@ -212,7 +213,7 @@
             <button
                 type="button"
                 @click="closeContextMenu(); openApplication('terminal')"
-                class="group flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-left transition-colors hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-500"
+                class="group flex w-full items-center gap-2.5 rounded px-2.5 py-1.5 text-left transition-colors hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-500"
             >
                 <flux:icon name="command-line" class="size-4 text-neutral-500 dark:text-neutral-400 group-hover:text-white" />
                 <span>Buka Terminal</span>
@@ -222,7 +223,7 @@
             <button
                 type="button"
                 @click="closeContextMenu(); openApplication('files')"
-                class="group flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-left transition-colors hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-500"
+                class="group flex w-full items-center gap-2.5 rounded px-2.5 py-1.5 text-left transition-colors hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-500"
             >
                 <flux:icon name="folder" class="size-4 text-neutral-500 dark:text-neutral-400 group-hover:text-white" />
                 <span>Manajer Berkas</span>
@@ -234,7 +235,7 @@
             <button
                 type="button"
                 @click="closeContextMenu(); openApplication('about')"
-                class="group flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-left transition-colors hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-500"
+                class="group flex w-full items-center gap-2.5 rounded px-2.5 py-1.5 text-left transition-colors hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-500"
             >
                 <flux:icon name="information-circle" class="size-4 text-neutral-500 dark:text-neutral-400 group-hover:text-white" />
                 <span>Tentang MiniOS</span>
