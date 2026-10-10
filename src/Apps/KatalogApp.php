@@ -43,6 +43,11 @@ class KatalogApp implements DesktopApp
         return true;
     }
 
+    public function version(): string
+    {
+        return '1.0.0';
+    }
+
     public function component(): ?string
     {
         return class_exists(Katalog::class) ? Katalog::class : 'apps.katalog';

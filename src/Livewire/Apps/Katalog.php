@@ -59,6 +59,8 @@ class Katalog extends Component
 
     public string $composerOutput = '';
 
+    public string $themeCategory = 'all';
+
     public function toggleAppDetails(string $id): void
     {
         $this->expandedApp = ($this->expandedApp === $id) ? null : $id;
@@ -66,9 +68,165 @@ class Katalog extends Component
 
     public function setTab(string $tab): void
     {
-        if (in_array($tab, ['all', 'system', 'custom', 'catalog'], true)) {
+        if (in_array($tab, ['all', 'system', 'custom', 'catalog', 'explore', 'apps', 'themes', 'installed'], true)) {
             $this->activeTab = $tab;
         }
+    }
+
+    public function setThemeCategory(string $category): void
+    {
+        $this->themeCategory = $category;
+    }
+
+    public function getEffectiveNavProperty(): string
+    {
+        if (in_array($this->activeTab, ['explore', 'jelajah'], true)) {
+            return 'explore';
+        }
+
+        if (in_array($this->activeTab, ['catalog', 'apps', 'aplikasi'], true)) {
+            return 'apps';
+        }
+
+        if ($this->activeTab === 'themes') {
+            return 'themes';
+        }
+
+        return 'installed';
+    }
+
+    public function getTopChartsProperty(): array
+    {
+        $apps = $this->catalogApps;
+        $charts = [];
+        $rank = 1;
+
+        foreach ($apps as $app) {
+            $charts[] = [
+                'rank' => $rank++,
+                'id' => $app['id'],
+                'name' => $app['name'],
+                'category_label' => $app['category_label'] ?? 'Aplikasi',
+                'icon' => $app['icon'] ?? 'cube',
+                'rating' => $app['rating'] ?? 4.8,
+                'downloads' => $app['downloads'] ?? '1.5k',
+                'is_installed' => $app['is_installed'] ?? false,
+                'is_catalog' => true,
+            ];
+            if ($rank > 6) {
+                break;
+            }
+        }
+
+        return $charts;
+    }
+
+    public function getThemesProperty(): array
+    {
+        $themes = [
+            [
+                'id' => 'fluent-mica',
+                'name' => 'Fluent Mica Dark',
+                'category' => 'dark',
+                'category_label' => 'Dark Mode',
+                'author' => 'MiniOS Core',
+                'rating' => 4.9,
+                'downloads' => '4.2k',
+                'badge' => 'Default OS',
+                'badge_color' => 'indigo',
+                'description' => 'Tema gelap modern dengan material kaca Mica, bayangan halus, dan kontras tajam khas Windows 11.',
+                'preview_bg' => 'linear-gradient(135deg, #18181b 0%, #09090b 100%)',
+                'colors' => ['#6366f1', '#18181b', '#27272a', '#e4e4e7'],
+                'accent' => '#6366f1',
+                'is_active' => true,
+            ],
+            [
+                'id' => 'cyberpunk-neon',
+                'name' => 'Cyberpunk Neon 2077',
+                'category' => 'neon',
+                'category_label' => 'Neon & Vibrant',
+                'author' => 'NightCity Labs',
+                'rating' => 4.85,
+                'downloads' => '2.9k',
+                'badge' => 'Populer',
+                'badge_color' => 'fuchsia',
+                'description' => 'Aksen futuristik bernuansa neon cyan dan magenta elektrik dengan efek pencahayaan dinamis.',
+                'preview_bg' => 'linear-gradient(135deg, #090d16 0%, #1e1b4b 50%, #4c0519 100%)',
+                'colors' => ['#06b6d4', '#d946ef', '#0284c7', '#f43f5e'],
+                'accent' => '#06b6d4',
+                'is_active' => false,
+            ],
+            [
+                'id' => 'nordic-frost',
+                'name' => 'Nordic Frost',
+                'category' => 'minimalist',
+                'category_label' => 'Minimalis',
+                'author' => 'Arctic Studio',
+                'rating' => 4.95,
+                'downloads' => '2.1k',
+                'badge' => "Editor's Choice",
+                'badge_color' => 'sky',
+                'description' => 'Palet warna pastel es Skandinavia yang menenangkan mata, cocok untuk fokus dan koding maraton.',
+                'preview_bg' => 'linear-gradient(135deg, #2e3440 0%, #3b4252 50%, #434c5e 100%)',
+                'colors' => ['#88c0d0', '#81a1c1', '#5e81ac', '#eceff4'],
+                'accent' => '#88c0d0',
+                'is_active' => false,
+            ],
+            [
+                'id' => 'macos-sonoma',
+                'name' => 'macOS Sonoma Glass',
+                'category' => 'glass',
+                'category_label' => 'Aero Glass',
+                'author' => 'Cupertino Team',
+                'rating' => 4.75,
+                'downloads' => '3.5k',
+                'badge' => 'Tren',
+                'badge_color' => 'amber',
+                'description' => 'Estetika desktop aero blur ultra jernih dengan transisi halus dan dock minimalis elegan.',
+                'preview_bg' => 'linear-gradient(135deg, #f59e0b 0%, #ec4899 50%, #8b5cf6 100%)',
+                'colors' => ['#f59e0b', '#ec4899', '#8b5cf6', '#ffffff'],
+                'accent' => '#f59e0b',
+                'is_active' => false,
+            ],
+            [
+                'id' => 'tokyo-night',
+                'name' => 'Tokyo Night Storm',
+                'category' => 'dark',
+                'category_label' => 'Dark Mode',
+                'author' => 'Tokyo Devs',
+                'rating' => 4.88,
+                'downloads' => '2.7k',
+                'badge' => 'Pro Developer',
+                'badge_color' => 'blue',
+                'description' => 'Tema gelap terinspirasi lampu kota Tokyo saat malam hari, kontras seimbang untuk produktivitas.',
+                'preview_bg' => 'linear-gradient(135deg, #1a1b26 0%, #24283b 50%, #414868 100%)',
+                'colors' => ['#7aa2f7', '#bb9af7', '#7dcfff', '#c0caf5'],
+                'accent' => '#7aa2f7',
+                'is_active' => false,
+            ],
+            [
+                'id' => 'retro-95',
+                'name' => 'Classic Desktop 95',
+                'category' => 'retro',
+                'category_label' => 'Retro Classic',
+                'author' => 'Vintage Pixel',
+                'rating' => 4.6,
+                'downloads' => '1.4k',
+                'badge' => 'Nostalgia',
+                'badge_color' => 'emerald',
+                'description' => 'Desain nostalgic border beveled abu-abu klasik dan tombol timbul gaya sistem operasi era 90-an.',
+                'preview_bg' => 'linear-gradient(135deg, #008080 0%, #004d4d 100%)',
+                'colors' => ['#008080', '#c0c0c0', '#ffffff', '#000000'],
+                'accent' => '#008080',
+                'is_active' => false,
+            ],
+        ];
+
+        if ($this->themeCategory !== 'all') {
+            return array_values(array_filter($themes, fn ($t) => $t['category'] === $this->themeCategory));
+        }
+
+        return $themes;
     }
 
     public function setCatalogCategory(string $category): void
@@ -1145,6 +1303,9 @@ class Katalog extends Component
             'catalogApps' => $this->catalogApps,
             'stats' => $this->stats,
             'accent' => $this->accent,
+            'themes' => $this->themes,
+            'topCharts' => $this->topCharts,
+            'effectiveNav' => $this->effectiveNav,
         ]);
     }
 }
