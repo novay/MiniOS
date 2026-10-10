@@ -14,12 +14,16 @@
     } else {
         $stateClass = "text-neutral-700 dark:text-neutral-200 hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600 dark:hover:text-white ";
     }
+
+    $customClick = $attributes->get('@click') ?? $attributes->get('x-on:click');
+    $clickExpr = $customClick ? "closeMenu(); {$customClick}" : "closeMenu()";
+    $mergedAttributes = $attributes->except(['@click', 'x-on:click'])->merge(['class' => $baseClass . $stateClass]);
 @endphp
 
 @if ($attributes->has('href'))
     <a
-        {{ $attributes->merge(['class' => $baseClass . $stateClass]) }}
-        @click="closeMenu()"
+        {{ $mergedAttributes }}
+        @click="{{ $clickExpr }}"
     >
         <div class="flex items-center gap-2 truncate">
             @if ($icon)
@@ -38,8 +42,8 @@
 @else
     <button
         type="button"
-        {{ $attributes->merge(['class' => $baseClass . $stateClass]) }}
-        @if(!$disabled) @click="closeMenu()" @endif
+        {{ $mergedAttributes }}
+        @if(!$disabled) @click="{{ $clickExpr }}" @endif
         @if($disabled) disabled @endif
     >
         <div class="flex items-center gap-2 truncate">

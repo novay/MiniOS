@@ -10,7 +10,7 @@
                     {{ $this->t('btn_install_zip') }}
                 </x-minios.menubar.item>
                 <x-minios.menubar.separator />
-                <x-minios.menubar.item @click="$dispatch('close-window', { id: 'katalog' })" icon="x-mark" shortcut="⌘W">
+                <x-minios.menubar.item @click="$dispatch('close-window', { id: 'katalog' })" icon="x-mark" shortcut="⌥W">
                     {{ __('Tutup Jendela') }}
                 </x-minios.menubar.item>
             </x-minios.menubar.menu>
@@ -37,8 +37,11 @@
 
             {{-- Window --}}
             <x-minios.menubar.menu label="{{ __('Window') }}">
-                <x-minios.menubar.item wire:click="$refresh" icon="arrow-path" shortcut="⌘R">
+                <x-minios.menubar.item @click="refresh()" icon="arrow-path" shortcut="⌘R">
                     {{ __('Muat Ulang') }}
+                </x-minios.menubar.item>
+                <x-minios.menubar.item @click="window.location.reload()" icon="arrow-path" shortcut="⇧⌘R">
+                    {{ __('Muat Ulang Halaman') }}
                 </x-minios.menubar.item>
                 <x-minios.menubar.separator />
                 <x-minios.menubar.item @click="toggleStatusbar()" icon="chart-bar" shortcut="⌘P">
@@ -101,6 +104,38 @@
             </button>
         </div>
 
+        {{-- Search Input (Filter List Menu, hidden when sidebar is collapsed) --}}
+        <div
+            x-show="!sidebarCollapsed"
+            x-transition:enter="transition ease-out duration-150"
+            x-transition:enter-start="opacity-0 -translate-y-1"
+            x-transition:enter-end="opacity-100 translate-y-0"
+            class="mb-3 px-0.5"
+        >
+            <div class="relative flex items-center">
+                <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-2.5">
+                    <flux:icon name="magnifying-glass" class="size-4 text-neutral-400 dark:text-neutral-500" />
+                </div>
+                <input
+                    type="text"
+                    x-model="menuSearch"
+                    @keydown.escape.stop="menuSearch = ''"
+                    placeholder="{{ __('Cari menu...') }}"
+                    class="w-full rounded-xl border border-neutral-200/80 dark:border-white/10 bg-white/70 dark:bg-white/5 py-1.5 pl-8.5 pr-7 text-xs text-neutral-900 dark:text-neutral-100 placeholder-neutral-400 dark:placeholder-neutral-500 shadow-2xs transition-all focus:outline-none focus:ring-1 focus:ring-[var(--accent-color,#3b82f6)] focus:border-[var(--accent-color,#3b82f6)]"
+                />
+                <button
+                    type="button"
+                    x-cloak
+                    x-show="menuSearch.length > 0"
+                    @click="menuSearch = ''"
+                    class="absolute inset-y-0 right-0 flex items-center pr-2 text-neutral-400 hover:text-neutral-700 dark:hover:text-white"
+                    title="{{ __('Hapus pencarian') }}"
+                >
+                    <flux:icon name="x-mark" class="size-3.5" />
+                </button>
+            </div>
+        </div>
+
         {{-- Category Navigation List --}}
         <nav class="flex flex-1 flex-col gap-1 text-[13px] overflow-y-auto">
             @php
@@ -133,6 +168,7 @@
                 <button
                     type="button"
                     wire:click="setTab('{{ $navKey }}')"
+                    x-show="sidebarCollapsed || !menuSearch || {{ json_encode(strtolower($navItem['label'].' '.$navItem['desc'])) }}.includes(menuSearch.toLowerCase().trim())"
                     :title="sidebarCollapsed ? '{{ $navItem['label'] }}' : ''"
                     :class="sidebarCollapsed ? 'justify-center px-0 py-2.5' : 'px-3 py-2.5'"
                     class="group relative flex items-center gap-3 rounded-xl text-left font-medium transition-all {{ $isActive ? 'bg-white dark:bg-white/10 text-neutral-900 dark:text-white shadow-2xs' : 'text-neutral-600 dark:text-neutral-400 hover:bg-black/[0.04] dark:hover:bg-white/5 hover:text-neutral-900 dark:hover:text-white' }}"
@@ -153,7 +189,10 @@
             @endforeach
 
             {{-- Separator Section Label --}}
-            <div x-show="!sidebarCollapsed" class="px-2.5 pt-4 pb-1">
+            <div
+                x-show="!sidebarCollapsed && (!menuSearch || {{ json_encode(strtolower($this->t('header_installed_apps').' instalasi kelola')) }}.includes(menuSearch.toLowerCase().trim()))"
+                class="px-2.5 pt-4 pb-1"
+            >
                 <span class="text-[10px] font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">
                     {{ __('INSTALASI & KELOLA') }}
                 </span>
@@ -167,6 +206,7 @@
             <button
                 type="button"
                 wire:click="setTab('installed')"
+                x-show="sidebarCollapsed || !menuSearch || {{ json_encode(strtolower($this->t('header_installed_apps').' instalasi kelola')) }}.includes(menuSearch.toLowerCase().trim())"
                 :title="sidebarCollapsed ? '{{ $this->t('header_installed_apps') }}' : ''"
                 :class="sidebarCollapsed ? 'justify-center px-0 py-2.5' : 'px-3 py-2.5'"
                 class="group relative flex items-center gap-3 rounded-xl text-left font-medium transition-all {{ $isInstalledActive ? 'bg-white dark:bg-white/10 text-neutral-900 dark:text-white shadow-2xs' : 'text-neutral-600 dark:text-neutral-400 hover:bg-black/[0.04] dark:hover:bg-white/5 hover:text-neutral-900 dark:hover:text-white' }}"
@@ -182,6 +222,22 @@
                     <span class="truncate block text-xs {{ $isInstalledActive ? 'font-bold text-neutral-900 dark:text-white' : 'font-medium' }}">{{ $this->t('header_installed_apps') }}</span>
                 </div>
             </button>
+
+            {{-- Empty search state --}}
+            <div
+                x-cloak
+                x-show="!sidebarCollapsed && menuSearch && ![
+                    'jelajah', 'unggulan', 'tren', 'explore',
+                    'aplikasi', 'template', 'apps',
+                    'themes', 'tema', 'koleksi tema',
+                    'instalasi', 'kelola', 'terpasang', 'installed'
+                ].some(k => k.includes(menuSearch.toLowerCase().trim()))"
+                class="py-6 px-2 text-center text-xs text-neutral-400 dark:text-neutral-500"
+            >
+                <flux:icon name="magnifying-glass" class="mx-auto size-5 mb-1.5 text-neutral-300 dark:text-neutral-600" />
+                <span class="block font-medium">{{ __('Menu tidak ditemukan') }}</span>
+                <span class="block text-[11px] text-neutral-400 dark:text-neutral-500 mt-0.5">{{ __('Coba kata kunci lain') }}</span>
+            </div>
         </nav>
 
         {{-- Sidebar Footer Quick Action & Storage --}}

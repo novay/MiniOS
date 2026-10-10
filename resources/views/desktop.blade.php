@@ -20,6 +20,13 @@
         }
     "
 
+    @close-window.window="
+        const closeId = $event.detail?.id || $event.detail?.app || (typeof $event.detail === 'string' ? $event.detail : null);
+        if (closeId) {
+            closeWindow(closeId);
+        }
+    "
+
     @trash-updated.window="
         const c = $event.detail?.count ?? $event.detail?.[0]?.count ?? (typeof $event.detail === 'number' ? $event.detail : null);
         if (c !== null && c !== undefined) {

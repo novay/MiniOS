@@ -9,7 +9,6 @@
         <img src="{{ asset('minios/images/ic-safari.webp') }}" alt="" {{ $attributes->merge(['class' => $class]) }} />
     @break
 
-
     @case('files')
         <img src="{{ asset('minios/images/ic-files.webp') }}" alt="" {{ $attributes->merge(['class' => $class]) }} />
     @break
@@ -22,19 +21,16 @@
         <img src="{{ asset('minios/images/ic-monitor.webp') }}" alt="" {{ $attributes->merge(['class' => $class]) }} />
     @break
 
-
     @case('terminal')
         <img src="{{ asset('minios/images/ic-terminal.webp') }}" alt="" {{ $attributes->merge(['class' => $class]) }} />
     @break
 
-
     @case('settings')
-        <img src="{{ asset('minios/images/ic-settings.webp') }}" alt="" {{ $attributes->merge(['class' => $class]) }} />
+        <img src="{{ asset('minios/images/ic-cp.webp') }}" alt="" {{ $attributes->merge(['class' => $class]) }} />
     @break
 
     @case('katalog')
-    @case('control-panel')
-        <img src="{{ asset('minios/images/ic-cp.webp') }}" alt="" {{ $attributes->merge(['class' => $class]) }} />
+        <img src="{{ asset('minios/images/ic-katalog.webp') }}" alt="" {{ $attributes->merge(['class' => $class]) }} />
     @break 
 
     @case('preview')
@@ -42,7 +38,6 @@
     @break 
     
     @case('editor')
-    @case('textedit')
         <img src="{{ asset('minios/images/ic-editor.webp') }}" alt="" {{ $attributes->merge(['class' => $class]) }} />
     @break
 
@@ -54,8 +49,11 @@
         <img src="{{ asset('minios/images/ic-soundcloud.webp') }}" alt="" {{ $attributes->merge(['class' => $class]) }} />
     @break
 
-    @case('about')
     @case('minios')
+        <img src="{{ asset('minios/images/ic-launch.webp') }}" alt="" {{ $attributes->merge(['class' => $class]) }} />
+    @break
+
+    @case('about')
     @case('logo')
         <img src="{{ asset('minios/images/logo.png') }}" alt="MiniOS" {{ $attributes->merge(['class' => $class]) }} />
     @break

@@ -92,7 +92,7 @@ Semua komponen dapat dipanggil menggunakan format `<x-minios:desktop.*>` maupun 
                 <x-minios.menubar.item
                     @click="$dispatch('close-window', { id: 'katalog' })"
                     icon="x-mark"
-                    shortcut="⌘W"
+                    shortcut="⌥W"
                 >
                     {{ __('Tutup Jendela') }}
                 </x-minios.menubar.item>
@@ -112,11 +112,19 @@ Semua komponen dapat dipanggil menggunakan format `<x-minios:desktop.*>` maupun 
             {{-- Menu Window --}}
             <x-minios.menubar.menu label="{{ __('Window') }}">
                 <x-minios.menubar.item
-                    wire:click="$refresh"
+                    @click="refresh()"
                     icon="arrow-path"
                     shortcut="⌘R"
                 >
                     {{ __('Muat Ulang') }}
+                </x-minios.menubar.item>
+
+                <x-minios.menubar.item
+                    @click="window.location.reload()"
+                    icon="arrow-path"
+                    shortcut="⇧⌘R"
+                >
+                    {{ __('Muat Ulang Halaman') }}
                 </x-minios.menubar.item>
 
                 <x-minios.menubar.separator />
@@ -156,8 +164,23 @@ Semua komponen dapat dipanggil menggunakan format `<x-minios:desktop.*>` maupun 
                 <flux:icon name="bars-3-bottom-left" class="size-4" />
             </button>
         </div>
+
+        {{-- Input Search Menu (Sembunyikan saat collapsed) --}}
+        <div x-show="!sidebarCollapsed" class="mb-3">
+            <input
+                type="text"
+                x-model="menuSearch"
+                placeholder="Cari menu..."
+                class="w-full text-xs rounded-xl border border-neutral-200 dark:border-white/10 px-3 py-1.5 bg-white/70 dark:bg-white/5"
+            />
+        </div>
+
         <nav class="flex flex-1 flex-col gap-1">
-            <button type="button" class="flex items-center gap-2 p-2 rounded-xl text-xs">
+            <button
+                type="button"
+                x-show="sidebarCollapsed || !menuSearch || 'jelajah'.includes(menuSearch.toLowerCase())"
+                class="flex items-center gap-2 p-2 rounded-xl text-xs"
+            >
                 <flux:icon name="sparkles" class="size-4" />
                 <span x-show="!sidebarCollapsed">Jelajah</span>
             </button>
@@ -184,7 +207,7 @@ Semua komponen dapat dipanggil menggunakan format `<x-minios:desktop.*>` maupun 
 #### Ringkasan Standar Properti Menubar Item:
 | Menu | Aksi | Icon | Shortcut | Handler | Penjelasan |
 |---|---|---|---|---|---|
-| **File** | Tutup Jendela | `x-mark` | `⌘W` | `@click="$dispatch('close-window', { id: 'katalog' })"` | Otomatis ditangkap Window Manager MiniOS |
+| **File** | Tutup Jendela | `x-mark` | `⌘W` | `@click="closeWindow('katalog')"` | Menutup jendela aplikasi yang aktif |
 | **View** | Buka/Tutup Sidebar | `bars-3-bottom-left` | `⌘B` | `@click="toggleSidebar()"` | Memanggil fungsi Alpine bawaan `<x-minios:desktop>` |
 | **Window** | Muat Ulang | `arrow-path` | `⌘R` | `wire:click="$refresh"` | Me-refresh komponen Livewire tanpa reload browser |
 | **Window** | Disable/Enable Status Bar | `chart-bar` | `⌘P` | `@click="toggleStatusbar()"` | Mengontrol visibilitas `<x-minios:desktop.statusbar>` |

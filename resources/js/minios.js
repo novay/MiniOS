@@ -1384,13 +1384,12 @@ export default function minios(applications = {}, userSettings = {}) {
                     return;
                 }
 
-                // 2. Cmd+W / Ctrl+W to close active window
-                const isCmdOrCtrlW = (event.metaKey || event.ctrlKey)
-                    && !event.altKey
+                // 2. Cmd+W / Ctrl+W / Alt+W (Option+W) to close active window
+                const isCloseWindowShortcut = (event.metaKey || event.ctrlKey || event.altKey)
                     && !event.shiftKey
-                    && (event.key === 'w' || event.key === 'W');
+                    && (event.key === 'w' || event.key === 'W' || event.code === 'KeyW');
 
-                if (!isCmdOrCtrlW) {
+                if (!isCloseWindowShortcut) {
                     return;
                 }
 
@@ -3348,12 +3347,20 @@ export default function minios(applications = {}, userSettings = {}) {
         toggleFullscreen() {
             if (!document.fullscreenElement) {
                 if (document.documentElement.requestFullscreen) {
-                    document.documentElement.requestFullscreen().catch(() => {});
+                    document.documentElement.requestFullscreen().then(() => {
+                        if (navigator.keyboard?.lock) {
+                            navigator.keyboard.lock(['KeyW']).catch(() => {});
+                        }
+                    }).catch(() => {});
                 }
                 this.isFullscreen = true;
             } else {
                 if (document.exitFullscreen) {
-                    document.exitFullscreen().catch(() => {});
+                    document.exitFullscreen().then(() => {
+                        if (navigator.keyboard?.unlock) {
+                            navigator.keyboard.unlock();
+                        }
+                    }).catch(() => {});
                     this.isFullscreen = false;
                 }
             }

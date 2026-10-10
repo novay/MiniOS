@@ -5,7 +5,7 @@
 
 <div
     style="grid-area: sidebar;"
-    class="relative flex h-full shrink-0 min-h-0 select-none overflow-hidden"
+    class="relative z-10 flex h-full shrink-0 min-h-0 select-none"
 >
     <aside
         :class="[
@@ -23,13 +23,14 @@
     @if ($resizable)
         {{-- Draggable Resizer Divider Handle (Sleek 1px line, zero layout shift) --}}
         <div
-            @mousedown.prevent="startResize($event)"
+            @pointerdown.prevent.stop="startSidebarResize($event)"
+            @mousedown.prevent.stop="startSidebarResize($event)"
             @dblclick="toggleSidebar()"
-            class="group relative w-px shrink-0 cursor-col-resize select-none bg-neutral-200/90 dark:bg-white/10 hover:bg-neutral-400 dark:hover:bg-neutral-500 active:bg-[var(--accent-color,{{ $accent['hex'] ?? '#3b82f6' }})] transition-colors z-20"
+            class="group relative z-20 w-px shrink-0 cursor-col-resize select-none bg-neutral-200/90 dark:bg-white/10 hover:bg-neutral-400 dark:hover:bg-neutral-500 active:bg-[var(--accent-color,#3b82f6)] transition-colors"
             :title="sidebarCollapsed ? '{{ __('Klik dua kali untuk membuka sidebar') }}' : '{{ __('Geser untuk mengatur lebar sidebar (klik 2x untuk toggle)') }}'"
         >
             {{-- Invisible expanded hit area for effortless grabbing --}}
-            <div class="absolute inset-y-0 -left-1.5 -right-1.5 cursor-col-resize"></div>
+            <div class="absolute inset-y-0 -left-2 -right-2 z-20 cursor-col-resize"></div>
         </div>
     @endif
 </div>

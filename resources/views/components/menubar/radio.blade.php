@@ -4,10 +4,16 @@
     'disabled' => false,
 ])
 
+@php
+    $customClick = $attributes->get('@click') ?? $attributes->get('x-on:click');
+    $clickExpr = $customClick ? "closeMenu(); {$customClick}" : "closeMenu()";
+    $mergedAttributes = $attributes->except(['@click', 'x-on:click'])->merge(['class' => 'group flex w-full items-center justify-between gap-3 px-2 py-1.5 rounded text-left transition-colors cursor-pointer select-none text-xs ' . ($disabled ? 'opacity-40 cursor-not-allowed pointer-events-none text-neutral-400 dark:text-neutral-500' : 'text-neutral-700 dark:text-neutral-200 hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600 dark:hover:text-white')]);
+@endphp
+
 <button
     type="button"
-    {{ $attributes->merge(['class' => 'group flex w-full items-center justify-between gap-3 px-2 py-1.5 rounded text-left transition-colors cursor-pointer select-none text-xs ' . ($disabled ? 'opacity-40 cursor-not-allowed pointer-events-none text-neutral-400 dark:text-neutral-500' : 'text-neutral-700 dark:text-neutral-200 hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600 dark:hover:text-white')]) }}
-    @if(!$disabled) @click="closeMenu()" @endif
+    {{ $mergedAttributes }}
+    @if(!$disabled) @click="{{ $clickExpr }}" @endif
     @if($disabled) disabled @endif
 >
     <div class="flex items-center gap-2 truncate">
@@ -26,3 +32,4 @@
         </span>
     @endif
 </button>
+

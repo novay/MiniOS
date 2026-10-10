@@ -173,7 +173,7 @@ Berikut adalah standar susunan menu aplikasi desktop yang direkomendasikan untuk
         <x-minios.menubar.item
             @click="$dispatch('close-window', { id: 'app-id' })"
             icon="x-mark"
-            shortcut="⌘W"
+            shortcut="⌥W"
         >
             {{ __('Tutup Jendela') }}
         </x-minios.menubar.item>
@@ -193,11 +193,19 @@ Berikut adalah standar susunan menu aplikasi desktop yang direkomendasikan untuk
     {{-- Menu Window --}}
     <x-minios.menubar.menu label="{{ __('Window') }}">
         <x-minios.menubar.item
-            wire:click="$refresh"
+            @click="refresh()"
             icon="arrow-path"
             shortcut="⌘R"
         >
             {{ __('Muat Ulang') }}
+        </x-minios.menubar.item>
+
+        <x-minios.menubar.item
+            @click="window.location.reload()"
+            icon="arrow-path"
+            shortcut="⇧⌘R"
+        >
+            {{ __('Muat Ulang Halaman') }}
         </x-minios.menubar.item>
 
         <x-minios.menubar.separator />
@@ -227,9 +235,10 @@ Berikut adalah standar susunan menu aplikasi desktop yang direkomendasikan untuk
 #### Ringkasan Penentuan Properti Menubar Item:
 | Menu | Aksi | Icon | Shortcut | Handler | Keterangan |
 |---|---|---|---|---|---|
-| **File** | Tutup Jendela | `x-mark` | `⌘W` | `@click="$dispatch('close-window', { id: 'app-id' })"` | Otomatis ditangkap MiniOS Window Manager |
+| **File** | Tutup Jendela | `x-mark` | `⌥W` | `@click="$dispatch('close-window', { id: 'app-id' })"` | Otomatis menutup jendela aktif (juga mendukung `⌘W` di mode Fullscreen/PWA) |
 | **View** | Buka/Tutup Sidebar | `bars-3-bottom-left` | `⌘B` | `@click="toggleSidebar()"` | Memanggil fungsi Alpine bawaan `<x-minios:desktop>` |
-| **Window** | Muat Ulang | `arrow-path` | `⌘R` | `wire:click="$refresh"` | Me-refresh state Livewire tanpa reload browser |
+| **Window** | Muat Ulang | `arrow-path` | `⌘R` | `@click="refresh()"` | Me-refresh window dengan gimik loading spinner & backdrop blur |
+| **Window** | Muat Ulang Halaman | `arrow-path` | `⇧⌘R` | `@click="window.location.reload()"` | Refresh penuh halaman browser |
 | **Window** | Disable/Enable Status Bar | `chart-bar` | `⌘P` | `@click="toggleStatusbar()"` | Mengontrol visibilitas `<x-minios:desktop.statusbar>` |
 | **Help** | About | `information-circle` | `⌘A` | `@click="$dispatch('open-about')"` | Membuka modal informasi aplikasi |
 
