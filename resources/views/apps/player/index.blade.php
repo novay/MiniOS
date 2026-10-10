@@ -200,12 +200,34 @@
                     this.controlsVisible = false;
                 }, 2800);
             }
+        },
+
+        handleKeyDown(e) {
+            if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName) || document.activeElement?.isContentEditable) {
+                return;
+            }
+
+            if (!this.$el.closest('.active-window') && !this.$el.contains(document.activeElement)) {
+                return;
+            }
+
+            const key = e.key;
+            if (key === ' ' || e.code === 'Space') {
+                e.preventDefault();
+                this.togglePlay();
+            } else if (key === 'ArrowLeft') {
+                e.preventDefault();
+                this.skip(-5);
+            } else if (key === 'ArrowRight') {
+                e.preventDefault();
+                this.skip(5);
+            } else if (key === 'm' || key === 'M') {
+                e.preventDefault();
+                this.toggleMute();
+            }
         }
      }"
-     @keydown.window.prevent.space="if ($el.closest('.active-window') || $el.contains(document.activeElement)) togglePlay()"
-     @keydown.window.prevent.arrow-left="if ($el.closest('.active-window') || $el.contains(document.activeElement)) skip(-5)"
-     @keydown.window.prevent.arrow-right="if ($el.closest('.active-window') || $el.contains(document.activeElement)) skip(5)"
-     @keydown.window.prevent.m="if ($el.closest('.active-window') || $el.contains(document.activeElement)) toggleMute()"
+     @keydown.window="handleKeyDown($event)"
      @mousemove="handleMouseMove()"
      x-ref="playerContainer">
 
