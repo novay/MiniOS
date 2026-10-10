@@ -35,6 +35,8 @@ class Katalog extends Component
 
     public bool $showUploadModal = false;
 
+    public bool $showAboutModal = false;
+
     public ?string $appToUninstall = null;
 
     public ?array $appToUninstallDetails = null;
@@ -268,6 +270,16 @@ class Katalog extends Component
     {
         $this->uploadFile = null;
         $this->showUploadModal = false;
+    }
+
+    public function openAboutModal(): void
+    {
+        $this->showAboutModal = true;
+    }
+
+    public function closeAboutModal(): void
+    {
+        $this->showAboutModal = false;
     }
 
     /**

@@ -55,7 +55,7 @@
                     {{ __('Dokumentasi Layout') }}
                 </x-minios.menubar.item>
                 <x-minios.menubar.separator />
-                <x-minios.menubar.item icon="information-circle" shortcut="⌘A">
+                <x-minios.menubar.item wire:click="openAboutModal" icon="information-circle" shortcut="⌘A">
                     {{ __('About Katalog v1.0.0') }}
                 </x-minios.menubar.item>
             </x-minios.menubar.menu>
