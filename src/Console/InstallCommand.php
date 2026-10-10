@@ -173,6 +173,35 @@ class InstallCommand extends Command
         }
 
         $content = File::get($cssPath);
+
+        // Deduplicate if minios.css was injected multiple times
+        if (substr_count($content, 'minios.css') > 1) {
+            $lines = explode("\n", $content);
+            $seenMiniosCss = false;
+            $seenMiniosSource = false;
+            $cleaned = [];
+            foreach ($lines as $line) {
+                if (str_contains($line, 'minios.css')) {
+                    if ($seenMiniosCss) {
+                        continue;
+                    }
+                    $seenMiniosCss = true;
+                }
+                if (str_contains($line, 'packages/novay/minios/resources/views') || str_contains($line, 'vendor/novay/minios/resources/views')) {
+                    if ($seenMiniosSource) {
+                        continue;
+                    }
+                    $seenMiniosSource = true;
+                }
+                $cleaned[] = $line;
+            }
+            $content = implode("\n", $cleaned);
+            File::put($cssPath, $content);
+            $this->line('  <info>✓</info> resources/css/app.css cleaned up duplicate MiniOS imports.');
+
+            return;
+        }
+
         if (str_contains($content, 'minios.css')) {
             $this->line('  <info>✓</info> resources/css/app.css already imports minios.css.');
 
@@ -206,6 +235,27 @@ class InstallCommand extends Command
         }
 
         $content = File::get($jsPath);
+
+        // Clean up duplicate blocks if already present from previous runs
+        if (substr_count($content, '@minios') > 1 || substr_count($content, 'Livewire.start()') > 1 || substr_count($content, 'livewire.esm') > 1) {
+            $content = preg_replace(
+                '/import\s*\{[^}]*\}\s*from\s*[\'"][^\'"]*livewire\.esm[\'"];?\s*/',
+                '',
+                $content
+            );
+            $content = preg_replace('/import\s+minios\s+from\s+[\'"]@minios(?:\/minios)?[\'"];?\s*/', '', $content);
+            $content = preg_replace('/Alpine\.data\([\'"]minios[\'"],\s*minios\);\s*/', '', $content);
+            $content = preg_replace('/Livewire\.start\(\);?\s*/', '', $content);
+
+            $cleanBlock = "\nimport {\n    Livewire,\n    Alpine,\n} from '../../vendor/livewire/livewire/dist/livewire.esm';\nimport minios from '@minios/minios';\n\nAlpine.data('minios', minios);\n\nLivewire.start();\n";
+            $content = rtrim($content)."\n".$cleanBlock;
+
+            File::put($jsPath, $content);
+            $this->line('  <info>✓</info> resources/js/app.js cleaned up duplicate MiniOS registrations.');
+
+            return;
+        }
+
         if (str_contains($content, 'minios')) {
             $this->line('  <info>✓</info> resources/js/app.js already configures MiniOS.');
 
