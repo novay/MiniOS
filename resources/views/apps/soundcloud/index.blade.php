@@ -837,7 +837,7 @@
 
             <!-- Playback Controls Bar -->
             <div class="relative z-10 flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-black/10 dark:border-white/10">
-                <div class="flex items-center gap-1.5 sm:gap-2">
+                <div class="flex items-center gap-1.5 sm:gap-1.5">
                     <!-- Shuffle Button -->
                     <button
                         type="button"
@@ -918,7 +918,7 @@
                         <span x-show="repeatMode !== 'off'" class="absolute -bottom-0.5 left-1/2 -translate-x-1/2 size-1 rounded-full bg-[#ff5500]"></span>
                     </button>
 
-                    <div class="mt-0.5 text-[12px] font-mono font-semibold text-neutral-700 dark:text-neutral-300 ml-1">
+                    <div class="mt-0.5 text-[12px] font-mono font-semibold text-neutral-700 dark:text-neutral-300 tracking-tight ml-1">
                         <span x-text="formatTime(currentPositionSec)"></span><span class="text-neutral-400 dark:text-neutral-500"> / </span><span x-text="formatTime(currentDurationSec)"></span>
                     </div>
 
@@ -930,7 +930,7 @@
                     </template> --}}
                 </div>
 
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-2">
 
                     <!-- Open on SoundCloud external link -->
                     <a
@@ -939,7 +939,7 @@
                         rel="noopener noreferrer"
                         class="bg-white/80 hover:bg-white dark:bg-black/50 dark:hover:bg-black/80 border border-black/10 hover:border-black/20 dark:border-white/20 dark:hover:border-white/40 backdrop-blur-md rounded-full px-2 py-0.5 text-[10px] font-medium text-neutral-700 hover:text-neutral-900 dark:text-neutral-200 dark:hover:text-white transition flex items-center gap-1 shadow-xs"
                     >
-                        <span>Open on Soundcloud</span>
+                        <span>Link</span>
                     </a>
                     <!-- Volume Slider -->
                     <div class="flex items-center gap-1.5">
