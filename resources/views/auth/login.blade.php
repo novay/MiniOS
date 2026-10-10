@@ -2,8 +2,8 @@
     <div class="flex w-full flex-col items-center text-center">
         
         {{-- User / Security Avatar --}}
-        <div class="relative flex size-28 items-center justify-center rounded-full shadow-2xl ring-3 ring-white/10 mb-6">
-            <img src="{{ asset('minios/images/logo.png') }}" alt="Logo MiniOS">
+        <div class="relative flex size-24 items-center justify-center rounded-full shadow-2xl ring-4 ring-white/10 mb-6 overflow-hidden bg-white/5">
+            <img src="{{ asset('minios/images/logo.png') }}" alt="Logo MiniOS" class="size-full object-contain p-2" width="96" height="96">
         </div>
 
         <!-- Session Status -->
@@ -39,12 +39,12 @@
                 <x-minios::error name="password" />
             </div>
 
-            <div class="relative flex items-center justify-between">
+            <div class="flex items-center justify-between text-sm">
                 <!-- Remember Me -->
                 <flux:checkbox name="remember" :label="__('Remember me')" :checked="old('remember')" />
 
                 @if(Route::has('password.request'))
-                    <flux:link class="absolute top-0 text-sm inset-e-0 text-indigo-300 hover:text-indigo-200" :href="route('password.request')" wire:navigate>
+                    <flux:link class="text-sm text-indigo-300 hover:text-indigo-200" :href="route('password.request')" wire:navigate>
                         {{ __('Forgot password?') }}
                     </flux:link>
                 @endif

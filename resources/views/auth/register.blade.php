@@ -1,8 +1,8 @@
 <x-layouts::minios.auth :title="__('Register')">
     <div class="flex w-full flex-col items-center text-center">
         {{-- User Avatar Icon --}}
-        <div class="relative flex size-28 items-center justify-center rounded-full shadow-2xl ring-3 ring-white/10">
-            <img src="{{ asset('minios/images/logo.png') }}" alt="Logo MiniOS">
+        <div class="relative flex size-24 items-center justify-center rounded-full shadow-2xl ring-4 ring-white/10 overflow-hidden bg-white/5">
+            <img src="{{ asset('minios/images/logo.png') }}" alt="Logo MiniOS" class="size-full object-contain p-2" width="96" height="96">
         </div>
 
         {{-- Title & Subtitle --}}

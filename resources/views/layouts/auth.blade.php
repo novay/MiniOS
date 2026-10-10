@@ -17,6 +17,7 @@
 
     @fonts
     @livewireStyles
+    @miniosStyles
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @fluxAppearance
 </head>
@@ -62,5 +63,6 @@
 
     @livewireScriptConfig
     @fluxScripts
+    @miniosScripts
 </body>
 </html>
