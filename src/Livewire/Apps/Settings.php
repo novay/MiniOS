@@ -95,6 +95,11 @@ class Settings extends Component
 
     public function mount(): void
     {
+        $validTabs = ['appearance', 'dock', 'window_manager', 'notifications', 'locale_time', 'account', 'filesystem', 'mail'];
+        if (! in_array($this->activeTab, $validTabs, true)) {
+            $this->activeTab = 'appearance';
+        }
+
         $this->loadSettings();
 
         $user = auth()->user();
