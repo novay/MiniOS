@@ -1,8 +1,8 @@
 {
     "app_title": "Katalog",
     "crumb_programs": "Programs & Features",
-    "header_installed_apps": "Installed Applications",
-    "btn_install_zip": "Install Application (.ZIP)",
+    "header_installed_apps": "Installed",
+    "btn_install_zip": "Install (.ZIP)",
     "search_placeholder": "Search installed applications...",
     "tab_all": "All",
     "tab_custom": "Custom",

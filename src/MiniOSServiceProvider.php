@@ -249,6 +249,15 @@ class MiniOSServiceProvider extends ServiceProvider
         Blade::component('minios::components.desktop.statusbar', 'minios.desktop.statusbar');
         Blade::component('minios::components.desktop.statusbar', 'minios:desktop.statusbar');
 
+        Blade::component('minios::components.desktop.nav.index', 'minios.desktop.nav');
+        Blade::component('minios::components.desktop.nav.index', 'minios:desktop.nav');
+        Blade::component('minios::components.desktop.nav.item', 'minios.desktop.nav.item');
+        Blade::component('minios::components.desktop.nav.item', 'minios:desktop.nav.item');
+        Blade::component('minios::components.desktop.nav.separator', 'minios.desktop.nav.separator');
+        Blade::component('minios::components.desktop.nav.separator', 'minios:desktop.nav.separator');
+        Blade::component('minios::components.desktop.nav.empty', 'minios.desktop.nav.empty');
+        Blade::component('minios::components.desktop.nav.empty', 'minios:desktop.nav.empty');
+
         Blade::component('minios::layouts.app', 'layouts::minios.app');
         Blade::component('minios::layouts.auth', 'layouts::minios.auth');
     }

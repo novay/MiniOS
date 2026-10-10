@@ -75,33 +75,28 @@
     <x-minios:desktop.sidebar>
         {{-- Store / Catalog Brand Card with Toggle Collapse Button --}}
         <div class="mb-4 flex items-center justify-between gap-2">
-            <div x-show="!sidebarCollapsed" class="flex flex-1 items-center gap-2.5 min-w-0 rounded-xl p-2 bg-white/70 dark:bg-white/5 border border-neutral-200/60 dark:border-white/5 shadow-2xs">
-                <div
-                    class="flex size-9 items-center justify-center rounded-xl text-white shadow-xs shrink-0"
-                    style="background-color: var(--accent-color, {{ $accent['hex'] }});"
-                >
-                    <flux:icon name="shopping-bag" class="size-4.5" />
-                </div>
+
+            {{-- Toggle Sidebar Collapse Button --}}
+            <button
+                type="button"
+                @click="toggleSidebar()"
+                class="flex size-9 shrink-0 items-center justify-center rounded-lg text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 transition-all"
+                :class="sidebarCollapsed ? 'w-full' : ''"
+                :title="sidebarCollapsed ? '{{ __('Buka Sidebar') }}' : '{{ __('Tutup Sidebar') }}'"
+            >
+                <flux:icon name="bars-3-bottom-left" class="size-6" />
+            </button>
+
+            <div x-show="!sidebarCollapsed" class="flex flex-1 items-center gap-2.5 min-w-0">
                 <div class="min-w-0 flex-1">
-                    <h2 class="truncate text-xs font-bold text-neutral-900 dark:text-white uppercase tracking-wider">
-                        {{ __('Katalog MiniOS') }}
+                    <h2 class="truncate text-sm font-bold text-neutral-900 dark:text-white">
+                        {{ __('Katalog') }}
                     </h2>
                     <p class="truncate text-[10px] text-neutral-500 dark:text-neutral-400">
                         App Catalog & Store
                     </p>
                 </div>
             </div>
-
-            {{-- Toggle Sidebar Collapse Button --}}
-            <button
-                type="button"
-                @click="toggleSidebar()"
-                class="flex size-9 shrink-0 items-center justify-center rounded-xl text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 transition-all"
-                :class="sidebarCollapsed ? 'w-full' : ''"
-                :title="sidebarCollapsed ? '{{ __('Buka Sidebar') }}' : '{{ __('Tutup Sidebar') }}'"
-            >
-                <flux:icon name="bars-3-bottom-left" class="size-4.5" />
-            </button>
         </div>
 
         {{-- Search Input (Filter List Menu, hidden when sidebar is collapsed) --}}
@@ -114,14 +109,14 @@
         >
             <div class="relative flex items-center">
                 <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-2.5">
-                    <flux:icon name="magnifying-glass" class="size-4 text-neutral-400 dark:text-neutral-500" />
+                    <flux:icon name="magnifying-glass" class="size-4.5 text-neutral-400 dark:text-neutral-500" />
                 </div>
                 <input
                     type="text"
                     x-model="menuSearch"
                     @keydown.escape.stop="menuSearch = ''"
                     placeholder="{{ __('Cari menu...') }}"
-                    class="w-full rounded-xl border border-neutral-200/80 dark:border-white/10 bg-white/70 dark:bg-white/5 py-1.5 pl-8.5 pr-7 text-xs text-neutral-900 dark:text-neutral-100 placeholder-neutral-400 dark:placeholder-neutral-500 shadow-2xs transition-all focus:outline-none focus:ring-1 focus:ring-[var(--accent-color,#3b82f6)] focus:border-[var(--accent-color,#3b82f6)]"
+                    class="w-full rounded-lg border border-neutral-200/80 dark:border-white/10 bg-white/70 dark:bg-white/5 py-2 pl-8.5 pr-7 text-sm text-neutral-900 dark:text-neutral-100 placeholder-neutral-400 dark:placeholder-neutral-500 shadow-2xs transition-all focus:outline-none focus:ring-1 focus:ring-[var(--accent-color,#3b82f6)] focus:border-[var(--accent-color,#3b82f6)]"
                 />
                 <button
                     type="button"
@@ -137,120 +132,117 @@
         </div>
 
         {{-- Category Navigation List --}}
-        <nav class="flex flex-1 flex-col gap-1 text-[13px] overflow-y-auto">
+        <x-minios:desktop.nav>
             @php
                 $navItems = [
                     'explore' => [
                         'label' => __('Jelajah'),
                         'icon' => 'sparkles',
                         'desc' => __('Unggulan & Tren'),
-                        'color' => 'bg-gradient-to-br from-indigo-500 to-purple-600 text-white',
+                        'color' => 'text-indigo-500',
                     ],
                     'apps' => [
                         'label' => __('Aplikasi'),
                         'icon' => 'squares-2x2',
                         'desc' => count($catalogApps) . ' ' . __('Template'),
-                        'color' => 'bg-gradient-to-br from-blue-500 to-cyan-600 text-white',
+                        'color' => 'text-blue-500',
                     ],
                     'themes' => [
                         'label' => __('Themes'),
                         'icon' => 'swatch',
                         'desc' => __('Koleksi Tema'),
-                        'color' => 'bg-gradient-to-br from-fuchsia-500 to-pink-600 text-white',
+                        'color' => 'text-fuchsia-500',
                     ],
                 ];
             @endphp
 
             @foreach ($navItems as $navKey => $navItem)
-                @php
-                    $isActive = $effectiveNav === $navKey;
-                @endphp
-                <button
-                    type="button"
+                <x-minios:desktop.nav.item
                     wire:click="setTab('{{ $navKey }}')"
-                    x-show="sidebarCollapsed || !menuSearch || {{ json_encode(strtolower($navItem['label'].' '.$navItem['desc'])) }}.includes(menuSearch.toLowerCase().trim())"
-                    :title="sidebarCollapsed ? '{{ $navItem['label'] }}' : ''"
-                    :class="sidebarCollapsed ? 'justify-center px-0 py-2.5' : 'px-3 py-2.5'"
-                    class="group relative flex items-center gap-3 rounded-xl text-left font-medium transition-all {{ $isActive ? 'bg-white dark:bg-white/10 text-neutral-900 dark:text-white shadow-2xs' : 'text-neutral-600 dark:text-neutral-400 hover:bg-black/[0.04] dark:hover:bg-white/5 hover:text-neutral-900 dark:hover:text-white' }}"
-                >
-                    {{-- Active Left Accent Pill Indicator --}}
-                    @if ($isActive)
-                        <span class="absolute left-0 top-1/2 -translate-y-1/2 h-4.5 w-1 rounded-r-full" style="background-color: var(--accent-color, {{ $accent['hex'] }});"></span>
-                    @endif
-
-                    <div class="flex size-7 items-center justify-center rounded-lg {{ $navItem['color'] }} shadow-2xs shrink-0 transition-transform group-hover:scale-105">
-                        <flux:icon :name="$navItem['icon']" class="size-4" />
-                    </div>
-
-                    <div x-show="!sidebarCollapsed" class="min-w-0 flex-1 truncate">
-                        <span class="truncate block text-xs {{ $isActive ? 'font-bold text-neutral-900 dark:text-white' : 'font-medium' }}">{{ $navItem['label'] }}</span>
-                    </div>
-                </button>
+                    :label="$navItem['label']"
+                    :icon="$navItem['icon']"
+                    :icon-color="$navItem['color']"
+                    :active="$effectiveNav === $navKey"
+                />
             @endforeach
 
             {{-- Separator Section Label --}}
-            <div
-                x-show="!sidebarCollapsed && (!menuSearch || {{ json_encode(strtolower($this->t('header_installed_apps').' instalasi kelola')) }}.includes(menuSearch.toLowerCase().trim()))"
-                class="px-2.5 pt-4 pb-1"
-            >
-                <span class="text-[10px] font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">
-                    {{ __('INSTALASI & KELOLA') }}
-                </span>
-            </div>
-            <div x-show="sidebarCollapsed" class="my-2 border-t border-neutral-200/80 dark:border-white/5"></div>
+            <x-minios:desktop.nav.separator
+                :label="__('INSTALASI & KELOLA')"
+                :keywords="$this->t('header_installed_apps').' instalasi kelola'"
+            />
 
             {{-- Installed App Navigation Item --}}
-            @php
-                $isInstalledActive = $effectiveNav === 'installed';
-            @endphp
-            <button
-                type="button"
+            <x-minios:desktop.nav.item
                 wire:click="setTab('installed')"
-                x-show="sidebarCollapsed || !menuSearch || {{ json_encode(strtolower($this->t('header_installed_apps').' instalasi kelola')) }}.includes(menuSearch.toLowerCase().trim())"
-                :title="sidebarCollapsed ? '{{ $this->t('header_installed_apps') }}' : ''"
-                :class="sidebarCollapsed ? 'justify-center px-0 py-2.5' : 'px-3 py-2.5'"
-                class="group relative flex items-center gap-3 rounded-xl text-left font-medium transition-all {{ $isInstalledActive ? 'bg-white dark:bg-white/10 text-neutral-900 dark:text-white shadow-2xs' : 'text-neutral-600 dark:text-neutral-400 hover:bg-black/[0.04] dark:hover:bg-white/5 hover:text-neutral-900 dark:hover:text-white' }}"
-            >
-                @if ($isInstalledActive)
-                    <span class="absolute left-0 top-1/2 -translate-y-1/2 h-4.5 w-1 rounded-r-full" style="background-color: var(--accent-color, {{ $accent['hex'] }});"></span>
-                @endif
-
-                <div class="flex size-7 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-2xs shrink-0 transition-transform group-hover:scale-105">
-                    <flux:icon name="arrow-down-tray" class="size-4" />
-                </div>
-                <div x-show="!sidebarCollapsed" class="min-w-0 flex-1 truncate">
-                    <span class="truncate block text-xs {{ $isInstalledActive ? 'font-bold text-neutral-900 dark:text-white' : 'font-medium' }}">{{ $this->t('header_installed_apps') }}</span>
-                </div>
-            </button>
+                :label="$this->t('header_installed_apps')"
+                icon="arrow-down-tray"
+                icon-color="text-emerald-500"
+                :active="$effectiveNav === 'installed'"
+            />
 
             {{-- Empty search state --}}
-            <div
-                x-cloak
-                x-show="!sidebarCollapsed && menuSearch && ![
+            <x-minios:desktop.nav.empty
+                :unfiltered="[
                     'jelajah', 'unggulan', 'tren', 'explore',
                     'aplikasi', 'template', 'apps',
                     'themes', 'tema', 'koleksi tema',
                     'instalasi', 'kelola', 'terpasang', 'installed'
-                ].some(k => k.includes(menuSearch.toLowerCase().trim()))"
-                class="py-6 px-2 text-center text-xs text-neutral-400 dark:text-neutral-500"
-            >
-                <flux:icon name="magnifying-glass" class="mx-auto size-5 mb-1.5 text-neutral-300 dark:text-neutral-600" />
-                <span class="block font-medium">{{ __('Menu tidak ditemukan') }}</span>
-                <span class="block text-[11px] text-neutral-400 dark:text-neutral-500 mt-0.5">{{ __('Coba kata kunci lain') }}</span>
-            </div>
-        </nav>
+                ]"
+                :title="__('Menu tidak ditemukan')"
+                :subtitle="__('Coba kata kunci lain')"
+            />
+        </x-minios:desktop.nav>
 
         {{-- Sidebar Footer Quick Action & Storage --}}
         <div class="mt-auto pt-3 border-t border-neutral-200/70 dark:border-white/5 space-y-2">
             <button
+                x-data="{
+                    tooltipHover: false,
+                    tooltipTop: 0,
+                    tooltipLeft: 0,
+                    showTooltip() {
+                        if (!sidebarCollapsed) {
+                            this.tooltipHover = false;
+                            return;
+                        }
+                        const rect = this.$el.getBoundingClientRect();
+                        this.tooltipTop = rect.top + (rect.height / 2);
+                        this.tooltipLeft = rect.right + 8;
+                        this.tooltipHover = true;
+                    },
+                    hideTooltip() {
+                        this.tooltipHover = false;
+                    }
+                }"
                 type="button"
                 wire:click="openUploadModal"
-                :title="sidebarCollapsed ? '{{ $this->t('btn_install_zip') }}' : ''"
+                @mouseenter="showTooltip()"
+                @mouseleave="hideTooltip()"
+                @focus="showTooltip()"
+                @blur="hideTooltip()"
+                @click="hideTooltip()"
                 :class="sidebarCollapsed ? 'justify-center px-0' : 'justify-center px-3'"
-                class="w-full flex items-center gap-2 rounded-xl bg-neutral-200/80 dark:bg-white/10 hover:bg-neutral-300/80 dark:hover:bg-white/15 py-2 text-xs font-semibold text-neutral-700 dark:text-neutral-200 transition-all active:scale-98"
+                class="w-full flex items-center gap-2 rounded-lg bg-neutral-200/80 dark:bg-white/10 hover:bg-neutral-300/80 dark:hover:bg-white/15 py-2 text-xs font-semibold text-neutral-700 dark:text-neutral-200 transition-all active:scale-98"
             >
                 <flux:icon name="arrow-up-tray" class="size-3.5 text-neutral-500 dark:text-neutral-400 shrink-0" />
                 <span x-show="!sidebarCollapsed" class="truncate">{{ $this->t('btn_install_zip') }}</span>
+
+                <template x-teleport="body">
+                    <div
+                        x-show="sidebarCollapsed && tooltipHover"
+                        x-transition:enter="transition ease-out duration-150"
+                        x-transition:enter-start="opacity-0 scale-95 -translate-x-1"
+                        x-transition:enter-end="opacity-100 scale-100 translate-x-0"
+                        x-transition:leave="transition ease-in duration-100"
+                        x-transition:leave-start="opacity-100 scale-100 translate-x-0"
+                        x-transition:leave-end="opacity-0 scale-95 -translate-x-1"
+                        :style="`top: ${tooltipTop}px; left: ${tooltipLeft}px; transform: translateY(-50%);`"
+                        class="pointer-events-none fixed z-[99999] flex items-center gap-2 rounded-lg border border-neutral-700/60 dark:border-white/15 bg-neutral-900/95 dark:bg-[#1c1c1c]/95 px-2.5 py-1.5 text-xs font-medium text-white shadow-xl shadow-black/25 backdrop-blur-md whitespace-nowrap select-none"
+                    >
+                        <span>{{ $this->t('btn_install_zip') }}</span>
+                    </div>
+                </template>
             </button>
 
             <div x-show="!sidebarCollapsed" class="flex items-center justify-between text-[11px] text-neutral-400 dark:text-neutral-500 px-1 font-medium">

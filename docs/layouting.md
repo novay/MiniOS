@@ -175,16 +175,39 @@ Semua komponen dapat dipanggil menggunakan format `<x-minios:desktop.*>` maupun 
             />
         </div>
 
-        <nav class="flex flex-1 flex-col gap-1">
-            <button
-                type="button"
-                x-show="sidebarCollapsed || !menuSearch || 'jelajah'.includes(menuSearch.toLowerCase())"
-                class="flex items-center gap-2 p-2 rounded-xl text-xs"
-            >
-                <flux:icon name="sparkles" class="size-4" />
-                <span x-show="!sidebarCollapsed">Jelajah</span>
-            </button>
-        </nav>
+        {{-- Navigasi Menu Reusable --}}
+        <x-minios:desktop.nav>
+            <x-minios:desktop.nav.item
+                label="Jelajah"
+                description="Unggulan & Tren"
+                icon="sparkles"
+                icon-color="text-indigo-500"
+                :active="true"
+            />
+            <x-minios:desktop.nav.item
+                label="Aplikasi"
+                description="Template & Modul"
+                icon="squares-2x2"
+                icon-color="text-blue-500"
+                badge="3"
+                :active="false"
+            />
+
+            <x-minios:desktop.nav.separator label="INSTALASI & KELOLA" />
+
+            <x-minios:desktop.nav.item
+                label="Terpasang"
+                icon="arrow-down-tray"
+                icon-color="text-emerald-500"
+                :active="false"
+            />
+
+            <x-minios:desktop.nav.empty
+                :unfiltered="['jelajah', 'aplikasi', 'terpasang']"
+                title="Menu tidak ditemukan"
+                subtitle="Coba kata kunci lain"
+            />
+        </x-minios:desktop.nav>
     </x-minios:desktop.sidebar>
 
     {{-- 3. Konten Utama (Container Queries Ready) --}}
