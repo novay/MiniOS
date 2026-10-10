@@ -27,7 +27,7 @@
     @trash-updated.window="
         const c = $event.detail?.count ?? $event.detail?.[0]?.count ?? (typeof $event.detail === 'number' ? $event.detail : null);
         if (c !== null && c !== undefined) {
-            $wire.trashCount = Number(c);
+            $wire.set('trashCount', Number(c), false);
         }
     "
     class="flex h-full min-h-125 w-full flex-col overflow-hidden bg-[#f3f3f3] dark:bg-[#202020] text-neutral-800 dark:text-neutral-100 font-sans select-none relative"

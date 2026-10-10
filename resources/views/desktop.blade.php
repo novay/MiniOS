@@ -23,9 +23,8 @@
     @trash-updated.window="
         const c = $event.detail?.count ?? $event.detail?.[0]?.count ?? (typeof $event.detail === 'number' ? $event.detail : null);
         if (c !== null && c !== undefined) {
-            $wire.trashCount = Number(c);
+            $wire.set('trashCount', Number(c), false);
         }
-        $wire.onTrashUpdated(c);
     "
 
     @click="closeContextMenu(); selectedShortcut = null"

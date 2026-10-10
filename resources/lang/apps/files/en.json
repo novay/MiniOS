@@ -146,6 +146,12 @@
 
     "error_delete_not_found": "Item not found.",
     "success_deleted": "':name' successfully deleted.",
+    "success_moved_to_trash": "':name' successfully moved to Trash.",
+    "success_deleted_permanently": "':name' permanently deleted.",
+    "success_restored": "Item successfully restored.",
+    "error_restore_failed": "Failed to restore item.",
+    "success_restored_all": ":count item(s) successfully restored.",
+    "success_trash_emptied": ":count item(s) permanently deleted from Trash.",
     "error_delete_failed": "Failed to delete: :error",
 
     "error_download_not_found": "File not found for download.",

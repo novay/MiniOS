@@ -732,7 +732,9 @@ class Files extends Component
 
     public function delete(): void
     {
-        if ($this->isLocked) {
+        if ($this->isLocked || empty(trim($this->deleteTargetPath, '/\\.'))) {
+            $this->closeDeleteModal();
+
             return;
         }
 

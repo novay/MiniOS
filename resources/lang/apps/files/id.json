@@ -146,6 +146,12 @@
 
     "error_delete_not_found": "Item tidak ditemukan.",
     "success_deleted": "':name' berhasil dihapus.",
+    "success_moved_to_trash": "':name' berhasil dipindahkan ke Tempat Sampah.",
+    "success_deleted_permanently": "':name' berhasil dihapus secara permanen.",
+    "success_restored": "Item berhasil dipulihkan.",
+    "error_restore_failed": "Gagal memulihkan item.",
+    "success_restored_all": ":count item berhasil dipulihkan.",
+    "success_trash_emptied": ":count item berhasil dihapus permanen dari Tempat Sampah.",
     "error_delete_failed": "Gagal menghapus: :error",
 
     "error_download_not_found": "Berkas tidak ditemukan untuk diunduh.",
