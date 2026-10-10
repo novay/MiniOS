@@ -22,7 +22,7 @@ class Soundcloud extends Component
 
     public string $version = '1.0.0';
 
-    public const SAMPLE_EMBED = '<iframe width="100%" height="450" scrolling="no" frameborder="no" allow="autoplay; encrypted-media" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/soundcloud%3Aplaylists%3A2299409466%3Fsecret_token%3Ds-1pQECtHZO72&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"></iframe><div style="font-size: 10px; color: #cccccc;line-break: anywhere;word-break: normal;overflow: hidden;white-space: nowrap;text-overflow: ellipsis; font-family: Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif;font-weight: 100;"><a href="https://soundcloud.com/nxvay" title="Nxvay" target="_blank" style="color: #cccccc; text-decoration: none;">Nxvay</a> · <a href="https://soundcloud.com/nxvay/sets/dystopia-raya-ai-remix/s-1pQECtHZO72" title="Dystopia Raya (AI Remix)" target="_blank" style="color: #cccccc; text-decoration: none;">Dystopia Raya (AI Remix)</a></div>';
+    public const SAMPLE_EMBED = '<iframe width="100%" height="450" scrolling="no" frameborder="no" allow="autoplay; encrypted-media" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/soundcloud%3Aplaylists%3A2299409466%3Fsecret_token%3Ds-1pQECtHZO72&color=%23ff5500&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false"></iframe><div style="font-size: 10px; color: #cccccc;line-break: anywhere;word-break: normal;overflow: hidden;white-space: nowrap;text-overflow: ellipsis; font-family: Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif;font-weight: 100;"><a href="https://soundcloud.com/nxvay" title="Nxvay" target="_blank" style="color: #cccccc; text-decoration: none;">Nxvay</a> · <a href="https://soundcloud.com/nxvay/sets/dystopia-raya-ai-remix/s-1pQECtHZO72" title="Dystopia Raya (AI Remix)" target="_blank" style="color: #cccccc; text-decoration: none;">Dystopia Raya (AI Remix)</a></div>';
 
     public const PRESETS = [
         'dystopia' => [
@@ -180,23 +180,28 @@ class Soundcloud extends Component
     public function extractPlayerUrl(string $code): string
     {
         $code = trim($code);
+        $url = '';
 
         // 1. Direct match for iframe src="..."
         if (preg_match('/src=["\']([^"\']+)["\']/', $code, $matches)) {
-            return html_entity_decode($matches[1]);
+            $url = html_entity_decode($matches[1]);
+        } elseif (str_starts_with($code, 'https://w.soundcloud.com/player/')) {
+            // 2. Direct player URL: https://w.soundcloud.com/player/?url=...
+            $url = $code;
+        } elseif (filter_var($code, FILTER_VALIDATE_URL) && str_contains($code, 'soundcloud.com')) {
+            // 3. Normal SoundCloud URL (tracks or sets): https://soundcloud.com/...
+            $url = 'https://w.soundcloud.com/player/?url='.urlencode($code).'&color=%23ff5500&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false';
         }
 
-        // 2. Direct player URL: https://w.soundcloud.com/player/?url=...
-        if (str_starts_with($code, 'https://w.soundcloud.com/player/')) {
-            return $code;
+        if ($url !== '') {
+            $url = str_replace('show_comments=true', 'show_comments=false', $url);
+            $url = str_replace('show_teaser=true', 'show_teaser=false', $url);
+            if (! str_contains($url, 'show_comments=')) {
+                $url .= (str_contains($url, '?') ? '&' : '?').'show_comments=false';
+            }
         }
 
-        // 3. Normal SoundCloud URL (tracks or sets): https://soundcloud.com/...
-        if (filter_var($code, FILTER_VALIDATE_URL) && str_contains($code, 'soundcloud.com')) {
-            return 'https://w.soundcloud.com/player/?url='.urlencode($code).'&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true';
-        }
-
-        return '';
+        return $url;
     }
 
     public function extractWebUrl(string $code): ?string

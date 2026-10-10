@@ -858,7 +858,7 @@ function a() {
 		toggleTheme() {
 			this.closeAll(), this.settings ||= {}, this.settings.appearance || (this.settings.appearance = {});
 			let e = this.isDarkMode ? "light" : "dark";
-			this.settings.appearance.theme = e, this.applyTheme(), window.Livewire && Livewire.dispatch("toggle-dark-mode");
+			this.settings.appearance.theme = e, this.applyTheme(), window.Livewire && Livewire.dispatch("toggle-dark-mode", { theme: e });
 		},
 		applyTheme() {
 			let e = this.settings?.appearance?.theme || "system";

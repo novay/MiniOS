@@ -1068,6 +1068,8 @@
                     src="{{ $playerUrl }}"
                     class="w-1 h-1 border-0"
                     allow="autoplay; encrypted-media"
+                    tabindex="-1"
+                    loading="lazy"
                 ></iframe>
             </div>
         @endpersist

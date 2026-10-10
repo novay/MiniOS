@@ -25,16 +25,23 @@ class Desktop extends Component
 
     #[On('toggle-dark-mode')]
     #[Renderless]
-    public function toggleDarkMode(): void
+    public function toggleDarkMode(mixed $theme = null): void
     {
-        $currentTheme = os_setting()->get('appearance.theme', 'system');
-        $newTheme = $currentTheme === 'dark' ? 'light' : 'dark';
-        os_setting()->set('appearance.theme', $newTheme);
+        if (is_array($theme)) {
+            $theme = $theme['theme'] ?? null;
+        }
+
+        if (! in_array($theme, ['light', 'dark', 'system'], true)) {
+            $currentTheme = os_setting()->get('appearance.theme', 'system');
+            $theme = $currentTheme === 'dark' ? 'light' : 'dark';
+        }
+
+        os_setting()->set('appearance.theme', $theme);
 
         $this->dispatch('os-setting-updated', [
             'category' => 'appearance',
             'key' => 'theme',
-            'value' => $newTheme,
+            'value' => $theme,
         ]);
     }
 
