@@ -31,7 +31,7 @@
     {{-- ========================================================= --}}
     <div class="flex items-center justify-end gap-1.5">
         {{-- Light / Dark Mode Toggle --}}
-        <button
+        {{-- <button
             type="button"
             @click.stop="toggleTheme()"
             class="flex size-6 items-center justify-center rounded-md text-neutral-700 dark:text-neutral-200 transition-colors hover:bg-black/10 dark:hover:bg-white/10"
@@ -43,7 +43,7 @@
             <span x-cloak x-show="!isDarkMode" class="flex items-center justify-center">
                 <flux:icon name="moon" variant="solid" class="size-4 text-neutral-800 dark:text-neutral-300" />
             </span>
-        </button>
+        </button> --}}
 
         {{-- Audio Control Dropdown --}}
         <div class="relative" @click.outside="audioDropdownOpen = false">
