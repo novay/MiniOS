@@ -116,7 +116,12 @@
     "cloud_lbl_endpoint": "Endpoint / CDN URL",
     "cloud_notice": "The Files application continues to browse local MiniOS server storage. External file operations or custom uploads in MiniOS are routed to the :name disk.",
     "cloud_empty_title": "No Active Cloud Storage",
-    "cloud_empty_desc": "Configure Amazon S3 or BunnyCDN in Settings > Services & Infrastructure > Filesystem.",
+    "cloud_empty_desc": "Configure Amazon S3 or BunnyCDN in Settings > Filesystem.",
+    "cloud_unconfigured_title": "Cloud Storage Not Configured",
+    "cloud_unconfigured_desc": "Connect S3-compatible or BunnyCDN storage to enable cloud syncing and storage in MiniOS.",
+    "cloud_unconfigured_info": "MiniOS supports various S3-compatible cloud storage providers. Enter your API credentials and bucket name in Filesystem Settings.",
+    "cloud_supported_providers": "Supported providers:",
+    "btn_open_settings": "Open Filesystem Settings",
     "btn_test_connection": "Test Connection",
     "btn_close": "Close",
 

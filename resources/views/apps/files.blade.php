@@ -1304,8 +1304,14 @@
     {{-- MODAL: FOLDER BARU (WINDOWS 11 FLUENT DIALOG)             --}}
     {{-- ========================================================= --}}
     @if ($showNewFolderModal)
-        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 dark:bg-black/70 p-4 backdrop-blur-xs">
-            <div class="relative w-full max-w-sm rounded-2xl bg-white dark:bg-[#2b2b2b] border border-neutral-200/90 dark:border-white/10 p-5 shadow-2xl space-y-4">
+        <div
+            wire:click.self="closeNewFolderModal"
+            class="absolute inset-0 z-50 flex items-center justify-center bg-black/40 dark:bg-black/60 p-4 backdrop-blur-xs"
+        >
+            <div
+                @click.stop
+                class="relative w-full max-w-sm rounded-2xl bg-white dark:bg-[#2b2b2b] border border-neutral-200/90 dark:border-white/10 p-5 shadow-2xl space-y-4"
+            >
                 <div class="flex items-center gap-3">
                     <div class="flex size-10 items-center justify-center rounded-xl bg-amber-500/10 text-amber-500">
                         <flux:icon name="folder-plus" class="size-5" />
@@ -1353,8 +1359,14 @@
     {{-- MODAL: BERKAS BARU (WINDOWS 11 FLUENT DIALOG)             --}}
     {{-- ========================================================= --}}
     @if ($showNewFileModal)
-        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 dark:bg-black/70 p-4 backdrop-blur-xs">
-            <div class="relative w-full max-w-sm rounded-2xl bg-white dark:bg-[#2b2b2b] border border-neutral-200/90 dark:border-white/10 p-5 shadow-2xl space-y-4">
+        <div
+            wire:click.self="closeNewFileModal"
+            class="absolute inset-0 z-50 flex items-center justify-center bg-black/40 dark:bg-black/60 p-4 backdrop-blur-xs"
+        >
+            <div
+                @click.stop
+                class="relative w-full max-w-sm rounded-2xl bg-white dark:bg-[#2b2b2b] border border-neutral-200/90 dark:border-white/10 p-5 shadow-2xl space-y-4"
+            >
                 <div class="flex items-center gap-3">
                     <div class="flex size-10 items-center justify-center rounded-xl bg-sky-500/10 text-sky-500">
                         <flux:icon name="document-plus" class="size-5" />
@@ -1402,8 +1414,14 @@
     {{-- MODAL: UNGGAH BERKAS (WINDOWS 11 FLUENT DIALOG)           --}}
     {{-- ========================================================= --}}
     @if ($showUploadModal)
-        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 dark:bg-black/70 p-4 backdrop-blur-xs">
-            <div class="relative w-full max-w-md rounded-2xl bg-white dark:bg-[#2b2b2b] border border-neutral-200/90 dark:border-white/10 p-5 shadow-2xl space-y-4">
+        <div
+            wire:click.self="closeUploadModal"
+            class="absolute inset-0 z-50 flex items-center justify-center bg-black/40 dark:bg-black/60 p-4 backdrop-blur-xs"
+        >
+            <div
+                @click.stop
+                class="relative w-full max-w-md rounded-2xl bg-white dark:bg-[#2b2b2b] border border-neutral-200/90 dark:border-white/10 p-5 shadow-2xl space-y-4"
+            >
                 <div class="flex items-center gap-3">
                     <div class="flex size-10 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-500">
                         <flux:icon name="arrow-up-tray" class="size-5" />
@@ -1469,8 +1487,14 @@
     {{-- MODAL: GANTI NAMA (WINDOWS 11 FLUENT DIALOG)              --}}
     {{-- ========================================================= --}}
     @if ($showRenameModal)
-        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 dark:bg-black/70 p-4 backdrop-blur-xs">
-            <div class="relative w-full max-w-sm rounded-2xl bg-white dark:bg-[#2b2b2b] border border-neutral-200/90 dark:border-white/10 p-5 shadow-2xl space-y-4">
+        <div
+            wire:click.self="closeRenameModal"
+            class="absolute inset-0 z-50 flex items-center justify-center bg-black/40 dark:bg-black/60 p-4 backdrop-blur-xs"
+        >
+            <div
+                @click.stop
+                class="relative w-full max-w-sm rounded-2xl bg-white dark:bg-[#2b2b2b] border border-neutral-200/90 dark:border-white/10 p-5 shadow-2xl space-y-4"
+            >
                 <div class="flex items-center gap-3">
                     <div class="flex size-10 items-center justify-center rounded-xl bg-amber-500/10 text-amber-500">
                         <flux:icon name="pencil-square" class="size-5" />
@@ -1517,8 +1541,14 @@
     {{-- MODAL: HAPUS ITEM (WINDOWS 11 FLUENT DIALOG)              --}}
     {{-- ========================================================= --}}
     @if ($showDeleteModal)
-        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 dark:bg-black/70 p-4 backdrop-blur-xs">
-            <div class="relative w-full max-w-sm rounded-2xl bg-white dark:bg-[#2b2b2b] border border-neutral-200/90 dark:border-white/10 p-5 shadow-2xl space-y-4">
+        <div
+            wire:click.self="closeDeleteModal"
+            class="absolute inset-0 z-50 flex items-center justify-center bg-black/40 dark:bg-black/60 p-4 backdrop-blur-xs"
+        >
+            <div
+                @click.stop
+                class="relative w-full max-w-sm rounded-2xl bg-white dark:bg-[#2b2b2b] border border-neutral-200/90 dark:border-white/10 p-5 shadow-2xl space-y-4"
+            >
                 <div class="flex items-center gap-3">
                     <div class="flex size-10 items-center justify-center rounded-xl bg-rose-500/10 text-rose-500">
                         <flux:icon name="trash" class="size-5" />
@@ -1571,8 +1601,14 @@
     {{-- MODAL: PINDAHKAN ITEM (WINDOWS 11 FLUENT DIALOG)          --}}
     {{-- ========================================================= --}}
     @if ($showMoveModal)
-        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 dark:bg-black/70 p-4 backdrop-blur-xs">
-            <div class="relative w-full max-w-sm rounded-2xl bg-white dark:bg-[#2b2b2b] border border-neutral-200/90 dark:border-white/10 p-5 shadow-2xl space-y-4">
+        <div
+            wire:click.self="closeMoveModal"
+            class="absolute inset-0 z-50 flex items-center justify-center bg-black/40 dark:bg-black/60 p-4 backdrop-blur-xs"
+        >
+            <div
+                @click.stop
+                class="relative w-full max-w-sm rounded-2xl bg-white dark:bg-[#2b2b2b] border border-neutral-200/90 dark:border-white/10 p-5 shadow-2xl space-y-4"
+            >
                 <div class="flex items-center gap-3">
                     <div class="flex size-10 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-500">
                         <flux:icon name="folder-arrow-down" class="size-5" />
@@ -1631,33 +1667,39 @@
     {{-- MODAL: CLOUD STORAGE DETAIL (WINDOWS 11 FLUENT DIALOG)    --}}
     {{-- ========================================================= --}}
     @if ($showCloudStorageModal)
-        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 dark:bg-black/70 p-4 backdrop-blur-xs">
-            <div class="relative w-full max-w-md rounded-2xl bg-white dark:bg-[#2b2b2b] border border-neutral-200/90 dark:border-white/10 p-5 sm:p-6 shadow-2xl space-y-4">
-                <div class="flex items-start justify-between gap-3">
-                    <div class="flex items-center gap-3">
-                        <div class="flex size-10 items-center justify-center rounded-xl {{ ($this->cloudStorageInfo['driver'] ?? '') === 'bunny' ? 'bg-amber-500/10 text-amber-500' : 'bg-sky-500/10 text-sky-500' }}">
-                            <flux:icon name="cloud" class="size-5" />
-                        </div>
-                        <div>
-                            <h3 class="text-sm font-semibold text-neutral-900 dark:text-white">
-                                {{ $this->cloudStorageInfo['name'] ?? $this->t('cloud_modal_title') }}
-                            </h3>
-                            <p class="text-xs text-neutral-500 dark:text-neutral-400">
-                                {{ $this->t('cloud_modal_desc') }}
-                            </p>
-                        </div>
-                    </div>
-                    <button
-                        type="button"
-                        wire:click="closeCloudStorageModal"
-                        class="flex size-7 items-center justify-center rounded-lg text-neutral-400 hover:bg-neutral-100 dark:hover:bg-white/10 hover:text-neutral-700 dark:hover:text-white"
-                        title="{{ $this->t('btn_close') }}"
-                    >
-                        <flux:icon name="x-mark" class="size-4" />
-                    </button>
-                </div>
-
+        <div
+            wire:click.self="closeCloudStorageModal"
+            class="absolute inset-0 z-50 flex items-center justify-center bg-black/40 dark:bg-black/60 p-4 backdrop-blur-xs"
+        >
+            <div
+                @click.stop
+                class="relative w-full max-w-md rounded-2xl bg-white dark:bg-[#2c2c2c] border border-neutral-200/90 dark:border-white/10 p-5 sm:p-6 shadow-2xl space-y-4"
+            >
                 @if ($this->cloudStorageInfo)
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="flex items-center gap-3">
+                            <div class="flex size-10 items-center justify-center rounded-xl {{ ($this->cloudStorageInfo['driver'] ?? '') === 'bunny' ? 'bg-amber-500/10 text-amber-500' : 'bg-sky-500/10 text-sky-500' }}">
+                                <flux:icon name="cloud" class="size-5" />
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-semibold text-neutral-900 dark:text-white">
+                                    {{ $this->cloudStorageInfo['name'] ?? $this->t('cloud_modal_title') }}
+                                </h3>
+                                <p class="text-xs text-neutral-500 dark:text-neutral-400">
+                                    {{ $this->t('cloud_modal_desc') }}
+                                </p>
+                            </div>
+                        </div>
+                        <button
+                            type="button"
+                            wire:click="closeCloudStorageModal"
+                            class="flex size-7 items-center justify-center rounded-lg text-neutral-400 hover:bg-neutral-100 dark:hover:bg-white/10 hover:text-neutral-700 dark:hover:text-white transition-all"
+                            title="{{ $this->t('btn_close') }}"
+                        >
+                            <flux:icon name="x-mark" class="size-4" />
+                        </button>
+                    </div>
+
                     <div class="rounded-xl border border-neutral-200/80 dark:border-white/10 bg-neutral-50/60 dark:bg-white/5 p-4 space-y-3">
                         <div class="grid grid-cols-2 gap-2 text-xs">
                             <div>
@@ -1710,33 +1752,23 @@
                             {{ $this->t('cloud_notice', ['name' => $this->cloudStorageInfo['name']]) }}
                         </div>
                     </div>
-                @else
-                    <div class="rounded-xl border border-dashed border-neutral-300 dark:border-white/10 p-6 text-center space-y-2">
-                        <flux:icon name="cloud" class="size-8 text-neutral-400 mx-auto" />
-                        <p class="text-xs font-semibold text-neutral-800 dark:text-neutral-200">{{ $this->t('cloud_empty_title') }}</p>
-                        <p class="text-[11px] text-neutral-500 max-w-xs mx-auto">
-                            {{ $this->t('cloud_empty_desc') }}
-                        </p>
-                    </div>
-                @endif
 
-                {{-- Status Uji Koneksi --}}
-                @if ($cloudStorageTestStatus)
-                    <div class="rounded-lg bg-emerald-500/10 border border-emerald-500/20 p-2.5 text-xs text-emerald-700 dark:text-emerald-300 flex items-center gap-2">
-                        <flux:icon name="check-circle" class="size-4 text-emerald-500 shrink-0" />
-                        <span>{{ $cloudStorageTestStatus }}</span>
-                    </div>
-                @endif
+                    {{-- Status Uji Koneksi --}}
+                    @if ($cloudStorageTestStatus)
+                        <div class="rounded-lg bg-emerald-500/10 border border-emerald-500/20 p-2.5 text-xs text-emerald-700 dark:text-emerald-300 flex items-center gap-2">
+                            <flux:icon name="check-circle" class="size-4 text-emerald-500 shrink-0" />
+                            <span>{{ $cloudStorageTestStatus }}</span>
+                        </div>
+                    @endif
 
-                @if ($cloudStorageTestError)
-                    <div class="rounded-lg bg-rose-500/10 border border-rose-500/20 p-2.5 text-xs text-rose-700 dark:text-rose-300 flex items-center gap-2">
-                        <flux:icon name="exclamation-circle" class="size-4 text-rose-500 shrink-0" />
-                        <span>{{ $cloudStorageTestError }}</span>
-                    </div>
-                @endif
+                    @if ($cloudStorageTestError)
+                        <div class="rounded-lg bg-rose-500/10 border border-rose-500/20 p-2.5 text-xs text-rose-700 dark:text-rose-300 flex items-center gap-2">
+                            <flux:icon name="exclamation-circle" class="size-4 text-rose-500 shrink-0" />
+                            <span>{{ $cloudStorageTestError }}</span>
+                        </div>
+                    @endif
 
-                <div class="flex items-center justify-between gap-2 pt-2 border-t border-neutral-200/80 dark:border-white/5">
-                    @if ($this->cloudStorageInfo)
+                    <div class="flex items-center justify-between gap-2 pt-2 border-t border-neutral-200/80 dark:border-white/5">
                         <button
                             type="button"
                             wire:click="testCloudStorageConnection"
@@ -1749,18 +1781,102 @@
                             <span wire:loading wire:target="testCloudStorageConnection" class="inline-block animate-spin size-3.5 border-2 border-sky-500 border-t-transparent rounded-full"></span>
                             <span>{{ $this->t('btn_test_connection') }}</span>
                         </button>
-                    @else
-                        <div></div>
-                    @endif
 
-                    <button
-                        type="button"
-                        wire:click="closeCloudStorageModal"
-                        class="rounded-md border border-neutral-300/80 dark:border-white/10 bg-white dark:bg-[#202020] px-4 py-1.5 text-xs font-medium text-neutral-700 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-white/5 transition-all"
-                    >
-                        {{ $this->t('btn_close') }}
-                    </button>
-                </div>
+                        <button
+                            type="button"
+                            wire:click="closeCloudStorageModal"
+                            class="rounded-md border border-neutral-300/80 dark:border-white/10 bg-white dark:bg-[#202020] px-4 py-1.5 text-xs font-medium text-neutral-700 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-white/5 transition-all"
+                        >
+                            {{ $this->t('btn_close') }}
+                        </button>
+                    </div>
+                @else
+                    {{-- WINDOWS 11 FLUENT DIALOG: UNCONNECTED S3 / CLOUD STORAGE --}}
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="flex items-center gap-3.5">
+                            <div class="relative flex size-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-sky-500/20 via-sky-500/10 to-indigo-500/10 text-sky-500 dark:text-sky-400 border border-sky-500/20 shadow-xs">
+                                <flux:icon name="cloud" class="size-6" />
+                                <div class="absolute -bottom-0.5 -right-0.5 flex size-4 items-center justify-center rounded-full bg-amber-500 text-white shadow-xs ring-2 ring-white dark:ring-[#2c2c2c]">
+                                    <flux:icon name="exclamation-circle" class="size-3" />
+                                </div>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-semibold text-neutral-900 dark:text-white leading-tight">
+                                    {{ $this->t('cloud_unconfigured_title') }}
+                                </h3>
+                                <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
+                                    {{ $this->t('cloud_unconfigured_desc') }}
+                                </p>
+                            </div>
+                        </div>
+                        <button
+                            type="button"
+                            wire:click="closeCloudStorageModal"
+                            class="flex size-7 shrink-0 items-center justify-center rounded-lg text-neutral-400 hover:bg-neutral-100 dark:hover:bg-white/10 hover:text-neutral-700 dark:hover:text-white transition-all"
+                            title="{{ $this->t('btn_close') }}"
+                        >
+                            <flux:icon name="x-mark" class="size-4" />
+                        </button>
+                    </div>
+
+                    {{-- Fluent Info Card --}}
+                    <div class="rounded-xl border border-neutral-200/80 dark:border-white/10 bg-neutral-50/70 dark:bg-white/[0.03] p-4 space-y-3">
+                        <p class="text-xs text-neutral-600 dark:text-neutral-300 leading-relaxed">
+                            {{ $this->t('cloud_unconfigured_info') }}
+                        </p>
+
+                        {{-- Supported Providers Chips --}}
+                        <div class="space-y-1.5 pt-1">
+                            <span class="text-[10px] font-semibold text-neutral-400 uppercase tracking-wider">
+                                {{ $this->t('cloud_supported_providers') }}
+                            </span>
+                            <div class="flex flex-wrap items-center gap-1.5">
+                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white dark:bg-white/10 text-neutral-700 dark:text-neutral-200 text-[11px] font-medium border border-neutral-200 dark:border-white/5 shadow-2xs">
+                                    <flux:icon name="circle-stack" class="size-3 text-amber-500" />
+                                    AWS S3
+                                </span>
+                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white dark:bg-white/10 text-neutral-700 dark:text-neutral-200 text-[11px] font-medium border border-neutral-200 dark:border-white/5 shadow-2xs">
+                                    <flux:icon name="server" class="size-3 text-rose-500" />
+                                    MinIO
+                                </span>
+                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white dark:bg-white/10 text-neutral-700 dark:text-neutral-200 text-[11px] font-medium border border-neutral-200 dark:border-white/5 shadow-2xs">
+                                    <flux:icon name="bolt" class="size-3 text-orange-500" />
+                                    Cloudflare R2
+                                </span>
+                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white dark:bg-white/10 text-neutral-700 dark:text-neutral-200 text-[11px] font-medium border border-neutral-200 dark:border-white/5 shadow-2xs">
+                                    <flux:icon name="sparkles" class="size-3 text-amber-500" />
+                                    BunnyCDN
+                                </span>
+                            </div>
+                        </div>
+
+                        {{-- Windows 11 Fluent Callout Hint --}}
+                        <div class="rounded-lg bg-sky-500/5 dark:bg-sky-500/10 border border-sky-500/20 p-2.5 text-[11px] text-sky-700 dark:text-sky-300 flex items-start gap-2">
+                            <flux:icon name="information-circle" class="size-3.5 shrink-0 mt-0.5 text-sky-500" />
+                            <span>{{ $this->t('cloud_empty_desc') }}</span>
+                        </div>
+                    </div>
+
+                    {{-- Fluent Dialog Footer --}}
+                    <div class="flex items-center justify-end gap-2 pt-2 border-t border-neutral-200/80 dark:border-white/5">
+                        <button
+                            type="button"
+                            wire:click="closeCloudStorageModal"
+                            class="rounded-lg border border-neutral-300/80 dark:border-white/10 bg-white dark:bg-[#333] px-3.5 py-2 text-xs font-medium text-neutral-700 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-white/10 transition-all active:scale-98"
+                        >
+                            {{ $this->t('btn_close') }}
+                        </button>
+                        <button
+                            type="button"
+                            @click="$wire.closeCloudStorageModal(); $dispatch('open-app', { id: 'settings', path: 'settings?tab=filesystem' }); $dispatch('open-settings-tab', { tab: 'filesystem' })"
+                            style="background-color: var(--accent-color, {{ $accent['hex'] }});"
+                            class="inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-xs font-medium text-white shadow-sm hover:brightness-110 active:scale-98 transition-all"
+                        >
+                            <flux:icon name="cog-6-tooth" class="size-3.5" />
+                            <span>{{ $this->t('btn_open_settings') }}</span>
+                        </button>
+                    </div>
+                @endif
             </div>
         </div>
     @endif

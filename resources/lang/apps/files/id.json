@@ -116,7 +116,12 @@
     "cloud_lbl_endpoint": "Endpoint / CDN URL",
     "cloud_notice": "Aplikasi Files tetap menelusuri penyimpanan lokal server MiniOS. Operasi berkas eksternal/upload kustom di MiniOS akan otomatis disalurkan ke disk :name.",
     "cloud_empty_title": "Belum Ada Cloud Storage Aktif",
-    "cloud_empty_desc": "Konfigurasikan Amazon S3 atau BunnyCDN di menu Pengaturan > Layanan & Infrastruktur > Filesystem.",
+    "cloud_empty_desc": "Konfigurasikan Amazon S3 atau BunnyCDN di menu Pengaturan > Filesystem.",
+    "cloud_unconfigured_title": "Penyimpanan Cloud Belum Dikonfigurasi",
+    "cloud_unconfigured_desc": "Hubungkan penyimpanan berbasis S3 atau BunnyCDN untuk mengaktifkan sinkronisasi dan penyimpanan awan di MiniOS.",
+    "cloud_unconfigured_info": "MiniOS mendukung berbagai penyedia penyimpanan awan berbasis S3. Masukkan kredensial API dan nama bucket melalui menu Pengaturan Filesystem.",
+    "cloud_supported_providers": "Penyedia yang didukung:",
+    "btn_open_settings": "Buka Pengaturan Filesystem",
     "btn_test_connection": "Uji Koneksi",
     "btn_close": "Tutup",
 

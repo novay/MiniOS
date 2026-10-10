@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use Livewire\Attributes\On;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 use Novay\MiniOS\Concerns\HasNotifications;
@@ -126,9 +127,15 @@ class Settings extends Component
     /**
      * Select active tab category.
      */
-    public function setTab(string $tab): void
+    #[On('open-settings-tab')]
+    #[On('set-settings-tab')]
+    public function setTab(string|array $tab): void
     {
-        $this->activeTab = $tab;
+        $selected = is_array($tab) ? ($tab['tab'] ?? 'appearance') : $tab;
+        $validTabs = ['appearance', 'dock', 'window_manager', 'notifications', 'locale_time', 'account', 'filesystem', 'mail'];
+        if (in_array($selected, $validTabs, true)) {
+            $this->activeTab = $selected;
+        }
     }
 
     /**
