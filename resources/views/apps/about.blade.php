@@ -58,7 +58,7 @@
                 wire:click="setTab('specs')"
                 @click="tab = 'specs'"
                 :class="tab === 'specs'
-                    ? 'bg-white dark:bg-[#2c2c2c] text-neutral-900 dark:text-white shadow-2xs'
+                    ? 'bg-white dark:bg-neutral-900/80 text-neutral-900 dark:text-white shadow-2xs'
                     : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white'"
                 class="flex flex-1 items-center justify-center gap-1.5 rounded-md py-1.5 transition-all"
             >
@@ -71,7 +71,7 @@
                 wire:click="setTab('about')"
                 @click="tab = 'about'"
                 :class="tab === 'about'
-                    ? 'bg-white dark:bg-[#2c2c2c] text-neutral-900 dark:text-white shadow-2xs'
+                    ? 'bg-white dark:bg-neutral-900/80 text-neutral-900 dark:text-white shadow-2xs'
                     : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white'"
                 class="flex flex-1 items-center justify-center gap-1.5 rounded-md py-1.5 transition-all"
             >

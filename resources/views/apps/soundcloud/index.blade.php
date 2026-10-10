@@ -176,6 +176,20 @@
             window.addEventListener('minios-sc-prev', () => this.prevTrack());
             window.addEventListener('minios-sc-toggle-list', () => { this.isTracklistVisible = !this.isTracklistVisible; });
             window.addEventListener('minios-sc-request-state', () => this.broadcastPlayback());
+            window.addEventListener('minios-sc-pause', () => this.pause());
+            window.addEventListener('minios-sc-stop', () => this.pause());
+
+            window.addEventListener('window-closed', (e) => {
+                if (e.detail?.id === 'soundcloud') {
+                    this.pause();
+                }
+            });
+
+            window.addEventListener('minios:window-closed', (e) => {
+                if (e.detail?.id === 'soundcloud') {
+                    this.pause();
+                }
+            });
 
             window.addEventListener('minios-volume-changed', (e) => {
                 if (!e.detail) return;
@@ -553,6 +567,10 @@
             return num.toString();
         }
     }"
+    @window-closed.window="if ($event.detail?.id === 'soundcloud') pause()"
+    @minios:window-closed.window="if ($event.detail?.id === 'soundcloud') pause()"
+    @minios-sc-pause.window="pause()"
+    @minios-sc-stop.window="pause()"
     class="flex h-full w-full flex-col bg-[#f5f5f7] dark:bg-[#111113] text-neutral-800 dark:text-neutral-100 select-none overflow-hidden font-sans relative"
 >
     <style>

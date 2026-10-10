@@ -1046,7 +1046,10 @@ function s() {
 		closeWindow(e) {
 			let t = this.getWindow(e);
 			if (t) {
-				if (t.open = !1, t.minimized = !1, this.activeWindow === e) {
+				if (t.open = !1, t.minimized = !1, window.dispatchEvent(new CustomEvent("window-closed", { detail: { id: e } })), window.dispatchEvent(new CustomEvent("minios:window-closed", { detail: { id: e } })), e === "soundcloud" && window.scWidget) try {
+					window.scWidget.pause();
+				} catch {}
+				if (this.activeWindow === e) {
 					this.activeWindow = null;
 					let t = this.getTopVisibleWindow(e);
 					t ? this.focusWindow(t.id, { syncUrl: !0 }) : this.navigate(this.desktopPath ? this.desktopPath() : "/", { replace: !0 });

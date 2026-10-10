@@ -266,6 +266,15 @@ export function createWindowManager() {
             windowState.open = false;
             windowState.minimized = false;
 
+            window.dispatchEvent(new CustomEvent('window-closed', { detail: { id } }));
+            window.dispatchEvent(new CustomEvent('minios:window-closed', { detail: { id } }));
+
+            if (id === 'soundcloud' && window.scWidget) {
+                try {
+                    window.scWidget.pause();
+                } catch (e) {}
+            }
+
             if (this.activeWindow === id) {
                 this.activeWindow = null;
                 const next = this.getTopVisibleWindow(id);
