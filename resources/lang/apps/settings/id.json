@@ -57,6 +57,8 @@
     "dock_autohide_desc": "Sembunyikan Dock secara mulus saat kursor berada di luar area bilah.",
     "dock_indicators_title": "Tampilkan Indikator Aplikasi Aktif",
     "dock_indicators_desc": "Tampilkan titik kecil di bawah ikon aplikasi yang sedang berjalan.",
+    "dock_drag_title": "Geser Ikon Aplikasi (Drag to Reorder)",
+    "dock_drag_desc": "Izinkan menggeser ikon aplikasi di dock untuk mengubah urutan posisinya.",
 
     "window_title": "Sistem & Window",
     "window_desc": "Konfigurasi perilaku jendela aplikasi dan pemulihan sesi kerja.",

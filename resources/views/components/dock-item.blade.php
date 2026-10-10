@@ -15,16 +15,22 @@
         type="button"
         aria-label="{{ $label }}"
         @if ($appId)
-            @click.stop="openApplication(@js($appId))"
+            @pointerdown="startDockDrag($event, @js($appId))"
+            @pointermove="handleDockDragMove($event)"
+            @pointerup="handleDockDragEnd($event)"
+            @pointercancel="handleDockDragEnd($event)"
+            @click.stop="if (isDockClickSuppressed(@js($appId))) return; openApplication(@js($appId))"
             @contextmenu.prevent.stop="openDockContextMenu($event, @js($appId))"
         @endif
         {{ $attributes->except('class') }}
-        class="group relative flex items-center justify-center rounded-sm transition duration-150 hover:bg-white/40 active:bg-white/60 dark:hover:bg-white/10 dark:active:bg-white/20 focus:outline-hidden"
+        class="group relative flex items-center justify-center rounded-sm transition duration-150 hover:bg-white/40 active:bg-white/60 dark:hover:bg-white/10 dark:active:bg-white/20 focus:outline-hidden touch-none"
         :class="{
             'size-9': (settings?.dock?.size ?? 'medium') === 'small',
             'size-11': (settings?.dock?.size ?? 'medium') === 'medium',
             'size-14': (settings?.dock?.size ?? 'medium') === 'large',
             'bg-white/50 dark:bg-white/15 shadow-xs border border-white/20 dark:border-white/10': @js($appId) ? isWindowFocused(@js($appId)) : applicationsOpen,
+            'cursor-grab': @js($appId) && isDockDragEnabled() && !isDockDragging(@js($appId)),
+            'cursor-grabbing': @js($appId) && isDockDragEnabled() && isDockDragging(@js($appId)),
         }"
     >
         {{-- Windows 11 Running & Active Indicators --}}
@@ -113,11 +119,12 @@
 
     {{-- Windows 11 Flyout Tooltip --}}
     <div
-        class="pointer-events-none absolute z-[100] whitespace-nowrap rounded-md border border-neutral-200/80 dark:border-white/10 bg-white/95 dark:bg-[#2b2b2b]/95 px-2.5 py-1 text-[11px] font-normal text-neutral-800 dark:text-neutral-100 opacity-0 shadow-lg backdrop-blur-md transition-opacity duration-150 group-hover:opacity-100 select-none"
+        class="pointer-events-none absolute z-[100] whitespace-nowrap rounded-md border border-neutral-200/80 dark:border-white/10 bg-white/95 dark:bg-[#2b2b2b]/95 px-2.5 py-1 text-[11px] font-normal text-neutral-800 dark:text-neutral-100 opacity-0 shadow-lg backdrop-blur-md transition-opacity duration-150 select-none"
         :class="{
             '-top-9 left-1/2 -translate-x-1/2': (settings?.dock?.position ?? 'bottom') === 'bottom',
             'left-full ml-3 top-1/2 -translate-y-1/2': (settings?.dock?.position ?? 'bottom') === 'left',
             'right-full mr-3 top-1/2 -translate-y-1/2': (settings?.dock?.position ?? 'bottom') === 'right',
+            'group-hover:opacity-100': !isDockDragging(),
         }"
     >
         {{ $label }}

@@ -57,6 +57,8 @@
     "dock_autohide_desc": "Seamlessly hide Dock when cursor is outside the bar area.",
     "dock_indicators_title": "Show Active App Indicators",
     "dock_indicators_desc": "Show a small dot under running application icons.",
+    "dock_drag_title": "Drag to Reorder Icons",
+    "dock_drag_desc": "Allow dragging application icons on the dock to customize their order.",
 
     "window_title": "System & Window",
     "window_desc": "Configure application window behavior and session restoration.",

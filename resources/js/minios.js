@@ -51,6 +51,9 @@ export default function minios(applications = {}, userSettings = {}) {
 
         dragState: null,
         resizeState: null,
+        dockDrag: null,
+        dockDrop: null,
+        dockDragSuppressedId: null,
 
         pointerMoveHandler: null,
         pointerUpHandler: null,
@@ -135,6 +138,20 @@ export default function minios(applications = {}, userSettings = {}) {
             */
 
             this.restoreWindowSession();
+
+            try {
+                const cachedPinned = localStorage.getItem('minios:dock:pinned_apps');
+                if (cachedPinned) {
+                    const parsed = JSON.parse(cachedPinned);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        if (!this.settings) this.settings = {};
+                        if (!this.settings.dock) this.settings.dock = {};
+                        if (!this.settings.dock.pinned_apps || !Array.isArray(this.settings.dock.pinned_apps)) {
+                            this.settings.dock.pinned_apps = parsed;
+                        }
+                    }
+                }
+            } catch (e) {}
 
 
             /*
@@ -1860,6 +1877,12 @@ export default function minios(applications = {}, userSettings = {}) {
         */
 
         handlePointerMove(event) {
+            if (this.dockDrag?.active) {
+                this.handleDockDragMove(event);
+
+                return;
+            }
+
             if (this.dragState) {
                 this.handleDrag(event);
 
@@ -2098,7 +2121,11 @@ export default function minios(applications = {}, userSettings = {}) {
         |--------------------------------------------------------------------------
         */
 
-        handlePointerUp() {
+        handlePointerUp(event) {
+            if (this.dockDrag) {
+                this.handleDockDragEnd(event);
+            }
+
             const wasInteracting =
                 !!this.dragState ||
                 !!this.resizeState;
@@ -2358,17 +2385,31 @@ export default function minios(applications = {}, userSettings = {}) {
 
         /*
         |--------------------------------------------------------------------------
-        | Dock App Pinning
+        | Dock App Pinning & Drag-to-Reorder
         |--------------------------------------------------------------------------
         */
 
         getPinnedAppIds() {
-            if (this.settings?.dock?.pinned_apps && Array.isArray(this.settings.dock.pinned_apps)) {
+            if (this.settings?.dock?.pinned_apps && Array.isArray(this.settings.dock.pinned_apps) && this.settings.dock.pinned_apps.length > 0) {
                 return [...this.settings.dock.pinned_apps];
             }
             return Object.keys(this.applications).filter(
                 id => Boolean(this.applications[id]?.pinned)
             );
+        },
+
+        getDockAppIds() {
+            const pinned = this.getPinnedAppIds();
+            const running = Object.keys(this.windows || {}).filter(
+                id => this.isWindowRunning(id) && !pinned.includes(id) && Boolean(this.applications[id])
+            );
+            return [...pinned, ...running];
+        },
+
+        getDockAppOrder(id) {
+            const list = this.getDockAppIds();
+            const idx = list.indexOf(id);
+            return idx === -1 ? 999 : idx;
         },
 
         isAppPinned(id) {
@@ -2377,6 +2418,322 @@ export default function minios(applications = {}, userSettings = {}) {
 
         isAppInDock(id) {
             return this.isAppPinned(id) || this.isWindowRunning(id);
+        },
+
+        isDockDragging(id = null) {
+            if (this.dockDrag?.active) {
+                return id ? this.dockDrag.appId === id : true;
+            }
+            if (this.dockDrop) {
+                return id ? this.dockDrop.appId === id : true;
+            }
+            return false;
+        },
+
+        isDockDragEnabled() {
+            const val = this.settings?.dock?.enable_drag;
+            if (val === false || val === 'false' || val === 0 || val === '0') {
+                return false;
+            }
+            return true;
+        },
+
+        isDockClickSuppressed(id) {
+            return this.dockDragSuppressedId === id;
+        },
+
+        measureDockItems() {
+            const dockNav = document.querySelector('[data-desktop-dock] nav');
+            if (!dockNav) return [];
+
+            const wrappers = Array.from(dockNav.querySelectorAll('[data-dock-wrapper]'));
+            const visible = wrappers.filter(el => {
+                const id = el.getAttribute('data-dock-wrapper');
+                return id && this.isAppInDock(id);
+            });
+
+            visible.sort((a, b) => {
+                const idA = a.getAttribute('data-dock-wrapper');
+                const idB = b.getAttribute('data-dock-wrapper');
+                return this.getDockAppOrder(idA) - this.getDockAppOrder(idB);
+            });
+
+            return visible.map(el => {
+                const id = el.getAttribute('data-dock-wrapper');
+                const rect = el.getBoundingClientRect();
+                return {
+                    id,
+                    rect,
+                    centerX: rect.left + rect.width / 2,
+                    centerY: rect.top + rect.height / 2,
+                    width: rect.width,
+                    height: rect.height,
+                };
+            });
+        },
+
+        startDockDrag(event, appId) {
+            if (!this.isDockDragEnabled()) return;
+            if (event.button !== 0 && event.pointerType === 'mouse') return;
+
+            this.closeContextMenu();
+            this.dockDrop = null;
+
+            const dockPos = this.settings?.dock?.position ?? 'bottom';
+            const isHorizontal = dockPos === 'bottom';
+            const visibleItems = this.measureDockItems();
+            const initialIndex = visibleItems.findIndex(item => item.id === appId);
+
+            if (initialIndex === -1) return;
+
+            let slotSize = 48;
+            if (visibleItems.length > 1) {
+                const first = visibleItems[0];
+                const last = visibleItems[visibleItems.length - 1];
+                slotSize = isHorizontal
+                    ? Math.abs(last.centerX - first.centerX) / (visibleItems.length - 1)
+                    : Math.abs(last.centerY - first.centerY) / (visibleItems.length - 1);
+            } else if (visibleItems.length === 1) {
+                slotSize = isHorizontal ? visibleItems[0].width : visibleItems[0].height;
+            }
+            if (!slotSize || slotSize <= 0) slotSize = 48;
+
+            this.dockDrag = {
+                active: false,
+                hasMoved: false,
+                appId: appId,
+                startX: event.clientX,
+                startY: event.clientY,
+                currentX: event.clientX,
+                currentY: event.clientY,
+                deltaX: 0,
+                deltaY: 0,
+                initialIndex: initialIndex,
+                targetIndex: initialIndex,
+                slotSize: slotSize,
+                isHorizontal: isHorizontal,
+                visibleItems: visibleItems,
+                pointerId: event.pointerId,
+                targetElement: event.currentTarget,
+            };
+
+            try {
+                if (event.currentTarget && typeof event.currentTarget.setPointerCapture === 'function') {
+                    event.currentTarget.setPointerCapture(event.pointerId);
+                }
+            } catch (e) {}
+        },
+
+        handleDockDragMove(event) {
+            if (!this.dockDrag || !this.isDockDragEnabled()) return;
+
+            const dx = event.clientX - this.dockDrag.startX;
+            const dy = event.clientY - this.dockDrag.startY;
+
+            if (!this.dockDrag.hasMoved) {
+                const threshold = 4;
+                if (Math.hypot(dx, dy) >= threshold) {
+                    this.dockDrag.hasMoved = true;
+                    this.dockDrag.active = true;
+                    this.dockDragSuppressedId = this.dockDrag.appId;
+                    document.body.style.userSelect = 'none';
+                    document.body.style.cursor = 'grabbing';
+                } else {
+                    return;
+                }
+            }
+
+            if (!this.dockDrag.active) return;
+
+            this.dockDrag.currentX = event.clientX;
+            this.dockDrag.currentY = event.clientY;
+
+            if (this.dockDrag.isHorizontal) {
+                this.dockDrag.deltaX = dx;
+                this.dockDrag.deltaY = Math.max(-14, Math.min(14, dy));
+            } else {
+                this.dockDrag.deltaX = Math.max(-14, Math.min(14, dx));
+                this.dockDrag.deltaY = dy;
+            }
+
+            const items = this.dockDrag.visibleItems;
+            if (items.length > 0) {
+                let bestIndex = this.dockDrag.initialIndex;
+                let minDistance = Infinity;
+                const pointerCoord = this.dockDrag.isHorizontal ? event.clientX : event.clientY;
+
+                items.forEach((item, index) => {
+                    const itemCoord = this.dockDrag.isHorizontal ? item.centerX : item.centerY;
+                    const dist = Math.abs(pointerCoord - itemCoord);
+                    if (dist < minDistance) {
+                        minDistance = dist;
+                        bestIndex = index;
+                    }
+                });
+
+                this.dockDrag.targetIndex = Math.max(0, Math.min(items.length - 1, bestIndex));
+            }
+        },
+
+        handleDockDragEnd(event) {
+            if (!this.dockDrag) return;
+
+            const drag = this.dockDrag;
+
+            try {
+                const targetEl = drag.targetElement || event?.currentTarget;
+                if (targetEl && typeof targetEl.releasePointerCapture === 'function' && drag.pointerId !== undefined) {
+                    targetEl.releasePointerCapture(drag.pointerId);
+                }
+            } catch (e) {}
+
+            document.body.style.userSelect = '';
+            document.body.style.cursor = '';
+
+            if (drag.hasMoved && drag.active) {
+                this.dockDragSuppressedId = drag.appId;
+
+                const hasReordered = drag.targetIndex !== drag.initialIndex && drag.visibleItems.length > 0;
+                let dropOffsetX = 0;
+                let dropOffsetY = 0;
+
+                if (hasReordered) {
+                    const currentDockAppIds = this.getDockAppIds();
+                    const fromId = drag.appId;
+                    const toItem = drag.visibleItems[drag.targetIndex];
+
+                    if (toItem && toItem.id !== fromId) {
+                        const fromIdx = currentDockAppIds.indexOf(fromId);
+                        if (fromIdx !== -1) {
+                            currentDockAppIds.splice(fromIdx, 1);
+                            const toIdx = currentDockAppIds.indexOf(toItem.id);
+                            if (toIdx !== -1) {
+                                if (drag.targetIndex > drag.initialIndex) {
+                                    currentDockAppIds.splice(toIdx + 1, 0, fromId);
+                                } else {
+                                    currentDockAppIds.splice(toIdx, 0, fromId);
+                                }
+                            } else {
+                                currentDockAppIds.push(fromId);
+                            }
+
+                            if (!this.settings) this.settings = {};
+                            if (!this.settings.dock) this.settings.dock = {};
+                            this.settings.dock.pinned_apps = [...currentDockAppIds];
+
+                            if (this.applications[fromId]) {
+                                this.applications[fromId].pinned = true;
+                            }
+
+                            this.persistDockPinnedApps(this.settings.dock.pinned_apps);
+                        }
+                    }
+
+                    const initialItem = drag.visibleItems[drag.initialIndex];
+                    const targetItem = drag.visibleItems[drag.targetIndex];
+                    const targetDistX = targetItem && initialItem ? (targetItem.centerX - initialItem.centerX) : 0;
+                    const targetDistY = targetItem && initialItem ? (targetItem.centerY - initialItem.centerY) : 0;
+
+                    dropOffsetX = drag.deltaX - targetDistX;
+                    dropOffsetY = drag.deltaY - targetDistY;
+                } else {
+                    dropOffsetX = drag.deltaX;
+                    dropOffsetY = drag.deltaY;
+                }
+
+                this.dockDrop = {
+                    appId: drag.appId,
+                    offsetX: dropOffsetX,
+                    offsetY: dropOffsetY,
+                    animating: false,
+                };
+
+                this.dockDrag = null;
+
+                requestAnimationFrame(() => {
+                    if (this.dockDrop) {
+                        this.dockDrop.animating = true;
+                    }
+                });
+
+                setTimeout(() => {
+                    this.dockDrop = null;
+                    this.dockDragSuppressedId = null;
+                }, 240);
+            } else {
+                this.dockDrag = null;
+                this.dockDrop = null;
+                setTimeout(() => {
+                    this.dockDragSuppressedId = null;
+                }, 100);
+            }
+        },
+
+        getDockItemStyle(id) {
+            if (!this.isAppInDock(id)) {
+                return 'display: none !important;';
+            }
+
+            const order = this.getDockAppOrder(id);
+            let style = `order: ${order};`;
+
+            // Active dragging
+            if (this.dockDrag && this.dockDrag.active) {
+                const drag = this.dockDrag;
+
+                if (drag.appId === id) {
+                    const tx = drag.deltaX;
+                    const ty = drag.deltaY;
+                    return `${style} transform: translate3d(${tx}px, ${ty}px, 0) scale(1.08); z-index: 60; opacity: 0.95; filter: drop-shadow(0 10px 18px rgba(0,0,0,0.3)); transition: none; pointer-events: none;`;
+                }
+
+                const items = drag.visibleItems;
+                const curIdx = items.findIndex(item => item.id === id);
+
+                if (curIdx === -1) {
+                    return style;
+                }
+
+                let shift = 0;
+                const initIdx = drag.initialIndex;
+                const targetIdx = drag.targetIndex;
+                const slot = drag.slotSize;
+
+                if (targetIdx > initIdx) {
+                    if (curIdx > initIdx && curIdx <= targetIdx) {
+                        shift = -slot;
+                    }
+                } else if (targetIdx < initIdx) {
+                    if (curIdx >= targetIdx && curIdx < initIdx) {
+                        shift = slot;
+                    }
+                }
+
+                if (shift !== 0) {
+                    const tx = drag.isHorizontal ? shift : 0;
+                    const ty = drag.isHorizontal ? 0 : shift;
+                    return `${style} transform: translate3d(${tx}px, ${ty}px, 0); transition: transform 0.22s cubic-bezier(0.2, 0, 0, 1);`;
+                }
+
+                return `${style} transform: translate3d(0, 0, 0); transition: transform 0.22s cubic-bezier(0.2, 0, 0, 1);`;
+            }
+
+            // Smooth drop landing animation
+            if (this.dockDrop) {
+                if (this.dockDrop.appId === id) {
+                    if (this.dockDrop.animating) {
+                        return `${style} transform: translate3d(0, 0, 0) scale(1); z-index: 60; opacity: 1; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); transition: transform 0.22s cubic-bezier(0.2, 0, 0, 1), scale 0.22s cubic-bezier(0.2, 0, 0, 1), filter 0.22s ease-out; pointer-events: none;`;
+                    }
+                    const ox = this.dockDrop.offsetX;
+                    const oy = this.dockDrop.offsetY;
+                    return `${style} transform: translate3d(${ox}px, ${oy}px, 0) scale(1.08); z-index: 60; opacity: 0.98; transition: none; pointer-events: none;`;
+                }
+
+                // Neighbor items: ALREADY in their new order slot. Must NOT jump or animate!
+                return `${style} transform: translate3d(0, 0, 0); transition: none !important;`;
+            }
+
+            return `${style} transform: translate3d(0, 0, 0); transition: none;`;
         },
 
         pinApp(id) {
@@ -3062,7 +3419,7 @@ export default function minios(applications = {}, userSettings = {}) {
 
 
         shouldHideDock() {
-            if (this.dockHovered || this.applicationsOpen || this.activitiesOpen) {
+            if (this.dockHovered || this.applicationsOpen || this.activitiesOpen || this.dockDrag?.active || this.dockDrop) {
                 return false;
             }
 

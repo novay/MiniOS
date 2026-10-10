@@ -111,6 +111,7 @@ class Settings extends Component
     {
         $this->appearance = os_setting()->getCategory('appearance');
         $this->dock = os_setting()->getCategory('dock');
+        $this->dock['enable_drag'] = (bool) ($this->dock['enable_drag'] ?? true);
         $this->window_manager = os_setting()->getCategory('window_manager');
         $this->locale_time = os_setting()->getCategory('locale_time');
         $this->notifications = os_setting()->getCategory('notifications');
@@ -468,7 +469,7 @@ class Settings extends Component
                 'desc' => $this->trans('nav_dock_desc'),
                 'icon' => 'rectangle-stack',
                 'color' => 'bg-amber-500 text-white',
-                'keywords' => ['dock', 'taskbar', 'ukuran', 'posisi', 'layar', 'autohide', 'sembunyikan', 'indikator', 'aplikasi', 'size', 'position', 'screen', 'indicators'],
+                'keywords' => ['dock', 'taskbar', 'ukuran', 'posisi', 'layar', 'autohide', 'sembunyikan', 'indikator', 'aplikasi', 'size', 'position', 'screen', 'indicators', 'drag', 'geser', 'reorder'],
             ],
             'window_manager' => [
                 'label' => $this->trans('nav_window_manager'),

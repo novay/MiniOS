@@ -83,7 +83,8 @@
                 <div
                     x-cloak
                     x-show="isAppInDock(@js($id))"
-                    class="transition-all duration-200"
+                    data-dock-wrapper="{{ $id }}"
+                    :style="isAppInDock(@js($id)) ? getDockItemStyle(@js($id)) : 'display: none !important;'"
                 >
                     <x-minios.dock-item
                         :label="$application['name']"

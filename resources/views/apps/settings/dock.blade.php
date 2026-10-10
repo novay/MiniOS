@@ -63,4 +63,13 @@
         </div>
         <flux:switch wire:model.live="dock.show_indicators" />
     </div>
+
+    {{-- Geser Aplikasi di Dock Card --}}
+    <div class="flex items-start justify-between rounded-xl bg-white dark:bg-[#2b2b2b]/70 border border-neutral-200/90 dark:border-white/5 p-4 sm:p-5 shadow-2xs">
+        <div class="space-y-1">
+            <div class="text-sm font-semibold text-neutral-900 dark:text-white">{{ $this->t('dock_drag_title') }}</div>
+            <div class="text-xs text-neutral-500 dark:text-neutral-400">{{ $this->t('dock_drag_desc') }}</div>
+        </div>
+        <flux:switch wire:model.live="dock.enable_drag" />
+    </div>
 </div>

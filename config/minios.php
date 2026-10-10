@@ -67,6 +67,7 @@ return [
             'position' => 'bottom',
             'autohide' => false,
             'show_indicators' => true,
+            'enable_drag' => true,
             'pinned_apps' => ['settings', 'files', 'terminal'],
         ],
 
