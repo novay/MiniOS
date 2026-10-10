@@ -9,6 +9,8 @@
         <!-- Session Status -->
         <x-auth-session-status class="mt-3 text-center text-xs font-medium text-emerald-400" :status="session('status')" />
 
+        <x-passkey-verify />
+
         {{-- Login Form --}}
         <form method="POST" action="{{ route('login.store') }}" class="w-full space-y-4 text-left">
             @csrf
@@ -52,8 +54,6 @@
                 {{ __('Log in') }}
             </flux:button>
         </form>
-
-        <x-passkey-verify />
 
         <div class="mt-6 text-white/60 text-sm">
             <span>{{ __('Don\'t have an account?') }}</span>
