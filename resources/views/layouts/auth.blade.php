@@ -36,23 +36,21 @@
         setInterval(() => updateLockClock(), 1000);
     "
     style="background-image: url('{{ asset('minios/wallpapers/'.$wallpaperFile) }}'); background-size: cover; background-position: center; background-repeat: no-repeat;"
-    class="fixed inset-0 z-[99999] flex flex-col items-center justify-between overflow-y-auto p-8 text-white select-none font-sans antialiased"
+    class="fixed inset-0 z-[99999] flex flex-col items-center justify-center overflow-y-auto p-4 sm:p-6 text-white select-none font-sans antialiased"
 >
     {{-- Glassmorphism Blur Overlay --}}
     <div class="fixed inset-0 bg-neutral-950/60 backdrop-blur-2xl"></div>
 
-    {{-- Main Content Layer --}}
-    <div class="relative z-10 flex min-h-full w-full flex-col items-center justify-between">
-
-        {{-- Center Section: Auth Card & Form --}}
-        <div class="my-auto flex w-full max-w-sm flex-col items-center text-center py-6">
+    {{-- Main Content Layer (Perfect Middle-Center) --}}
+    <div class="relative z-10 flex min-h-full w-full flex-col items-center justify-center py-12">
+        <div class="my-auto flex w-full max-w-sm flex-col items-center text-center">
             {{ $slot }}
         </div>
+    </div>
 
-        {{-- Bottom Section: System Footer --}}
-        <div class="mb-4 text-center text-xs text-white/50">
-            <span>MiniOS (Desktop Environment)</span>
-        </div>
+    {{-- Bottom Section: System Footer --}}
+    <div class="fixed bottom-4 inset-x-0 z-20 text-center text-xs text-white/50 pointer-events-none">
+        <span>MiniOS (Desktop Environment)</span>
     </div>
 
     @persist('toast')
