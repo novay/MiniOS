@@ -3,3 +3,7 @@
 .github export-ignore
 .gitignore export-ignore
 .editorconfig export-ignore
+tests export-ignore
+phpunit.xml* export-ignore
+vite.package.config.js export-ignore
+/resources/js export-ignore

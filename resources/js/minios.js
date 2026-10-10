@@ -7,17 +7,18 @@ import { createSystemUI } from './core/system-ui.js';
 import { mergeSlices } from './core/utils.js';
 import { createWindowManager } from './core/window-manager.js';
 
-export default function minios(applications = {}, userSettings = {}) {
+export default function minios(applications = {}, userSettings = {}, basePath = '/') {
     const instance = {
 
         /*
         |--------------------------------------------------------------------------
-        | Applications & Settings
+        | Applications, Settings & Base Path
         |--------------------------------------------------------------------------
         */
 
         applications,
         settings: userSettings,
+        basePath: basePath || '/',
         initialized: false,
 
         /*

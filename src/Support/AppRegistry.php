@@ -61,7 +61,7 @@ class AppRegistry
      */
     public function toArray(): array
     {
-        $result = [];
+        $prefix = trim(config('minios.prefix', ''), '/');
 
         foreach ($this->apps as $id => $app) {
             $requiredPackages = [];
@@ -78,11 +78,14 @@ class AppRegistry
                 }
             }
 
+            $entry = $this->formatRoute($app->entry(), $prefix);
+            $routes = array_map(fn ($r) => $this->formatRoute($r, $prefix), (array) $app->routes());
+
             $result[$id] = [
                 'name' => $app->name(),
                 'icon' => $app->icon(),
-                'entry' => $app->entry(),
-                'routes' => $app->routes(),
+                'entry' => $entry,
+                'routes' => $routes,
                 'pinned' => $app->isPinned(),
                 'component' => $app->component(),
                 'window' => $app->window()->toArray(),
@@ -92,5 +95,28 @@ class AppRegistry
         }
 
         return $result;
+    }
+
+    /**
+     * Format route with configured prefix.
+     */
+    protected function formatRoute(string $route, string $prefix): string
+    {
+        $cleanRoute = '/'.ltrim($route, '/');
+        if ($prefix === '') {
+            return $cleanRoute;
+        }
+
+        $prefixPath = "/{$prefix}";
+
+        if (str_starts_with($cleanRoute, "{$prefixPath}/") || $cleanRoute === $prefixPath) {
+            return $cleanRoute;
+        }
+
+        if (str_starts_with($cleanRoute, '/desktop/')) {
+            $cleanRoute = substr($cleanRoute, 8);
+        }
+
+        return rtrim($prefixPath, '/').'/'.ltrim($cleanRoute, '/');
     }
 }

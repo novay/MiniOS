@@ -19,6 +19,7 @@
 
     @fonts
     @livewireStyles
+    @miniosStyles
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @fluxAppearance
 </head>
@@ -38,5 +39,6 @@
     {{-- app.js bundles and starts Livewire/Alpine. Emit config, not a second runtime. --}}
     @livewireScriptConfig
     @fluxScripts
+    @miniosScripts
 </body>
 </html>

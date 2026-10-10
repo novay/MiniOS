@@ -4,7 +4,7 @@
 @endphp
 
 <div
-    x-data="minios(@js(config('desktop.applications')), @js(os_setting()->all()))"
+    x-data="minios(@js(config('desktop.applications')), @js(os_setting()->all()), @js(os_path()))"
 
     @contextmenu.prevent="openContextMenu($event)"
 
@@ -123,7 +123,7 @@
                 label="{{ __('Home') }}"
                 selected="selectedShortcut === 'home'"
                 @click.stop="selectedShortcut = 'home'"
-                @dblclick="navigate('/files/home')"
+                @dblclick="navigate(desktopPath('/files/home'))"
             >
 
                 <x-minios.icon name="home" class="h-full w-full" />

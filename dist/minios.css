@@ -1,0 +1,260 @@
+[x-cloak] {
+    display: none !important;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Desktop
+|--------------------------------------------------------------------------
+*/
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+body {
+    margin: 0;
+    user-select: none;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Ubuntu-like wallpaper
+|--------------------------------------------------------------------------
+*/
+
+.desktop-wallpaper {
+    background:
+        radial-gradient(circle at 82% 18%,
+            rgba(242, 112, 33, 0.38),
+            transparent 28%),
+        radial-gradient(circle at 25% 78%,
+            rgba(119, 41, 83, 0.72),
+            transparent 38%),
+        linear-gradient(135deg,
+            #2c001e 0%,
+            #5e2750 42%,
+            #772953 68%,
+            #e95420 135%);
+}
+
+
+
+/*
+|--------------------------------------------------------------------------
+| Desktop text shadow
+|--------------------------------------------------------------------------
+*/
+
+.desktop-label {
+    text-shadow:
+        0 1px 2px rgba(0, 0, 0, .9),
+        0 2px 6px rgba(0, 0, 0, .6);
+}
+
+/*
+|--------------------------------------------------------------------------
+| Dock
+|--------------------------------------------------------------------------
+*/
+
+.desktop-dock {
+    background: rgba(255, 255, 255, 0.28);
+    border-color: rgba(255, 255, 255, 0.35);
+    box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.05);
+    backdrop-filter: blur(28px) saturate(180%);
+    -webkit-backdrop-filter: blur(28px) saturate(180%);
+}
+
+.dark .desktop-dock {
+    background: rgba(18, 18, 18, 0.38);
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 -4px 28px rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(28px) saturate(180%);
+    -webkit-backdrop-filter: blur(28px) saturate(180%);
+}
+
+/*
+|--------------------------------------------------------------------------
+| Top bar
+|--------------------------------------------------------------------------
+*/
+
+.desktop-topbar {
+    background: rgba(255, 255, 255, 0.45);
+    color: #1c1c1e;
+    box-shadow: none;
+    border: none;
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+}
+
+.dark .desktop-topbar {
+    background: rgba(0, 0, 0, 0.45);
+    color: #ffffff;
+    box-shadow: none;
+    border: none;
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+}
+
+/*
+|--------------------------------------------------------------------------
+| No Blur Override (Panel Blur Toggle)
+|--------------------------------------------------------------------------
+*/
+
+html.no-blur .desktop-dock {
+    background: rgba(255, 255, 255, 0.95) !important;
+}
+
+html.dark.no-blur .desktop-dock {
+    background: rgba(22, 17, 21, 0.98) !important;
+}
+
+html.no-blur .desktop-topbar {
+    background: rgba(255, 255, 255, 1) !important;
+}
+
+html.dark.no-blur .desktop-topbar {
+    background: rgba(25, 21, 24, 1) !important;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Desktop Window Motion
+|--------------------------------------------------------------------------
+*/
+
+.desktop-window-motion {
+    transition-property:
+        left,
+        top,
+        width,
+        height,
+        border-radius,
+        box-shadow;
+
+    transition-duration: 300ms;
+
+    transition-timing-function:
+        cubic-bezier(0.22, 1, 0.36, 1);
+
+    will-change:
+        left,
+        top,
+        width,
+        height;
+}
+
+
+.desktop-window-no-motion {
+    transition: none !important;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Dynamic Font Family Presets
+|--------------------------------------------------------------------------
+*/
+
+:root {
+    --font-ubuntu: 'Ubuntu', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-segoe: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+    --font-system: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-inter: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-google: 'Google Sans', 'Product Sans', 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-sf: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+}
+
+[data-font="ubuntu"],
+[data-font="ubuntu"] body,
+[data-font="ubuntu"] button,
+[data-font="ubuntu"] input,
+[data-font="ubuntu"] select,
+[data-font="ubuntu"] textarea {
+    font-family: var(--font-ubuntu) !important;
+}
+
+[data-font="segoe"],
+[data-font="segoe"] body,
+[data-font="segoe"] button,
+[data-font="segoe"] input,
+[data-font="segoe"] select,
+[data-font="segoe"] textarea {
+    font-family: var(--font-segoe) !important;
+}
+
+[data-font="system-ui"],
+[data-font="system-ui"] body,
+[data-font="system-ui"] button,
+[data-font="system-ui"] input,
+[data-font="system-ui"] select,
+[data-font="system-ui"] textarea {
+    font-family: var(--font-system) !important;
+}
+
+[data-font="inter"],
+[data-font="inter"] body,
+[data-font="inter"] button,
+[data-font="inter"] input,
+[data-font="inter"] select,
+[data-font="inter"] textarea {
+    font-family: var(--font-inter) !important;
+}
+
+[data-font="google"],
+[data-font="google"] body,
+[data-font="google"] button,
+[data-font="google"] input,
+[data-font="google"] select,
+[data-font="google"] textarea {
+    font-family: var(--font-google) !important;
+}
+
+[data-font="san-francisco"],
+[data-font="san-francisco"] body,
+[data-font="san-francisco"] button,
+[data-font="san-francisco"] input,
+[data-font="san-francisco"] select,
+[data-font="san-francisco"] textarea {
+    font-family: var(--font-sf) !important;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Windows 11 Toast Entrance Animations
+|--------------------------------------------------------------------------
+*/
+@keyframes win11ToastInRight {
+    0% {
+        transform: translate3d(110%, 0, 0) scale(0.96);
+        opacity: 0;
+    }
+    100% {
+        transform: translate3d(0, 0, 0) scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes win11ToastInLeft {
+    0% {
+        transform: translate3d(-110%, 0, 0) scale(0.96);
+        opacity: 0;
+    }
+    100% {
+        transform: translate3d(0, 0, 0) scale(1);
+        opacity: 1;
+    }
+}
+
+.animate-toast-in-right {
+    animation: win11ToastInRight 200ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-toast-in-left {
+    animation: win11ToastInLeft 200ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}

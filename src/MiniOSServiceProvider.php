@@ -56,6 +56,11 @@ class MiniOSServiceProvider extends ServiceProvider
         $this->registerPublishing();
         $this->registerResources();
 
+        $prefix = MiniOS::prefix();
+        if ($prefix !== '' && config('fortify.home') === '/') {
+            config(['fortify.home' => MiniOS::path()]);
+        }
+
         /** @var MiniOS $minios */
         $minios = $this->app->make('novay.minios');
 
@@ -197,6 +202,10 @@ class MiniOSServiceProvider extends ServiceProvider
             ], 'minios-assets');
 
             $this->publishes([
+                __DIR__.'/../dist' => public_path('vendor/minios'),
+            ], 'minios-dist');
+
+            $this->publishes([
                 __DIR__.'/../resources/js' => resource_path('js/vendor/minios'),
                 __DIR__.'/../resources/css' => resource_path('css/vendor/minios'),
             ], 'minios-src');
@@ -216,6 +225,14 @@ class MiniOSServiceProvider extends ServiceProvider
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'minios');
         $this->loadJsonTranslationsFrom(__DIR__.'/../resources/lang');
+
+        Blade::directive('miniosStyles', function () {
+            return '<?php echo \Novay\MiniOS\MiniOS::styles(); ?>';
+        });
+
+        Blade::directive('miniosScripts', function () {
+            return '<?php echo \Novay\MiniOS\MiniOS::scripts(); ?>';
+        });
 
         Blade::anonymousComponentPath(__DIR__.'/../resources/views/components', 'minios');
 

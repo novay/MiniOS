@@ -115,9 +115,10 @@ export function createShortcuts() {
                 return;
             }
 
-            // 4. If no open window exists in state, but URL is not '/', navigate back to '/'
-            if (this.normalizePath(window.location.pathname) !== '/') {
-                this.navigate('/', { replace: true });
+            // 4. If no open window exists in state, but URL is not desktop root, navigate back to desktop root
+            const rootPath = this.desktopPath ? this.desktopPath() : '/';
+            if (this.normalizePath(window.location.pathname) !== this.normalizePath(rootPath)) {
+                this.navigate(rootPath, { replace: true });
             }
         },
     };

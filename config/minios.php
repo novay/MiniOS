@@ -4,13 +4,17 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | MiniOS Applications
+    | MiniOS URL Prefix / Path
     |--------------------------------------------------------------------------
     |
-    | Additional application manifests that should be automatically registered
-    | into MiniOS on boot.
+    | The URL prefix where the MiniOS desktop environment and its applications
+    | will be accessible. By default, it runs at the root ('').
+    | You can set this to 'desktop' (or via MINIOS_PREFIX env) so all desktop
+    | URLs live under '/desktop', keeping root for landing pages or docs.
     |
     */
+
+    'prefix' => env('MINIOS_PREFIX', ''),
 
     'apps' => [
         // \App\MiniOS\Todo\TodoApp::class,

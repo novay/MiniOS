@@ -273,7 +273,7 @@ export function createWindowManager() {
                 if (next) {
                     this.focusWindow(next.id, { syncUrl: true });
                 } else {
-                    this.navigate('/', { replace: true });
+                    this.navigate(this.desktopPath ? this.desktopPath() : '/', { replace: true });
                 }
             }
 
@@ -304,7 +304,7 @@ export function createWindowManager() {
                 if (next) {
                     this.focusWindow(next.id, { syncUrl: true });
                 } else {
-                    this.navigate('/', { replace: true });
+                    this.navigate(this.desktopPath ? this.desktopPath() : '/', { replace: true });
                 }
             }
 

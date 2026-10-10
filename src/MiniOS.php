@@ -113,6 +113,63 @@ class MiniOS
     }
 
     /**
+     * Get configured desktop URL prefix.
+     */
+    public static function prefix(): string
+    {
+        return trim(config('minios.prefix', ''), '/');
+    }
+
+    /**
+     * Get MiniOS path with configured prefix.
+     */
+    public static function path(?string $path = null): string
+    {
+        $prefix = static::prefix();
+        $cleanPath = $path !== null ? trim($path, '/') : '';
+
+        if ($prefix === '') {
+            return $cleanPath === '' ? '/' : "/{$cleanPath}";
+        }
+
+        return $cleanPath === '' ? "/{$prefix}" : "/{$prefix}/{$cleanPath}";
+    }
+
+    /**
+     * Get MiniOS full URL with configured prefix.
+     */
+    public static function url(?string $path = null): string
+    {
+        return url(static::path($path));
+    }
+
+    /**
+     * Get the HTML script tags to load MiniOS JavaScript.
+     */
+    public static function scripts(): string
+    {
+        $published = public_path('vendor/minios/minios.min.js');
+        $url = file_exists($published)
+            ? asset('vendor/minios/minios.min.js')
+            : route('minios.assets.js');
+
+        return '<script src="'.$url.'" defer></script>';
+    }
+
+    /**
+     * Get the HTML link tag to load MiniOS CSS.
+     */
+    public static function styles(): string
+    {
+        $published = public_path('vendor/minios/minios.css');
+        $url = file_exists($published)
+            ? asset('vendor/minios/minios.css')
+            : route('minios.assets.css');
+
+        return '<link rel="stylesheet" href="'.$url.'">';
+    }
+
+    /**
      * Register MiniOS desktop and lock routes.
      */
     public static function routes(): void
@@ -130,6 +187,11 @@ class MiniOS
         }
 
         if (class_exists(Fortify::class)) {
+            $prefix = static::prefix();
+            if ($prefix !== '' && config('fortify.home') === '/') {
+                config(['fortify.home' => static::path()]);
+            }
+
             $view = fn (string $name) => view("minios::auth.{$name}");
 
             Fortify::loginView(fn () => $view('login'));

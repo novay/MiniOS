@@ -45,6 +45,12 @@ export function createRouter() {
             return normalized;
         },
 
+        desktopPath(path = '') {
+            const clean = path ? '/' + path.replace(/^\/+/, '') : '';
+            const base = (this.basePath || '/').replace(/\/+$/, '');
+            return (base + clean) || '/';
+        },
+
         resolveApplication(path) {
             const normalizedPath = this.normalizePath(path);
             const matches = [];

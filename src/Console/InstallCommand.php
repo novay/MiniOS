@@ -46,6 +46,12 @@ class InstallCommand extends Command
             '--force' => $this->option('force'),
         ]);
 
+        $this->comment('Publishing MiniOS Compiled Assets (minios.min.js & minios.css)...');
+        $this->call('vendor:publish', [
+            '--tag' => 'minios-dist',
+            '--force' => $this->option('force'),
+        ]);
+
         $this->comment('Publishing MiniOS Agent Skills...');
         $this->call('vendor:publish', [
             '--tag' => 'minios-skills',
