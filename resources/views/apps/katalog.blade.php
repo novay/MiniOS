@@ -1,41 +1,75 @@
-<div
-    x-data="{
-        sidebarCollapsed: false,
-        sidebarWidth: 260,
-        isResizing: false,
-        toggleSidebar() {
-            this.sidebarCollapsed = !this.sidebarCollapsed;
-        },
-        startResize(e) {
-            if (this.sidebarCollapsed) return;
-            this.isResizing = true;
-            const startX = e.clientX;
-            const startWidth = this.sidebarWidth;
-            const onMouseMove = (ev) => {
-                if (!this.isResizing) return;
-                const newWidth = Math.min(380, Math.max(180, startWidth + (ev.clientX - startX)));
-                this.sidebarWidth = newWidth;
-            };
-            const onMouseUp = () => {
-                this.isResizing = false;
-                window.removeEventListener('mousemove', onMouseMove);
-                window.removeEventListener('mouseup', onMouseUp);
-            };
-            window.addEventListener('mousemove', onMouseMove);
-            window.addEventListener('mouseup', onMouseUp);
-        }
-    }"
-    :class="{ 'select-none cursor-col-resize': isResizing }"
-    class="relative flex h-full w-full min-h-0 overflow-hidden bg-[#f3f3f3] dark:bg-[#202020] text-neutral-800 dark:text-neutral-100 font-sans select-none"
->
+<x-minios:desktop app-id="katalog" width="260" min-width="180" max-width="380">
     {{-- ========================================================= --}}
-    {{-- WINDOWS 11 FLUENT NAVIGATION SIDEBAR (LEFT) --}}
+    {{-- 1. APPLICATION TOP MENUBAR --}}
     {{-- ========================================================= --}}
-    <aside
-        :class="sidebarCollapsed ? 'w-16 p-2' : 'p-3.5'"
-        :style="!sidebarCollapsed ? ('width: ' + sidebarWidth + 'px') : ''"
-        class="flex shrink-0 flex-col border-r border-neutral-200/90 dark:border-white/5 bg-[#f8f8f8]/85 dark:bg-[#202020]/90 backdrop-blur-xl transition-[width,padding] duration-150 relative select-none"
-    >
+    <x-minios:desktop.menu>
+        <x-minios.menubar>
+            {{-- File --}}
+            <x-minios.menubar.menu label="{{ __('File') }}">
+                <x-minios.menubar.item wire:click="openUploadModal" icon="arrow-up-tray" shortcut="⌘O">
+                    {{ $this->t('btn_install_zip') }}
+                </x-minios.menubar.item>
+                <x-minios.menubar.separator />
+                <x-minios.menubar.item @click="$dispatch('close-window', { id: 'katalog' })" icon="x-mark" shortcut="⌘W">
+                    {{ __('Tutup Jendela') }}
+                </x-minios.menubar.item>
+            </x-minios.menubar.menu>
+
+            {{-- View --}}
+            <x-minios.menubar.menu label="{{ __('View') }}">
+                <x-minios.menubar.item wire:click="setTab('explore')" icon="sparkles" shortcut="⌘1">
+                    {{ __('Jelajah') }}
+                </x-minios.menubar.item>
+                <x-minios.menubar.item wire:click="setTab('apps')" icon="squares-2x2" shortcut="⌘2">
+                    {{ __('Aplikasi') }}
+                </x-minios.menubar.item>
+                <x-minios.menubar.item wire:click="setTab('themes')" icon="swatch" shortcut="⌘3">
+                    {{ __('Tema') }}
+                </x-minios.menubar.item>
+                <x-minios.menubar.item wire:click="setTab('installed')" icon="arrow-down-tray" shortcut="⌘4">
+                    {{ $this->t('header_installed_apps') }}
+                </x-minios.menubar.item>
+                <x-minios.menubar.separator />
+                <x-minios.menubar.item @click="toggleSidebar()" icon="bars-3-bottom-left" shortcut="⌘B">
+                    <span x-text="sidebarCollapsed ? '{{ __('Buka Sidebar') }}' : '{{ __('Tutup Sidebar') }}'"></span>
+                </x-minios.menubar.item>
+            </x-minios.menubar.menu>
+
+            {{-- Window --}}
+            <x-minios.menubar.menu label="{{ __('Window') }}">
+                <x-minios.menubar.item wire:click="$refresh" icon="arrow-path" shortcut="⌘R">
+                    {{ __('Muat Ulang') }}
+                </x-minios.menubar.item>
+                <x-minios.menubar.separator />
+                <x-minios.menubar.item @click="toggleStatusbar()" icon="chart-bar" shortcut="⌘P">
+                    <span x-text="statusbarVisible ? '{{ __('Disable Status Bar') }}' : '{{ __('Enable Status Bar') }}'"></span>
+                </x-minios.menubar.item>
+            </x-minios.menubar.menu>
+
+            {{-- Help --}}
+            <x-minios.menubar.menu label="{{ __('Help') }}">
+                <x-minios.menubar.item @click="$dispatch('open-window', { id: 'docs' })" icon="book-open">
+                    {{ __('Dokumentasi Layout') }}
+                </x-minios.menubar.item>
+                <x-minios.menubar.separator />
+                <x-minios.menubar.item icon="information-circle" shortcut="⌘A">
+                    {{ __('About Katalog v1.0.0') }}
+                </x-minios.menubar.item>
+            </x-minios.menubar.menu>
+        </x-minios.menubar>
+
+        <div class="flex items-center gap-2 pr-1 text-[11px] text-neutral-400 dark:text-neutral-500">
+            <span class="flex items-center gap-1.5 font-medium">
+                <span class="size-1.5 rounded-full bg-emerald-500"></span>
+                <span>v1.0.0</span>
+            </span>
+        </div>
+    </x-minios:desktop.menu>
+
+    {{-- ========================================================= --}}
+    {{-- 2. APPLICATION NAVIGATION SIDEBAR (LEFT) --}}
+    {{-- ========================================================= --}}
+    <x-minios:desktop.sidebar>
         {{-- Store / Catalog Brand Card with Toggle Collapse Button --}}
         <div class="mb-4 flex items-center justify-between gap-2">
             <div x-show="!sidebarCollapsed" class="flex flex-1 items-center gap-2.5 min-w-0 rounded-xl p-2 bg-white/70 dark:bg-white/5 border border-neutral-200/60 dark:border-white/5 shadow-2xs">
@@ -168,22 +202,12 @@
                 <span>{{ $stats['total'] }} {{ __('Apps') }}</span>
             </div>
         </div>
-    </aside>
-
-    {{-- Resizer divider handle --}}
-    <div
-        x-show="!sidebarCollapsed"
-        @mousedown.prevent="startResize($event)"
-        class="group relative w-1 hover:w-1.5 shrink-0 cursor-col-resize select-none bg-neutral-200/60 dark:bg-white/5 hover:bg-[var(--accent-color,{{ $accent['hex'] }})]/60 transition-colors z-20"
-        title="{{ __('Geser untuk mengatur lebar sidebar') }}"
-    >
-        <div class="absolute inset-y-0 -left-1 -right-1"></div>
-    </div>
+    </x-minios:desktop.sidebar>
 
     {{-- ========================================================= --}}
-    {{-- MAIN CONTENT PANEL (RIGHT - WINDOWS 11 FLUENT MICA) --}}
+    {{-- 3. MAIN CONTENT PANEL (RIGHT - WINDOWS 11 FLUENT MICA) --}}
     {{-- ========================================================= --}}
-    <main class="@container flex flex-1 flex-col min-w-0 h-full overflow-y-auto bg-[#f3f3f3] dark:bg-[#1f1f1f]">
+    <x-minios:desktop.content>
         @if ($effectiveNav === 'explore')
             @include('minios::apps.katalog.explore')
         @elseif ($effectiveNav === 'apps')
@@ -193,10 +217,40 @@
         @else
             @include('minios::apps.katalog.installed')
         @endif
-    </main>
+    </x-minios:desktop.content>
+
+    {{-- ========================================================= --}}
+    {{-- 4. APPLICATION FIXED STATUSBAR --}}
+    {{-- ========================================================= --}}
+    <x-minios:desktop.statusbar>
+        <div class="flex items-center gap-3">
+            <span class="flex items-center gap-1.5 font-medium text-neutral-600 dark:text-neutral-300">
+                <flux:icon name="check-circle" class="size-3.5 text-emerald-500" />
+                <span>{{ __('Siap') }}</span>
+            </span>
+            <span class="text-neutral-300 dark:text-neutral-700">|</span>
+            <span>{{ $stats['total'] }} {{ __('Aplikasi Terpasang') }}</span>
+            <span class="text-neutral-300 dark:text-neutral-700">|</span>
+            <span>{{ count($catalogApps) }} {{ __('Katalog Tersedia') }}</span>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <span>{{ $this->t('storage_size', ['size' => $stats['storage']]) }}</span>
+            <span class="text-neutral-300 dark:text-neutral-700">|</span>
+            <button
+                type="button"
+                @click="toggleSidebar()"
+                class="hover:text-neutral-800 dark:hover:text-white transition-colors flex items-center gap-1"
+                :title="sidebarCollapsed ? '{{ __('Buka Sidebar') }}' : '{{ __('Tutup Sidebar') }}'"
+            >
+                <flux:icon name="bars-3-bottom-left" class="size-3" />
+                <span x-text="sidebarCollapsed ? '{{ __('Tampilkan Sidebar') }}' : '{{ __('Sembunyikan Sidebar') }}'"></span>
+            </button>
+        </div>
+    </x-minios:desktop.statusbar>
 
     {{-- ========================================================= --}}
     {{-- WINDOW-SCOPED APPLICATION MODALS --}}
     {{-- ========================================================= --}}
     @include('minios::apps.katalog.modals.index')
-</div>
+</x-minios:desktop>

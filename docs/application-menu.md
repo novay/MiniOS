@@ -162,18 +162,82 @@ Berikut adalah contoh implementasi lengkap menubar pada header window mini-app:
 
 ---
 
-### 2. Studi Kasus Nyata: Aplikasi SoundCloud
+### 2. Standar Menu Desktop MiniOS (File, View, Window, Help)
 
-Pada aplikasi **SoundCloud** bawaan MiniOS (`packages/novay/minios/resources/views/apps/soundcloud.blade.php`), Application Menu diterapkan untuk mengelola playlist dan pemutar:
+Berikut adalah standar susunan menu aplikasi desktop yang direkomendasikan untuk seluruh aplikasi di MiniOS:
 
-- **Menu `Playlist`**:
-  - `Ganti Playlist...` (`wire:click="openConfig"`)
-  - Submenu `Playlist Contoh` $\rightarrow$ `AI / Cyberpunk Mix` (`wire:click="useSample"`)
-  - `Salin URL Player` (menyalin ke clipboard via Alpine/JavaScript)
-  - `Hapus / Reset Playlist` (status `danger` dengan konfirmasi)
-- **Menu `Pemutar`**:
-  - `Audio Persisten (Latar Belakang)` (checkbox aktif)
-  - `Muat Ulang Pemutar`
-- **Menu `Bantuan`**:
-  - `Buka SoundCloud.com` (tautan eksternal tab baru)
-  - `Tentang SoundCloud MiniOS`
+```blade
+<x-minios.menubar>
+    {{-- Menu File --}}
+    <x-minios.menubar.menu label="{{ __('File') }}">
+        <x-minios.menubar.item
+            @click="$dispatch('close-window', { id: 'app-id' })"
+            icon="x-mark"
+            shortcut="⌘W"
+        >
+            {{ __('Tutup Jendela') }}
+        </x-minios.menubar.item>
+    </x-minios.menubar.menu>
+
+    {{-- Menu View --}}
+    <x-minios.menubar.menu label="{{ __('View') }}">
+        <x-minios.menubar.item
+            @click="toggleSidebar()"
+            icon="bars-3-bottom-left"
+            shortcut="⌘B"
+        >
+            <span x-text="sidebarCollapsed ? '{{ __('Buka Sidebar') }}' : '{{ __('Tutup Sidebar') }}'"></span>
+        </x-minios.menubar.item>
+    </x-minios.menubar.menu>
+
+    {{-- Menu Window --}}
+    <x-minios.menubar.menu label="{{ __('Window') }}">
+        <x-minios.menubar.item
+            wire:click="$refresh"
+            icon="arrow-path"
+            shortcut="⌘R"
+        >
+            {{ __('Muat Ulang') }}
+        </x-minios.menubar.item>
+
+        <x-minios.menubar.separator />
+
+        <x-minios.menubar.item
+            @click="toggleStatusbar()"
+            icon="chart-bar"
+            shortcut="⌘P"
+        >
+            <span x-text="statusbarVisible ? '{{ __('Disable Status Bar') }}' : '{{ __('Enable Status Bar') }}'"></span>
+        </x-minios.menubar.item>
+    </x-minios.menubar.menu>
+
+    {{-- Menu Help --}}
+    <x-minios.menubar.menu label="{{ __('Help') }}">
+        <x-minios.menubar.item
+            @click="$dispatch('open-about')"
+            icon="information-circle"
+            shortcut="⌘A"
+        >
+            {{ __('About') }}
+        </x-minios.menubar.item>
+    </x-minios.menubar.menu>
+</x-minios.menubar>
+```
+
+#### Ringkasan Penentuan Properti Menubar Item:
+| Menu | Aksi | Icon | Shortcut | Handler | Keterangan |
+|---|---|---|---|---|---|
+| **File** | Tutup Jendela | `x-mark` | `⌘W` | `@click="$dispatch('close-window', { id: 'app-id' })"` | Otomatis ditangkap MiniOS Window Manager |
+| **View** | Buka/Tutup Sidebar | `bars-3-bottom-left` | `⌘B` | `@click="toggleSidebar()"` | Memanggil fungsi Alpine bawaan `<x-minios:desktop>` |
+| **Window** | Muat Ulang | `arrow-path` | `⌘R` | `wire:click="$refresh"` | Me-refresh state Livewire tanpa reload browser |
+| **Window** | Disable/Enable Status Bar | `chart-bar` | `⌘P` | `@click="toggleStatusbar()"` | Mengontrol visibilitas `<x-minios:desktop.statusbar>` |
+| **Help** | About | `information-circle` | `⌘A` | `@click="$dispatch('open-about')"` | Membuka modal informasi aplikasi |
+
+---
+
+### 3. Studi Kasus Nyata: Aplikasi SoundCloud & Katalog
+
+Pada aplikasi bawaan MiniOS (`SoundCloud` dan `Katalog`), Application Menu diterapkan penuh:
+- **SoundCloud**: Menu `Playlist` (`wire:click="openConfig"`), `Pemutar` (Playback control), dan `Bantuan`.
+- **Katalog**: Menu `File` (Pasang ZIP `⌘O`, Tutup `⌘W`), `View` (Tab & Toggle Sidebar `⌘B`), `Window` (Muat Ulang `⌘R`, Status Bar `⌘P`), dan `Help` (About `⌘A`).
+
