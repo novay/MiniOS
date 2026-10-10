@@ -52,7 +52,7 @@ php artisan minios:install
 > * **[0] Full Desktop OS** — Menjadikan web lu OS Desktop lengkap (window manager, core apps, wallpapers, & tampilan auth).
 > * **[1] UI Kit Only** — Hanya memasang komponen Blade, style window, dan script tanpa mengutak-atik rute atau autentikasi bawaan web lu.
 > 
-> *Bisa juga langsung pake flag:* `php artisan minios:install --full` atau `php artisan minios:install --ui-kit`.
+> *Bisa juga langsung pake flag:* `php artisan minios:install --full` atau `php artisan minios:install --ui`.
 
 ```bash
 php artisan migrate

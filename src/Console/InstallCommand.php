@@ -15,7 +15,8 @@ class InstallCommand extends Command
     protected $signature = 'minios:install 
                             {--force : Overwrite existing published files}
                             {--full : Install the complete Web Desktop OS}
-                            {--ui-kit : Install UI Kit components and styles only}';
+                            {--ui : Install UI Kit components and styles only}
+                            {--ui-kit : Alias for --ui}';
 
     /**
      * The console command description.
@@ -31,7 +32,7 @@ class InstallCommand extends Command
     {
         $mode = $this->determineInstallationMode();
 
-        $this->info($mode === 'ui-kit' ? 'Installing MiniOS UI Kit...' : 'Installing MiniOS Full Desktop OS...');
+        $this->info($mode === 'ui' ? 'Installing MiniOS UI Kit...' : 'Installing MiniOS Full Desktop OS...');
 
         $this->comment('Publishing MiniOS Configuration...');
         $this->call('vendor:publish', [
@@ -72,7 +73,7 @@ class InstallCommand extends Command
             $this->configureFortify();
         }
 
-        if ($mode === 'ui-kit') {
+        if ($mode === 'ui') {
             $this->info('MiniOS UI Kit has been successfully installed!');
             $this->line('  <comment>Tip:</comment> You can now use <x-minios::...> components, @miniosStyles, and @miniosScripts in any Blade view.');
         } else {
@@ -91,15 +92,15 @@ class InstallCommand extends Command
             return 'full';
         }
 
-        if ($this->option('ui-kit')) {
-            return 'ui-kit';
+        if ($this->option('ui') || $this->option('ui-kit')) {
+            return 'ui';
         }
 
         return $this->choice(
             'What would you like to install?',
             [
                 'full' => 'Full Desktop OS',
-                'ui-kit' => 'UI Kit Only',
+                'ui' => 'UI Kit Only',
             ],
             'full'
         );

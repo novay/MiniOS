@@ -137,7 +137,7 @@ php artisan minios:install
 > * **[0] Full Desktop OS** — Complete Web OS environment (window manager, core apps, wallpapers, and auth views).
 > * **[1] UI Kit Only** — Blade components, window styling, and assets only (does NOT modify routes or auth).
 > 
-> *Or pass a flag directly:* `php artisan minios:install --full` or `php artisan minios:install --ui-kit`.
+> *Or pass a flag directly:* `php artisan minios:install --full` or `php artisan minios:install --ui`.
 
 ```bash
 php artisan migrate
