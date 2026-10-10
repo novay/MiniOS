@@ -26,11 +26,7 @@ class Browser extends Component
 
     public function render()
     {
-        $view = view()->exists('pages.minios.apps.browser')
-            ? 'pages.minios.apps.browser'
-            : 'minios::apps.browser';
-
-        return view($view, [
+        return view('minios::apps.browser.index', [
             'accent' => $this->accent,
         ]);
     }

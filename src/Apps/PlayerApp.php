@@ -45,7 +45,7 @@ class PlayerApp implements DesktopApp
 
     public function component(): ?string
     {
-        return class_exists(Player::class) ? Player::class : 'apps.player';
+        return Player::class;
     }
 
     public function window(): WindowConfig

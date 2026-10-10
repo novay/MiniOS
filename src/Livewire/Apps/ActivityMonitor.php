@@ -577,11 +577,7 @@ class ActivityMonitor extends Component
 
     public function render()
     {
-        $view = view()->exists('pages.minios.apps.activity-monitor')
-            ? 'pages.minios.apps.activity-monitor'
-            : 'minios::apps.activity-monitor';
-
-        return view($view, [
+        return view('minios::apps.activity-monitor.index', [
             'accent' => $this->accent,
         ]);
     }

@@ -45,7 +45,7 @@ class PreviewApp implements DesktopApp
 
     public function component(): ?string
     {
-        return class_exists(Preview::class) ? Preview::class : 'apps.preview';
+        return Preview::class;
     }
 
     public function window(): WindowConfig

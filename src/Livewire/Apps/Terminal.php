@@ -254,10 +254,6 @@ MATRIX;
 
     public function render()
     {
-        $view = view()->exists('pages.minios.apps.terminal')
-            ? 'pages.minios.apps.terminal'
-            : 'minios::apps.terminal';
-
-        return view($view);
+        return view('minios::apps.terminal.index');
     }
 }

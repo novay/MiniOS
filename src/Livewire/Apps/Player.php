@@ -212,6 +212,6 @@ class Player extends Component
 
     public function render()
     {
-        return view('minios::apps.player');
+        return view('minios::apps.player.index');
     }
 }

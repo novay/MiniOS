@@ -40,7 +40,7 @@ class FilesApp implements DesktopApp
 
     public function component(): ?string
     {
-        return class_exists(Files::class) ? Files::class : 'apps.files';
+        return Files::class;
     }
 
     public function window(): WindowConfig

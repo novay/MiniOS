@@ -1365,9 +1365,7 @@ class Katalog extends Component
     {
         $view = view()->exists('pages.minios.apps.katalog')
             ? 'pages.minios.apps.katalog'
-            : (view()->exists('minios::apps.katalog')
-                ? 'minios::apps.katalog'
-                : 'minios::apps.control-panel');
+            : 'minios::apps.katalog';
 
         return view($view, [
             'applications' => $this->applications,

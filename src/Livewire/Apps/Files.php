@@ -1418,11 +1418,7 @@ class Files extends Component
 
     public function render()
     {
-        $view = view()->exists('pages.minios.apps.files')
-            ? 'pages.minios.apps.files'
-            : 'minios::apps.files';
-
-        return view($view, [
+        return view('minios::apps.files.index', [
             'accent' => $this->accent,
         ]);
     }

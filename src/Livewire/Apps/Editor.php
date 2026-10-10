@@ -223,13 +223,7 @@ class Editor extends Component
 
     public function render()
     {
-        $view = view()->exists('pages.minios.apps.editor')
-            ? 'pages.minios.apps.editor'
-            : (view()->exists('minios::apps.editor')
-                ? 'minios::apps.editor'
-                : 'minios::apps.textedit');
-
-        return view($view, [
+        return view('minios::apps.editor.index', [
             'accent' => $this->accent,
         ]);
     }

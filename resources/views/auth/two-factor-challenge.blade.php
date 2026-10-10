@@ -30,7 +30,7 @@
             }"
         >
             <div x-show="!showRecoveryInput" class="text-center">
-                <div class="relative flex size-24 items-center justify-center mx-auto rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 shadow-2xl ring-4 ring-white/10">
+                <div class="relative flex size-24 items-center justify-center mx-auto rounded-full bg-linear-to-br from-emerald-500 to-teal-600 shadow-2xl ring-4 ring-white/10">
                     <span class="text-3xl font-bold uppercase tracking-wider text-white">
                         <flux:icon name="shield-check" class="size-12 text-white" />
                     </span>
@@ -40,7 +40,7 @@
             </div>
 
             <div x-show="showRecoveryInput" class="text-center">
-                <div class="relative flex size-24 items-center justify-center mx-auto rounded-full bg-gradient-to-br from-amber-500 to-red-600 shadow-2xl ring-4 ring-white/10">
+                <div class="relative flex size-24 items-center justify-center mx-auto rounded-full bg-linear-to-br from-amber-500 to-red-600 shadow-2xl ring-4 ring-white/10">
                     <span class="text-3xl font-bold uppercase tracking-wider text-white">
                         <flux:icon name="key" class="size-12 text-white" />
                     </span>

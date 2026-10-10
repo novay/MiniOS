@@ -218,11 +218,7 @@ class Preview extends Component
 
     public function render()
     {
-        $view = view()->exists('pages.minios.apps.preview')
-            ? 'pages.minios.apps.preview'
-            : 'minios::apps.preview';
-
-        return view($view, [
+        return view('minios::apps.preview.index', [
             'accent' => $this->accent,
         ]);
     }

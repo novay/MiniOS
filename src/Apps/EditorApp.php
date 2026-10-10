@@ -45,7 +45,7 @@ class EditorApp implements DesktopApp
 
     public function component(): ?string
     {
-        return class_exists(Editor::class) ? Editor::class : 'apps.editor';
+        return Editor::class;
     }
 
     public function window(): WindowConfig

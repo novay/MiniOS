@@ -45,7 +45,7 @@ class CalculatorApp implements DesktopApp
 
     public function component(): ?string
     {
-        return class_exists(Calculator::class) ? Calculator::class : 'apps.calculator';
+        return Calculator::class;
     }
 
     public function window(): WindowConfig

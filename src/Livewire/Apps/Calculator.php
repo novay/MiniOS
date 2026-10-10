@@ -27,11 +27,7 @@ class Calculator extends Component
 
     public function render()
     {
-        $view = view()->exists('pages.minios.apps.calculator')
-            ? 'pages.minios.apps.calculator'
-            : 'minios::apps.calculator';
-
-        return view($view, [
+        return view('minios::apps.calculator.index', [
             'accent' => $this->accent,
         ]);
     }

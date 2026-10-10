@@ -45,7 +45,7 @@ class BrowserApp implements DesktopApp
 
     public function component(): ?string
     {
-        return class_exists(Browser::class) ? Browser::class : 'apps.browser';
+        return Browser::class;
     }
 
     public function window(): WindowConfig

@@ -40,7 +40,7 @@ class TerminalApp implements DesktopApp
 
     public function component(): ?string
     {
-        return class_exists(Terminal::class) ? Terminal::class : 'apps.terminal';
+        return Terminal::class;
     }
 
     public function window(): WindowConfig

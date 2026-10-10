@@ -40,7 +40,7 @@ class SettingsApp implements DesktopApp
 
     public function component(): ?string
     {
-        return class_exists(Settings::class) ? Settings::class : 'apps.settings';
+        return Settings::class;
     }
 
     public function window(): WindowConfig

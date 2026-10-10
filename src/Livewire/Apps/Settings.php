@@ -565,7 +565,7 @@ class Settings extends Component
 
     public function render()
     {
-        return view('minios::apps.settings', [
+        return view('minios::apps.settings.index', [
             'accent' => $this->accent,
             'navItems' => $this->navItems,
         ]);
