@@ -45,20 +45,70 @@
             </span>
         </button>
 
-        {{-- Audio Toggle --}}
-        <button
-            type="button"
-            @click.stop="toggleAudio()"
-            class="flex size-6 items-center justify-center rounded-md text-neutral-700 dark:text-neutral-200 transition-colors hover:bg-black/10 dark:hover:bg-white/10"
-            :title="isAudioActive ? '{{ __('Mute Audio') }}' : '{{ __('Enable Audio') }}'"
-        >
-            <span x-cloak x-show="isAudioActive" class="flex items-center justify-center">
-                <flux:icon name="speaker-wave" class="size-4 text-neutral-800 dark:text-neutral-200" />
-            </span>
-            <span x-cloak x-show="!isAudioActive" class="flex items-center justify-center">
-                <flux:icon name="speaker-x-mark" class="size-4 text-neutral-400 dark:text-neutral-500" />
-            </span>
-        </button>
+        {{-- Audio Control Dropdown --}}
+        <div class="relative" @click.outside="audioDropdownOpen = false">
+            <button
+                type="button"
+                @click.stop="toggleAudioDropdown()"
+                class="flex size-6 items-center justify-center rounded-md text-neutral-700 dark:text-neutral-200 transition-colors hover:bg-black/10 dark:hover:bg-white/10"
+                :class="audioDropdownOpen ? 'bg-black/10 dark:bg-white/15' : ''"
+                :title="'{{ __('Sound Volume') }}'"
+            >
+                <span x-cloak x-show="globalMuted || globalVolume === 0" class="flex items-center justify-center">
+                    <flux:icon name="speaker-x-mark" class="size-4 text-neutral-400 dark:text-neutral-500" />
+                </span>
+                <span x-cloak x-show="!globalMuted && globalVolume > 0" class="flex items-center justify-center">
+                    <flux:icon name="speaker-wave" class="size-4 text-neutral-800 dark:text-neutral-200" />
+                </span>
+            </button>
+
+            {{-- Volume Dropdown Popover --}}
+            <div
+                x-cloak
+                x-show="audioDropdownOpen"
+                x-transition:enter="transition ease-out duration-150"
+                x-transition:enter-start="opacity-0 translate-y-1 scale-95"
+                x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                x-transition:leave="transition ease-in duration-100"
+                x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                x-transition:leave-end="opacity-0 translate-y-1 scale-95"
+                class="absolute right-0 top-full mt-2 w-64 rounded-lg border border-neutral-200/80 bg-white/95 p-3.5 shadow-xl backdrop-blur-xl dark:border-white/10 dark:bg-neutral-900/95 z-50 select-none text-neutral-800 dark:text-neutral-100"
+                @click.stop
+            >
+                <div class="flex items-center justify-between mb-2.5">
+                    <div class="flex items-center gap-1.5 text-xs font-semibold">
+                        <span>{{ __('Volume Master') }}</span>
+                    </div>
+                    <span class="text-xs font-medium text-neutral-500 dark:text-neutral-400" x-text="(globalMuted ? 0 : Math.round(globalVolume * 100)) + '%'"></span>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <button
+                        type="button"
+                        @click="toggleGlobalMute()"
+                        class="flex size-7 shrink-0 items-center justify-center rounded-lg text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900 dark:text-neutral-300 dark:hover:bg-neutral-800 transition"
+                        :title="globalMuted ? '{{ __('Unmute') }}' : '{{ __('Mute') }}'"
+                    >
+                        <template x-if="globalMuted || globalVolume === 0">
+                            <flux:icon name="speaker-x-mark" class="size-4 text-rose-500" />
+                        </template>
+                        <template x-if="!globalMuted && globalVolume > 0">
+                            <flux:icon name="speaker-wave" class="size-4" />
+                        </template>
+                    </button>
+
+                    <input
+                        type="range"
+                        min="0"
+                        max="1"
+                        step="0.01"
+                        :value="globalMuted ? 0 : globalVolume"
+                        @input="setGlobalVolume($event.target.value)"
+                        class="w-full h-1.5 bg-neutral-200 dark:bg-neutral-700 rounded-lg appearance-none cursor-pointer accent-primary-500 hover:accent-primary-600"
+                    />
+                </div>
+            </div>
+        </div>
 
         {{-- Notification Center Toggle --}}
         <button

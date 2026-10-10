@@ -28,6 +28,23 @@
                 this.currentTime = 0;
                 this.duration = 0;
             });
+
+            window.addEventListener('minios-volume-changed', (e) => {
+                if (!e.detail) return;
+                if (typeof e.detail.volume === 'number') {
+                    this.volume = e.detail.volume;
+                }
+                if (typeof e.detail.muted === 'boolean') {
+                    this.muted = e.detail.muted;
+                }
+                const el = this.getMediaEl();
+                if (el) {
+                    el.volume = this.volume;
+                    el.muted = this.muted;
+                }
+            });
+
+            window.dispatchEvent(new CustomEvent('minios-request-volume'));
         },
 
         getMediaEl() {
@@ -106,14 +123,19 @@
 
         setVolume(val) {
             this.volume = parseFloat(val);
+            if (this.volume > 0 && this.muted) {
+                this.muted = false;
+            } else if (this.volume === 0) {
+                this.muted = true;
+            }
             const el = this.getMediaEl();
             if (el) {
                 el.volume = this.volume;
-                if (this.volume > 0 && this.muted) {
-                    this.muted = false;
-                    el.muted = false;
-                }
+                el.muted = this.muted;
             }
+            window.dispatchEvent(new CustomEvent('minios-set-volume', {
+                detail: { volume: this.volume, muted: this.muted, source: 'player' }
+            }));
         },
 
         toggleMute() {
@@ -122,6 +144,9 @@
             if (el) {
                 el.muted = this.muted;
             }
+            window.dispatchEvent(new CustomEvent('minios-set-volume', {
+                detail: { volume: this.volume, muted: this.muted, source: 'player' }
+            }));
         },
 
         toggleLoop() {

@@ -14,6 +14,8 @@
         STORAGE_KEY: 'minios_sc_playback_state',
         _isRestoring: false,
         _needsInitialSeek: false,
+        isShuffle: false,
+        repeatMode: 'all',
 
         get currentTrack() {
             return this.currentSounds[this.currentTrackIndex] || {
@@ -42,6 +44,8 @@
                     playlistUrl: {{ json_encode($playerUrl) }},
                     trackIndex: this.currentTrackIndex,
                     positionSec: this.currentPositionSec,
+                    isShuffle: this.isShuffle,
+                    repeatMode: this.repeatMode,
                     updatedAt: Date.now()
                 };
                 localStorage.setItem(this.STORAGE_KEY, JSON.stringify(state));
@@ -74,6 +78,40 @@
                 this.currentPositionSec = saved.positionSec;
                 this._needsInitialSeek = true;
             }
+
+            if (typeof saved.isShuffle === 'boolean') {
+                this.isShuffle = saved.isShuffle;
+            }
+
+            if (['off', 'all', 'one'].includes(saved.repeatMode)) {
+                this.repeatMode = saved.repeatMode;
+            }
+        },
+
+        toggleShuffle() {
+            this.isShuffle = !this.isShuffle;
+            this.savePlaybackState();
+        },
+
+        cycleRepeat() {
+            if (this.repeatMode === 'off') {
+                this.repeatMode = 'all';
+            } else if (this.repeatMode === 'all') {
+                this.repeatMode = 'one';
+            } else {
+                this.repeatMode = 'off';
+            }
+            this.savePlaybackState();
+        },
+
+        getRandomTrackIndex() {
+            const len = this.currentSounds.length;
+            if (len <= 1) return 0;
+            let randomIdx;
+            do {
+                randomIdx = Math.floor(Math.random() * len);
+            } while (randomIdx === this.currentTrackIndex && len > 1);
+            return randomIdx;
         },
 
         applySavedPlaybackToWidget() {
@@ -139,6 +177,23 @@
             window.addEventListener('minios-sc-toggle-list', () => { this.isTracklistVisible = !this.isTracklistVisible; });
             window.addEventListener('minios-sc-request-state', () => this.broadcastPlayback());
 
+            window.addEventListener('minios-volume-changed', (e) => {
+                if (!e.detail) return;
+                if (typeof e.detail.volume === 'number') {
+                    this.volume = e.detail.volume;
+                }
+                if (typeof e.detail.muted === 'boolean') {
+                    this.isMuted = e.detail.muted;
+                }
+                if (window.scWidget) {
+                    try {
+                        window.scWidget.setVolume((this.isMuted ? 0 : this.volume) * 100);
+                    } catch(err) {}
+                }
+            });
+
+            window.dispatchEvent(new CustomEvent('minios-request-volume'));
+
             this.broadcastPlayback();
         },
 
@@ -202,6 +257,7 @@
                 window.scWidget.bind(window.SC.Widget.Events.READY, () => {
                     this.fetchSounds();
                     this.applySavedPlaybackToWidget();
+                    try { window.scWidget.setVolume((this.isMuted ? 0 : this.volume) * 100); } catch(e){}
                     this.broadcastPlayback();
                 });
 
@@ -271,6 +327,11 @@
                 });
 
                 window.scWidget.bind(window.SC.Widget.Events.FINISH, () => {
+                    if (this.repeatMode === 'one') {
+                        this.seek(0);
+                        this.play();
+                        return;
+                    }
                     this.nextTrack(true);
                 });
             } catch (err) {
@@ -369,6 +430,17 @@
         prevTrack() {
             const len = this.currentSounds.length;
             if (len === 0) return;
+
+            if (this.currentPositionSec > 3) {
+                this.seek(0);
+                return;
+            }
+
+            if (this.isShuffle && len > 1) {
+                this.selectTrack(this.getRandomTrackIndex(), this.isPlaying);
+                return;
+            }
+
             const prev = (this.currentTrackIndex - 1 + len) % len;
             this.selectTrack(prev, this.isPlaying);
         },
@@ -376,6 +448,18 @@
         nextTrack(autoPlay = false) {
             const len = this.currentSounds.length;
             if (len === 0) return;
+
+            if (this.isShuffle && len > 1) {
+                this.selectTrack(this.getRandomTrackIndex(), autoPlay || this.isPlaying);
+                return;
+            }
+
+            if (this.repeatMode === 'off' && this.currentTrackIndex >= len - 1 && autoPlay) {
+                this.pause();
+                this.seek(0);
+                return;
+            }
+
             const next = (this.currentTrackIndex + 1) % len;
             this.selectTrack(next, autoPlay || this.isPlaying);
         },
@@ -410,8 +494,11 @@
             this.volume = parseFloat(val);
             this.isMuted = this.volume === 0;
             if (window.scWidget) {
-                try { window.scWidget.setVolume(this.volume * 100); } catch(e){}
+                try { window.scWidget.setVolume((this.isMuted ? 0 : this.volume) * 100); } catch(e){}
             }
+            window.dispatchEvent(new CustomEvent('minios-set-volume', {
+                detail: { volume: this.volume, muted: this.isMuted, source: 'soundcloud' }
+            }));
         },
 
         toggleMute() {
@@ -424,8 +511,11 @@
                 this.isMuted = true;
             }
             if (window.scWidget) {
-                try { window.scWidget.setVolume(this.volume * 100); } catch(e){}
+                try { window.scWidget.setVolume((this.isMuted ? 0 : this.volume) * 100); } catch(e){}
             }
+            window.dispatchEvent(new CustomEvent('minios-set-volume', {
+                detail: { volume: this.volume, muted: this.isMuted, source: 'soundcloud' }
+            }));
         },
 
         loadPlaylistUrl(url) {
@@ -729,7 +819,26 @@
 
             <!-- Playback Controls Bar -->
             <div class="relative z-10 flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-black/10 dark:border-white/10">
-                <div class="flex items-center gap-1.5">
+                <div class="flex items-center gap-1.5 sm:gap-2">
+                    <!-- Shuffle Button -->
+                    <button
+                        type="button"
+                        @click="toggleShuffle()"
+                        class="p-1 rounded transition cursor-pointer relative flex items-center justify-center"
+                        :class="isShuffle ? 'text-[#ff5500]' : 'text-neutral-400 hover:text-neutral-700 dark:text-neutral-500 dark:hover:text-neutral-300'"
+                        :title="isShuffle ? '{{ $this->t('btn_shuffle_on') }}' : '{{ $this->t('btn_shuffle_off') }}'"
+                    >
+                        <svg class="size-3.5 sm:size-4" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M2 18h1.4c1.3 0 2.5-.6 3.3-1.7l6.1-8.6c.7-1.1 2-1.7 3.3-1.7H22"/>
+                            <path d="m18 2 4 4-4 4"/>
+                            <path d="M2 6h1.9c1.5 0 2.9.9 3.6 2.2"/>
+                            <path d="M22 18h-5.9c-1.3 0-2.6-.7-3.3-1.8l-.5-.8"/>
+                            <path d="m18 14 4 4-4 4"/>
+                        </svg>
+                        <span x-show="isShuffle" class="absolute -bottom-0.5 left-1/2 -translate-x-1/2 size-1 rounded-full bg-[#ff5500]"></span>
+                    </button>
+
+                    <!-- Previous Button -->
                     <button
                         type="button"
                         @click="prevTrack()"
@@ -739,6 +848,7 @@
                         <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 640 640"><path d="M0 0h640v640H0z" fill="none"/><path fill="currentColor" d="M491 100.8c-12.9-7-28.7-6.3-41 1.8L192 272.1V128c0-17.7-14.3-32-32-32s-32 14.3-32 32v384c0 17.7 14.3 32 32 32s32-14.3 32-32V367.9l258 169.6c12.3 8.1 28 8.8 41 1.8s21-20.5 21-35.2v-368c0-14.7-8.1-28.2-21-35.2z"/></svg>
                     </button>
 
+                    <!-- Play/Pause Button -->
                     <button
                         type="button"
                         @click="togglePlay()"
@@ -752,6 +862,7 @@
                         </template>
                     </button>
 
+                    <!-- Next Button -->
                     <button
                         type="button"
                         @click="nextTrack()"
@@ -759,6 +870,34 @@
                         title="{{ $this->t('btn_next') }}"
                     >
                         <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 640 640"><path d="M0 0h640v640H0z" fill="none"/><path fill="currentColor" d="M149 100.8c12.9-7 28.7-6.3 41 1.8l258 169.5V128c0-17.7 14.3-32 32-32s32 14.3 32 32v384c0 17.7-14.3 32-32 32s-32-14.3-32-32V367.9L190 537.5c-12.3 8.1-28 8.8-41 1.8s-21-20.6-21-35.3V136c0-14.7 8.1-28.2 21-35.2"/></svg>
+                    </button>
+
+                    <!-- Repeat Button (Off / All / One) -->
+                    <button
+                        type="button"
+                        @click="cycleRepeat()"
+                        class="p-1 rounded transition cursor-pointer relative flex items-center justify-center"
+                        :class="repeatMode !== 'off' ? 'text-[#ff5500]' : 'text-neutral-400 hover:text-neutral-700 dark:text-neutral-500 dark:hover:text-neutral-300'"
+                        :title="repeatMode === 'one' ? '{{ $this->t('btn_repeat_one') }}' : (repeatMode === 'all' ? '{{ $this->t('btn_repeat_all') }}' : '{{ $this->t('btn_repeat_off') }}')"
+                    >
+                        <template x-if="repeatMode === 'one'">
+                            <svg class="size-3.5 sm:size-4" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="m17 2 4 4-4 4"/>
+                                <path d="M3 11v-1a4 4 0 0 1 4-4h14"/>
+                                <path d="m7 22-4-4 4-4"/>
+                                <path d="M21 13v1a4 4 0 0 1-4 4H3"/>
+                                <path d="M11 10h1v4"/>
+                            </svg>
+                        </template>
+                        <template x-if="repeatMode !== 'one'">
+                            <svg class="size-3.5 sm:size-4" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="m17 2 4 4-4 4"/>
+                                <path d="M3 11v-1a4 4 0 0 1 4-4h14"/>
+                                <path d="m7 22-4-4 4-4"/>
+                                <path d="M21 13v1a4 4 0 0 1-4 4H3"/>
+                            </svg>
+                        </template>
+                        <span x-show="repeatMode !== 'off'" class="absolute -bottom-0.5 left-1/2 -translate-x-1/2 size-1 rounded-full bg-[#ff5500]"></span>
                     </button>
 
                     <div class="mt-0.5 text-[12px] font-mono font-semibold text-neutral-700 dark:text-neutral-300 ml-1">

@@ -88,6 +88,11 @@ export default function minios(applications = {}, userSettings = {}) {
         toastTicker: null,
         audioContext: null,
         audioUnlocked: false,
+        audioDropdownOpen: false,
+        globalVolume: 0.8,
+        globalMuted: false,
+        volumeHudVisible: false,
+        volumeHudTimer: null,
         selectedShortcut: null,
         isFullscreen: false,
 
@@ -1345,8 +1350,27 @@ export default function minios(applications = {}, userSettings = {}) {
                 const isSpace = event.code === 'Space' || event.key === ' ';
                 const isK = event.key === 'k' || event.key === 'K';
                 const isS = event.key === 's' || event.key === 'S';
+                const isCmdOrCtrl = event.metaKey || event.ctrlKey;
 
-                const isLauncherCmd = (event.metaKey || event.ctrlKey)
+                // Global Volume Shortcuts: Cmd+F12 (Up), Cmd+F11 (Down)
+                const isF12 = event.key === 'F12' || event.code === 'F12';
+                const isF11 = event.key === 'F11' || event.code === 'F11';
+
+                if (isCmdOrCtrl && isF12) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    this.increaseGlobalVolume(0.05);
+                    return;
+                }
+
+                if (isCmdOrCtrl && isF11) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    this.decreaseGlobalVolume(0.05);
+                    return;
+                }
+
+                const isLauncherCmd = isCmdOrCtrl
                     && !event.altKey
                     && !event.shiftKey
                     && (isSpace || isK);
@@ -3109,6 +3133,41 @@ export default function minios(applications = {}, userSettings = {}) {
         initAudioSystem() {
             this.checkAudioStatus();
 
+            try {
+                const savedVol = localStorage.getItem('minios_global_volume');
+                if (savedVol !== null) {
+                    const parsed = parseFloat(savedVol);
+                    if (!isNaN(parsed)) {
+                        this.globalVolume = Math.max(0, Math.min(1, parsed));
+                    }
+                }
+                const savedMuted = localStorage.getItem('minios_global_muted');
+                if (savedMuted !== null) {
+                    this.globalMuted = savedMuted === 'true';
+                }
+            } catch (e) {}
+
+            window.addEventListener('minios-set-volume', (e) => {
+                if (!e.detail) return;
+                if (typeof e.detail.volume === 'number' || typeof e.detail.volume === 'string') {
+                    const vol = parseFloat(e.detail.volume);
+                    if (!isNaN(vol)) {
+                        this.globalVolume = Math.max(0, Math.min(1, vol));
+                    }
+                }
+                if (typeof e.detail.muted === 'boolean') {
+                    this.globalMuted = e.detail.muted;
+                } else if (this.globalVolume > 0 && this.globalMuted) {
+                    this.globalMuted = false;
+                }
+                this.saveGlobalVolume();
+                this.broadcastGlobalVolume(e.detail.source || null);
+            });
+
+            window.addEventListener('minios-request-volume', () => {
+                this.broadcastGlobalVolume();
+            });
+
             const unlockHandler = () => {
                 const ctx = this.getAudioContext();
                 if (ctx && ctx.state === 'suspended' && this.settings?.notifications?.sound !== false) {
@@ -3120,12 +3179,96 @@ export default function minios(applications = {}, userSettings = {}) {
 
             window.addEventListener('pointerdown', unlockHandler, { once: true });
             window.addEventListener('keydown', unlockHandler, { once: true });
+
+            setTimeout(() => {
+                this.broadcastGlobalVolume();
+            }, 100);
+        },
+
+        toggleAudioDropdown() {
+            const willOpen = !this.audioDropdownOpen;
+            this.closeAll();
+            this.audioDropdownOpen = willOpen;
+        },
+
+        saveGlobalVolume() {
+            try {
+                localStorage.setItem('minios_global_volume', this.globalVolume.toString());
+                localStorage.setItem('minios_global_muted', this.globalMuted ? 'true' : 'false');
+            } catch (e) {}
+        },
+
+        setGlobalVolume(val, source = 'system') {
+            const vol = parseFloat(val);
+            if (isNaN(vol)) return;
+            this.globalVolume = Math.max(0, Math.min(1, Math.round(vol * 100) / 100));
+            if (this.globalVolume > 0 && this.globalMuted) {
+                this.globalMuted = false;
+            } else if (this.globalVolume === 0) {
+                this.globalMuted = true;
+            }
+            this.saveGlobalVolume();
+            this.broadcastGlobalVolume(source);
+        },
+
+        toggleGlobalMute(source = 'system') {
+            this.globalMuted = !this.globalMuted;
+            this.saveGlobalVolume();
+            this.broadcastGlobalVolume(source);
+        },
+
+        increaseGlobalVolume(step = 0.05) {
+            let next = Math.min(1, Math.round((this.globalVolume + step) * 100) / 100);
+            this.globalMuted = false;
+            this.setGlobalVolume(next);
+            this.showVolumeHud();
+        },
+
+        decreaseGlobalVolume(step = 0.05) {
+            let next = Math.max(0, Math.round((this.globalVolume - step) * 100) / 100);
+            if (next === 0) {
+                this.globalMuted = true;
+            }
+            this.setGlobalVolume(next);
+            this.showVolumeHud();
+        },
+
+        showVolumeHud() {
+            this.volumeHudVisible = true;
+            if (this.volumeHudTimer) {
+                clearTimeout(this.volumeHudTimer);
+            }
+            this.volumeHudTimer = setTimeout(() => {
+                this.volumeHudVisible = false;
+            }, 1500);
+        },
+
+        broadcastGlobalVolume(source = null) {
+            const effectiveVolume = this.globalMuted ? 0 : this.globalVolume;
+
+            document.querySelectorAll('audio, video').forEach(media => {
+                try {
+                    media.volume = effectiveVolume;
+                } catch (e) {}
+            });
+
+            window.dispatchEvent(new CustomEvent('minios-volume-changed', {
+                detail: {
+                    volume: this.globalVolume,
+                    muted: this.globalMuted,
+                    effectiveVolume: effectiveVolume,
+                    source: source,
+                }
+            }));
         },
 
         playNotificationChime() {
             try {
                 const isSoundEnabled = this.settings?.notifications?.sound !== false;
                 if (!isSoundEnabled) return;
+
+                const volScale = (this.globalMuted ? 0 : this.globalVolume);
+                if (volScale <= 0) return;
 
                 const ctx = this.getAudioContext();
                 if (!ctx) return;
@@ -3148,7 +3291,7 @@ export default function minios(applications = {}, userSettings = {}) {
                     osc.frequency.setValueAtTime(freq, startTime);
 
                     gain.gain.setValueAtTime(0, startTime);
-                    gain.gain.linearRampToValueAtTime(0.12, startTime + 0.02);
+                    gain.gain.linearRampToValueAtTime(0.12 * volScale, startTime + 0.02);
                     gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
 
                     osc.connect(gain);
@@ -3195,6 +3338,7 @@ export default function minios(applications = {}, userSettings = {}) {
             this.applicationsOpen = false;
             this.systemMenuOpen = false;
             this.notificationCenterOpen = false;
+            this.audioDropdownOpen = false;
             this.aboutOpen = false;
             this.selectedShortcut = null;
 
