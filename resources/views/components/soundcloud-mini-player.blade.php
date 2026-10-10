@@ -10,33 +10,32 @@
         init() {
             window.dispatchEvent(new CustomEvent('minios-sc-request-state'));
 
-            this.$watch('isSoundcloudActive', (isActive) => {
-                if (isActive) {
-                    this.wasActiveInBackground = false;
+            this.$watch('isSoundcloudMinimized', (isMinimized) => {
+                if (!isMinimized) {
                     this.dismissed = false;
                 }
             });
-        },
-
-        get isSoundcloudActive() {
-            return this.activeWindow === 'soundcloud' && this.isWindowVisible('soundcloud');
         },
 
         get isSoundcloudRunning() {
             return Boolean(this.isWindowRunning('soundcloud'));
         },
 
+        get isSoundcloudMinimized() {
+            if (typeof this.isWindowMinimized === 'function') {
+                return Boolean(this.isWindowMinimized('soundcloud'));
+            }
+
+            const win = typeof this.getWindow === 'function' ? this.getWindow('soundcloud') : this.windows?.soundcloud;
+            return Boolean(win?.open && win?.minimized);
+        },
+
         get shouldShowMiniPlayer() {
-            if (!this.isSoundcloudRunning || this.dismissed || this.isSoundcloudActive) {
+            if (!this.isSoundcloudRunning || this.dismissed || !this.isSoundcloudMinimized) {
                 return false;
             }
 
-            if (this.scPlaying && this.scTrack) {
-                this.wasActiveInBackground = true;
-                return true;
-            }
-
-            return this.wasActiveInBackground && Boolean(this.scTrack);
+            return Boolean(this.scTrack || this.scPlaying);
         },
 
         get progressPercent() {

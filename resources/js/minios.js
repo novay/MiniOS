@@ -1619,6 +1619,23 @@ export default function minios(applications = {}, userSettings = {}) {
         },
 
 
+        isWindowMinimized(id) {
+            const windowState =
+                this.windows[id];
+
+
+            if (!windowState) {
+                return false;
+            }
+
+
+            return (
+                windowState.open === true &&
+                windowState.minimized === true
+            );
+        },
+
+
         isWindowVisible(id) {
             const windowState =
                 this.windows[id];
