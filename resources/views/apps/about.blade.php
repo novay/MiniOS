@@ -17,24 +17,17 @@
         {{-- ========================================================= --}}
         {{-- WINDOWS 11 HERO BRANDING HEADER                           --}}
         {{-- ========================================================= --}}
-        <div class="relative overflow-hidden rounded-2xl border border-neutral-200/80 dark:border-white/10 bg-white/80 dark:bg-white/5 p-4 sm:p-5 shadow-2xs backdrop-blur-xl">
+        <div class="relative overflow-hidden rounded-xl bg-white/80 dark:bg-white/5 p-4 sm:p-5 shadow-2xs backdrop-blur-xl">
             {{-- Ambient Glow --}}
             <div
                 class="pointer-events-none absolute -right-6 -top-6 size-28 rounded-full blur-2xl opacity-20 dark:opacity-30"
                 style="background-color: var(--accent-color, {{ $accent['hex'] }});"
             ></div>
 
-            <div class="flex items-center gap-4">
+            <div class="flex items-center gap-3">
+                
                 {{-- MiniOS Logo with Accent Ring --}}
-                <div class="relative flex size-14 sm:size-16 shrink-0 items-center justify-center rounded-2xl bg-white dark:bg-[#1a1a1a] p-2 shadow-md border border-neutral-200/70 dark:border-white/10">
-                    <img src="{{ asset('minios/images/logo.png') }}" alt="MiniOS Logo" class="size-full object-contain drop-shadow" onerror="this.src='/minios/images/logo.png'" />
-                    <span
-                        class="absolute -bottom-1 -right-1 flex size-4 items-center justify-center rounded-full text-white text-[9px] shadow-2xs"
-                        style="background-color: var(--accent-color, {{ $accent['hex'] }});"
-                    >
-                        <flux:icon name="check" class="size-2.5" />
-                    </span>
-                </div>
+                <img src="{{ asset('minios/images/logo.png') }}" alt="MiniOS Logo" class="size-18 sm:size-20 shrink-0 object-contain drop-shadow" onerror="this.src='/minios/images/logo.png'" />
 
                 {{-- Branding Info --}}
                 <div class="min-w-0 flex-1">
@@ -49,7 +42,7 @@
                     <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5 font-medium truncate">
                         {{ $this->trans('tagline') }}
                     </p>
-                    <p class="text-[11px] text-neutral-400 dark:text-neutral-500 mt-0.5">
+                    <p class="text-[11px] text-neutral-400 dark:text-neutral-500 mt-1">
                         Versi {{ $this->miniosVersion }} • {{ $this->buildNumber }}
                     </p>
                 </div>
@@ -59,15 +52,15 @@
         {{-- ========================================================= --}}
         {{-- FLUENT SEGMENTED TAB SWITCHER                             --}}
         {{-- ========================================================= --}}
-        <div class="flex rounded-xl bg-neutral-200/70 dark:bg-white/5 p-1 text-xs font-medium border border-neutral-200/60 dark:border-white/5">
+        <div class="flex rounded-lg bg-neutral-200/70 dark:bg-white/5 p-1 text-xs font-medium shadow-inner">
             <button
                 type="button"
                 wire:click="setTab('specs')"
                 @click="tab = 'specs'"
                 :class="tab === 'specs'
-                    ? 'bg-white dark:bg-[#2c2c2c] text-neutral-900 dark:text-white shadow-2xs font-semibold'
+                    ? 'bg-white dark:bg-[#2c2c2c] text-neutral-900 dark:text-white shadow-2xs'
                     : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white'"
-                class="flex flex-1 items-center justify-center gap-1.5 rounded-lg py-1.5 transition-all"
+                class="flex flex-1 items-center justify-center gap-1.5 rounded-md py-1.5 transition-all"
             >
                 <flux:icon name="cpu-chip" class="size-3.5" />
                 <span>{{ $this->trans('tab_specs') }}</span>
@@ -78,9 +71,9 @@
                 wire:click="setTab('about')"
                 @click="tab = 'about'"
                 :class="tab === 'about'
-                    ? 'bg-white dark:bg-[#2c2c2c] text-neutral-900 dark:text-white shadow-2xs font-semibold'
+                    ? 'bg-white dark:bg-[#2c2c2c] text-neutral-900 dark:text-white shadow-2xs'
                     : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white'"
-                class="flex flex-1 items-center justify-center gap-1.5 rounded-lg py-1.5 transition-all"
+                class="flex flex-1 items-center justify-center gap-1.5 rounded-md py-1.5 transition-all"
             >
                 <flux:icon name="information-circle" class="size-3.5" />
                 <span>{{ $this->trans('tab_about') }}</span>
@@ -91,7 +84,7 @@
         {{-- TAB CONTENT 1: SPESIFIKASI SISTEM (SPECS)                 --}}
         {{-- ========================================================= --}}
         <div x-show="tab === 'specs'" class="space-y-3">
-            <div class="overflow-hidden rounded-xl border border-neutral-200/80 dark:border-white/10 bg-white/90 dark:bg-white/5 shadow-2xs divide-y divide-neutral-100 dark:divide-white/5 text-xs">
+            <div class="overflow-hidden rounded-lg bg-white/90 dark:bg-white/5 shadow-2xs divide-y divide-neutral-100 dark:divide-white/5 text-xs">
                 {{-- Device Name --}}
                 <div class="flex items-center justify-between px-3.5 py-2.5">
                     <span class="flex items-center gap-2 text-neutral-500 dark:text-neutral-400 font-medium">
@@ -179,7 +172,7 @@
         {{-- TAB CONTENT 2: LISENSI & PENGEMBANG                       --}}
         {{-- ========================================================= --}}
         <div x-show="tab === 'about'" x-cloak class="space-y-3">
-            <div class="overflow-hidden rounded-xl border border-neutral-200/80 dark:border-white/10 bg-white/90 dark:bg-white/5 shadow-2xs divide-y divide-neutral-100 dark:divide-white/5 text-xs">
+            <div class="overflow-hidden rounded-lg bg-white/90 dark:bg-white/5 shadow-2xs divide-y divide-neutral-100 dark:divide-white/5 text-xs">
                 {{-- Author / Creator --}}
                 <div class="flex items-center justify-between px-3.5 py-2.5">
                     <span class="flex items-center gap-2 text-neutral-500 dark:text-neutral-400 font-medium">
@@ -222,7 +215,7 @@
     {{-- ========================================================= --}}
     {{-- BOTTOM ACTIONS & COPYRIGHT                                --}}
     {{-- ========================================================= --}}
-    <div class="mt-5 space-y-3 pt-3 border-t border-neutral-200/70 dark:border-white/5">
+    <div class="space-y-3">
         <div class="flex items-center gap-2">
             {{-- Copy Specs Button --}}
             <button

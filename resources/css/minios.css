@@ -293,3 +293,34 @@ html.dark.no-blur .desktop-topbar {
     max-height: 100%;
     object-fit: contain;
 }
+
+/*
+|--------------------------------------------------------------------------
+| Desktop Window App Grid Layout
+|--------------------------------------------------------------------------
+*/
+.minios-desktop-layout {
+    display: grid !important;
+    grid-template-columns: auto minmax(0, 1fr) !important;
+    grid-template-rows: auto minmax(0, 1fr) auto !important;
+    grid-template-areas:
+        "menu menu"
+        "sidebar content"
+        "sidebar statusbar" !important;
+}
+
+.minios-desktop-menu {
+    grid-area: menu !important;
+}
+
+.minios-desktop-sidebar {
+    grid-area: sidebar !important;
+}
+
+.minios-desktop-content {
+    grid-area: content !important;
+}
+
+.minios-desktop-statusbar {
+    grid-area: statusbar !important;
+}

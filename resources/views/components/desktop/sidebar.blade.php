@@ -5,7 +5,7 @@
 
 <div
     style="grid-area: sidebar;"
-    class="relative z-10 flex h-full shrink-0 min-h-0 select-none"
+    class="minios-desktop-sidebar relative z-10 flex h-full shrink-0 min-h-0 select-none"
 >
     <aside
         :class="[

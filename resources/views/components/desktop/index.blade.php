@@ -224,8 +224,9 @@
     "
     @keydown.window="handleKeyboardShortcut($event)"
     :class="{ 'select-none cursor-col-resize': isResizing }"
+    style="display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto; grid-template-areas: 'menu menu' 'sidebar content' 'sidebar statusbar';"
     {{ $attributes->merge([
-        'class' => 'relative grid h-full w-full min-h-0 min-w-0 overflow-hidden bg-[#f3f3f3] dark:bg-[#202020] text-neutral-800 dark:text-neutral-100 font-sans select-none grid-cols-[auto_minmax(0,1fr)] grid-rows-[auto_minmax(0,1fr)_auto] [grid-template-areas:\'menu_menu\'_\'sidebar_content\'_\'sidebar_statusbar\']'
+        'class' => 'relative h-full w-full min-h-0 min-w-0 overflow-hidden bg-[#f3f3f3] dark:bg-[#202020] text-neutral-800 dark:text-neutral-100 font-sans select-none minios-desktop-layout'
     ]) }}
 >
     {{ $slot }}
