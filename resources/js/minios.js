@@ -1635,7 +1635,6 @@ export default function minios(applications = {}, userSettings = {}) {
             );
         },
 
-
         isWindowVisible(id) {
             const windowState =
                 this.windows[id];
