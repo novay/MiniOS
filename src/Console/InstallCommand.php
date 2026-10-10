@@ -98,8 +98,8 @@ class InstallCommand extends Command
         return $this->choice(
             'What would you like to install?',
             [
-                'full' => 'Full Desktop OS (Complete Web OS with window manager, wallpapers, core apps & auth)',
-                'ui-kit' => 'UI Kit Only (Blade components, window styles & scripts only — without touching routes or auth)',
+                'full' => 'Full Desktop OS',
+                'ui-kit' => 'UI Kit Only',
             ],
             'full'
         );
