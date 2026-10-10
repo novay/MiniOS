@@ -34,13 +34,7 @@ class KatalogApp implements DesktopApp
             '/katalog',
             '/katalog/apps',
             '/katalog/themes',
-            '/katalog/installed',
-            '/desktop/katalog',
-            '/desktop/katalog/apps',
-            '/desktop/katalog/themes',
-            '/desktop/katalog/installed',
-            '/control-panel',
-            '/desktop/control-panel',
+            '/katalog/installed'
         ];
     }
 
@@ -56,7 +50,7 @@ class KatalogApp implements DesktopApp
 
     public function component(): ?string
     {
-        return class_exists(Katalog::class) ? Katalog::class : 'apps.katalog';
+        return Katalog::class;
     }
 
     public function window(): WindowConfig

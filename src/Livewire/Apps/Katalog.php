@@ -1363,11 +1363,7 @@ class Katalog extends Component
 
     public function render()
     {
-        $view = view()->exists('pages.minios.apps.katalog')
-            ? 'pages.minios.apps.katalog'
-            : 'minios::apps.katalog';
-
-        return view($view, [
+        return view('minios::apps.katalog.index', [
             'applications' => $this->applications,
             'catalogApps' => $this->catalogApps,
             'stats' => $this->stats,

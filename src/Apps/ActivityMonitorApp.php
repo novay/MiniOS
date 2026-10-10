@@ -30,7 +30,9 @@ class ActivityMonitorApp implements DesktopApp
 
     public function routes(): array
     {
-        return ['/activity-monitor'];
+        return [
+            '/activity-monitor'
+        ];
     }
 
     public function isPinned(): bool
