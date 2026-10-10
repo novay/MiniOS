@@ -43,7 +43,7 @@
 
     {{-- Main Content Layer (Perfect Middle-Center) --}}
     <div class="relative z-10 flex min-h-full w-full flex-col items-center justify-center py-12">
-        <div class="my-auto flex w-full max-w-sm flex-col items-center text-center">
+        <div class="my-auto flex w-full max-w-xs flex-col items-center text-center">
             {{ $slot }}
         </div>
     </div>

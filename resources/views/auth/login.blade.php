@@ -2,14 +2,12 @@
     <div class="flex w-full flex-col items-center text-center">
         
         {{-- User / Security Avatar --}}
-        <div class="relative flex size-24 items-center justify-center rounded-full shadow-2xl ring-4 ring-white/10 mb-6 overflow-hidden bg-white/5">
-            <img src="{{ asset('minios/images/logo.png') }}" alt="Logo MiniOS" class="size-full object-contain p-2" width="96" height="96">
+        <div class="relative flex size-24 items-center justify-center rounded-full shadow-2xl ring-2 ring-white/10 mb-6 overflow-hidden bg-white/5">
+            <img src="{{ asset('minios/images/logo.png') }}" alt="Logo MiniOS" class="size-full object-contain">
         </div>
 
         <!-- Session Status -->
         <x-auth-session-status class="mt-3 text-center text-xs font-medium text-emerald-400" :status="session('status')" />
-
-        <x-passkey-verify />
 
         {{-- Login Form --}}
         <form method="POST" action="{{ route('login.store') }}" class="w-full space-y-4 text-left">
@@ -55,6 +53,7 @@
             </flux:button>
         </form>
 
+        <x-passkey-verify />
 
         <div class="mt-6 text-white/60 text-sm">
             <span>{{ __('Don\'t have an account?') }}</span>

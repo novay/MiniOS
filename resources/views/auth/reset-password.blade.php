@@ -1,10 +1,8 @@
 <x-layouts::minios.auth :title="__('Reset password')">
     <div class="flex w-full flex-col items-center text-center">
         {{-- Lock Avatar Icon --}}
-        <div class="relative flex size-24 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 shadow-2xl ring-4 ring-white/10 mb-6">
-            <span class="text-3xl font-bold uppercase tracking-wider text-white">
-                <flux:icon name="lock-closed" class="size-12 text-white" />
-            </span>
+        <div class="relative flex size-24 items-center justify-center rounded-full shadow-2xl ring-2 ring-white/10 mb-6 overflow-hidden bg-white/5">
+            <img src="{{ asset('minios/images/logo.png') }}" alt="Logo MiniOS" class="size-full object-contain">
         </div>
 
         {{-- Title & Subtitle --}}
