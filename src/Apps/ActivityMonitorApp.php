@@ -40,7 +40,7 @@ class ActivityMonitorApp implements DesktopApp
 
     public function component(): ?string
     {
-        return class_exists(ActivityMonitor::class) ? ActivityMonitor::class : 'apps.activity-monitor';
+        return ActivityMonitor::class;
     }
 
     public function window(): WindowConfig
