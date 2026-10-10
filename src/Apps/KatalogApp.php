@@ -34,7 +34,7 @@ class KatalogApp implements DesktopApp
             '/katalog',
             '/katalog/apps',
             '/katalog/themes',
-            '/katalog/installed'
+            '/katalog/installed',
         ];
     }
 

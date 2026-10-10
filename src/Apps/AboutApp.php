@@ -31,7 +31,7 @@ class AboutApp implements DesktopApp
     public function routes(): array
     {
         return [
-            '/desktop/about'
+            '/desktop/about',
         ];
     }
 

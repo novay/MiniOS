@@ -31,7 +31,7 @@ class ActivityMonitorApp implements DesktopApp
     public function routes(): array
     {
         return [
-            '/activity-monitor'
+            '/activity-monitor',
         ];
     }
 
