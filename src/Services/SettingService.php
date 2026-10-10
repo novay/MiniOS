@@ -33,18 +33,22 @@ class SettingService
         $resolvedUserId = $this->resolveUserId($userId);
         [$category, $settingKey] = $this->parseKey($key);
 
-        Setting::updateOrCreate(
-            [
-                'user_id' => $resolvedUserId,
-                'category' => $category,
-                'key' => $settingKey,
-            ],
-            [
-                'value' => $value,
-            ]
-        );
+        try {
+            Setting::updateOrCreate(
+                [
+                    'user_id' => $resolvedUserId,
+                    'category' => $category,
+                    'key' => $settingKey,
+                ],
+                [
+                    'value' => $value,
+                ]
+            );
 
-        $this->clearCache($category, $resolvedUserId);
+            $this->clearCache($category, $resolvedUserId);
+        } catch (\Throwable $e) {
+            // Silently ignore if table does not exist yet
+        }
     }
 
     /**
@@ -55,19 +59,22 @@ class SettingService
     public function getCategory(string $category, ?int $userId = null): array
     {
         $resolvedUserId = $this->resolveUserId($userId);
+        $defaults = config("minios.settings.{$category}", config("desktop.settings.{$category}", []));
         $cacheKey = $this->getCacheKey($category, $resolvedUserId);
 
-        return Cache::remember($cacheKey, $this->cacheTtl, function () use ($category, $resolvedUserId) {
-            $defaults = config("minios.settings.{$category}", config("desktop.settings.{$category}", []));
+        try {
+            return Cache::remember($cacheKey, $this->cacheTtl, function () use ($category, $resolvedUserId, $defaults) {
+                $userSettings = Setting::query()
+                    ->where('user_id', $resolvedUserId)
+                    ->where('category', $category)
+                    ->pluck('value', 'key')
+                    ->toArray();
 
-            $userSettings = Setting::query()
-                ->where('user_id', $resolvedUserId)
-                ->where('category', $category)
-                ->pluck('value', 'key')
-                ->toArray();
-
-            return array_merge($defaults, $userSettings);
-        });
+                return array_merge($defaults, $userSettings);
+            });
+        } catch (\Throwable $e) {
+            return $defaults;
+        }
     }
 
     /**
@@ -79,20 +86,24 @@ class SettingService
     {
         $resolvedUserId = $this->resolveUserId($userId);
 
-        foreach ($values as $settingKey => $value) {
-            Setting::updateOrCreate(
-                [
-                    'user_id' => $resolvedUserId,
-                    'category' => $category,
-                    'key' => $settingKey,
-                ],
-                [
-                    'value' => $value,
-                ]
-            );
-        }
+        try {
+            foreach ($values as $settingKey => $value) {
+                Setting::updateOrCreate(
+                    [
+                        'user_id' => $resolvedUserId,
+                        'category' => $category,
+                        'key' => $settingKey,
+                    ],
+                    [
+                        'value' => $value,
+                    ]
+                );
+            }
 
-        $this->clearCache($category, $resolvedUserId);
+            $this->clearCache($category, $resolvedUserId);
+        } catch (\Throwable $e) {
+            // Silently ignore if table does not exist yet
+        }
     }
 
     /**
@@ -102,12 +113,16 @@ class SettingService
     {
         $resolvedUserId = $this->resolveUserId($userId);
 
-        Setting::query()
-            ->where('user_id', $resolvedUserId)
-            ->where('category', $category)
-            ->delete();
+        try {
+            Setting::query()
+                ->where('user_id', $resolvedUserId)
+                ->where('category', $category)
+                ->delete();
 
-        $this->clearCache($category, $resolvedUserId);
+            $this->clearCache($category, $resolvedUserId);
+        } catch (\Throwable $e) {
+            // Silently ignore if table does not exist yet
+        }
     }
 
     /**
