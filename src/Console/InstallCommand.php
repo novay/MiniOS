@@ -12,21 +12,26 @@ class InstallCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'minios:install {--force : Overwrite existing published files}';
+    protected $signature = 'minios:install 
+                            {--force : Overwrite existing published files}
+                            {--full : Install the complete Web Desktop OS}
+                            {--ui-kit : Install UI Kit components and styles only}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Install and publish all MiniOS resources, configuration, and migrations';
+    protected $description = 'Install and publish MiniOS resources, configuration, and migrations';
 
     /**
      * Execute the console command.
      */
     public function handle(): int
     {
-        $this->info('Installing MiniOS...');
+        $mode = $this->determineInstallationMode();
+
+        $this->info($mode === 'ui-kit' ? 'Installing MiniOS UI Kit...' : 'Installing MiniOS Full Desktop OS...');
 
         $this->comment('Publishing MiniOS Configuration...');
         $this->call('vendor:publish', [
@@ -34,17 +39,19 @@ class InstallCommand extends Command
             '--force' => $this->option('force'),
         ]);
 
-        $this->comment('Publishing MiniOS Migrations...');
-        $this->call('vendor:publish', [
-            '--tag' => 'minios-migrations',
-            '--force' => $this->option('force'),
-        ]);
+        if ($mode === 'full') {
+            $this->comment('Publishing MiniOS Migrations...');
+            $this->call('vendor:publish', [
+                '--tag' => 'minios-migrations',
+                '--force' => $this->option('force'),
+            ]);
 
-        $this->comment('Publishing MiniOS Assets (Images & Wallpapers)...');
-        $this->call('vendor:publish', [
-            '--tag' => 'minios-assets',
-            '--force' => $this->option('force'),
-        ]);
+            $this->comment('Publishing MiniOS Assets (Images & Wallpapers)...');
+            $this->call('vendor:publish', [
+                '--tag' => 'minios-assets',
+                '--force' => $this->option('force'),
+            ]);
+        }
 
         $this->comment('Publishing MiniOS Compiled Assets (minios.min.js & minios.css)...');
         $this->call('vendor:publish', [
@@ -58,25 +65,59 @@ class InstallCommand extends Command
             '--force' => $this->option('force'),
         ]);
 
-        $this->configureFrontend();
-        $this->configureRoutes();
-        $this->configureFortify();
+        $this->configureFrontend($mode);
 
-        $this->info('MiniOS has been successfully installed!');
+        if ($mode === 'full') {
+            $this->configureRoutes();
+            $this->configureFortify();
+        }
+
+        if ($mode === 'ui-kit') {
+            $this->info('MiniOS UI Kit has been successfully installed!');
+            $this->line('  <comment>Tip:</comment> You can now use <x-minios::...> components, @miniosStyles, and @miniosScripts in any Blade view.');
+        } else {
+            $this->info('MiniOS Full Desktop OS has been successfully installed!');
+        }
 
         return Command::SUCCESS;
     }
 
     /**
+     * Determine whether to install Full Desktop OS or UI Kit only.
+     */
+    protected function determineInstallationMode(): string
+    {
+        if ($this->option('full')) {
+            return 'full';
+        }
+
+        if ($this->option('ui-kit')) {
+            return 'ui-kit';
+        }
+
+        return $this->choice(
+            'What would you like to install?',
+            [
+                'full' => 'Full Desktop OS (Complete Web OS with window manager, wallpapers, core apps & auth)',
+                'ui-kit' => 'UI Kit Only (Blade components, window styles & scripts only — without touching routes or auth)',
+            ],
+            'full'
+        );
+    }
+
+    /**
      * Configure frontend integration (Vite aliases, Tailwind CSS, Alpine/Livewire JS).
      */
-    protected function configureFrontend(): void
+    protected function configureFrontend(string $mode = 'full'): void
     {
-        $this->comment('Configuring frontend integration (Vite, CSS, JS)...');
+        $this->comment('Configuring frontend integration (Vite, CSS)...');
 
         $this->configureVite();
         $this->configureAppCss();
-        $this->configureAppJs();
+
+        if ($mode === 'full') {
+            $this->configureAppJs();
+        }
     }
 
     /**
@@ -104,7 +145,7 @@ class InstallCommand extends Command
         }
 
         // 2. Inject resolve.alias block into defineConfig
-        $aliasBlock = "    resolve: {\n        alias: {\n            '@minios': path.resolve(__dirname, 'vendor/novay/minios/resources/js'),\n            '@minios-css': path.resolve(__dirname, 'vendor/novay/minios/resources/css'),\n            '@minios-img': path.resolve(__dirname, 'vendor/novay/minios/resources/img'),\n        },\n    },\n";
+        $aliasBlock = "    resolve: {\n        alias: {\n            '@minios/minios': path.resolve(__dirname, 'vendor/novay/minios/dist/minios.esm.js'),\n            '@minios': path.resolve(__dirname, 'vendor/novay/minios/dist/minios.esm.js'),\n            '@minios-css': path.resolve(__dirname, 'vendor/novay/minios/dist/minios.css'),\n            '@minios-img': path.resolve(__dirname, 'vendor/novay/minios/resources/img'),\n        },\n    },\n";
 
         if (preg_match('/(export\s+default\s+defineConfig\(\s*\{)/', $content)) {
             $content = preg_replace(
@@ -137,7 +178,7 @@ class InstallCommand extends Command
             return;
         }
 
-        $imports = "@import '../../vendor/novay/minios/resources/css/minios.css';\n@source '../../vendor/novay/minios/resources/views/**/*.blade.php';\n";
+        $imports = "@import '../../vendor/novay/minios/dist/minios.css';\n@source '../../vendor/novay/minios/resources/views/**/*.blade.php';\n";
 
         if (str_contains($content, "@import 'tailwindcss';")) {
             $content = str_replace("@import 'tailwindcss';", "@import 'tailwindcss';\n".$imports, $content);

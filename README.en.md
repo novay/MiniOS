@@ -127,10 +127,19 @@ composer require novay/minios
 ```
 
 ### 2. Run Installer & Migrations
-The installer automatically sets up configs, migrations, assets, AI skills, and injects Vite aliases and CSS imports:
+Run the interactive installer to set up configs, assets, AI skills, and frontend styles:
 
 ```bash
 php artisan minios:install
+```
+
+> **💡 Installation Modes:**
+> * **[0] Full Desktop OS** — Complete Web OS environment (window manager, core apps, wallpapers, and auth views).
+> * **[1] UI Kit Only** — Blade components, window styling, and assets only (does NOT modify routes or auth).
+> 
+> *Or pass a flag directly:* `php artisan minios:install --full` or `php artisan minios:install --ui-kit`.
+
+```bash
 php artisan migrate
 npm run build
 ```
@@ -142,7 +151,23 @@ npm run build
 
 > *Note: This is automatically handled by `minios:install`. Only needed if using a custom build pipeline or if automatic injection failed.*
 
-**1. Add aliases in `vite.config.js`:**
+**1. Include MiniOS Directives in your Blade layout (Easiest & Recommended):**
+```blade
+<head>
+    <!-- ... -->
+    @miniosStyles
+</head>
+<body>
+    {{ $slot }}
+
+    @livewireScriptConfig
+    @fluxScripts
+    @miniosScripts
+</body>
+```
+
+**Or 2. Bundle via Vite using pre-compiled ESM (Optional):**
+In `vite.config.js`:
 ```javascript
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -152,32 +177,19 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export default defineConfig({
     resolve: {
         alias: {
-            '@minios': path.resolve(__dirname, 'vendor/novay/minios/resources/js'),
-            '@minios-css': path.resolve(__dirname, 'vendor/novay/minios/resources/css'),
+            '@minios': path.resolve(__dirname, 'vendor/novay/minios/dist/minios.esm.js'),
+            '@minios-css': path.resolve(__dirname, 'vendor/novay/minios/dist/minios.css'),
             '@minios-img': path.resolve(__dirname, 'vendor/novay/minios/resources/img'),
         },
     },
 });
 ```
 
-**2. Register Livewire & Alpine in `resources/js/app.js`:**
-```javascript
-import {
-    Livewire,
-    Alpine,
-} from '../../vendor/livewire/livewire/dist/livewire.esm';
-import minios from '@minios/minios';
-
-Alpine.data('minios', minios);
-
-Livewire.start();
-```
-
-**3. Import stylesheets in `resources/css/app.css`:**
+And in `resources/css/app.css`:
 ```css
 @import 'tailwindcss';
 @import '../../vendor/livewire/flux/dist/flux.css';
-@import '../../vendor/novay/minios/resources/css/minios.css';
+@import '../../vendor/novay/minios/dist/minios.css';
 
 @source '../views';
 @source '../../vendor/novay/minios/resources/views/**/*.blade.php';
@@ -265,6 +277,17 @@ This is standard Fortify behavior when email verification is enabled but mail se
    ```bash
    php artisan tinker --execute "App\Models\User::first()->markEmailAsVerified();"
    ```
+
+---
+
+### 🧹 Uninstallation
+If you ever want to cleanly remove MiniOS from your Laravel application:
+
+```bash
+php artisan minios:uninstall
+```
+
+This interactive command prompts for confirmation, then safely cleans up published configurations, public assets, views, routes, and reverts frontend integrations without touching any other parts of your Laravel application.
 
 ---
 

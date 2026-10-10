@@ -46,6 +46,15 @@ composer require novay/minios
 
 ```bash
 php artisan minios:install
+```
+
+> **💡 Pilihan Mode:** Installer bakal nawarin dua pilihan:
+> * **[0] Full Desktop OS** — Menjadikan web lu OS Desktop lengkap (window manager, core apps, wallpapers, & tampilan auth).
+> * **[1] UI Kit Only** — Hanya memasang komponen Blade, style window, dan script tanpa mengutak-atik rute atau autentikasi bawaan web lu.
+> 
+> *Bisa juga langsung pake flag:* `php artisan minios:install --full` atau `php artisan minios:install --ui-kit`.
+
+```bash
 php artisan migrate
 npm run build
 ```
@@ -66,6 +75,15 @@ Buka `config/fortify.php`, matiin (komentari) baris ini:
 ```php
 // Features::emailVerification(),
 ```
+
+---
+
+### 🧹 Cara Hapus (Uninstall)
+Kalo suatu saat lu pengen bersihin MiniOS dari project Laravel lu:
+```bash
+php artisan minios:uninstall
+```
+Perintah ini bakal minta konfirmasi terlebih dahulu, lalu otomatis membersihkan semua konfigurasi, asset publik, rute, migrasi, dan integrasi frontend yang dilibatkan oleh MiniOS tanpa mengganggu file-file bawaan Laravel lainnya.
 
 <br/>
 

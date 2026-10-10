@@ -9,6 +9,7 @@ use Illuminate\Support\ServiceProvider;
 use League\Flysystem\Filesystem;
 use Novay\MiniOS\Console\InstallCommand;
 use Novay\MiniOS\Console\MakeAppCommand;
+use Novay\MiniOS\Console\UninstallCommand;
 use Novay\MiniOS\Contracts\DesktopApp;
 use Novay\MiniOS\Services\SettingService;
 use Novay\MiniOS\Services\TrashService;
@@ -178,6 +179,7 @@ class MiniOSServiceProvider extends ServiceProvider
             $this->commands([
                 InstallCommand::class,
                 MakeAppCommand::class,
+                UninstallCommand::class,
             ]);
         }
     }
@@ -205,10 +207,12 @@ class MiniOSServiceProvider extends ServiceProvider
                 __DIR__.'/../dist' => public_path('vendor/minios'),
             ], 'minios-dist');
 
-            $this->publishes([
-                __DIR__.'/../resources/js' => resource_path('js/vendor/minios'),
-                __DIR__.'/../resources/css' => resource_path('css/vendor/minios'),
-            ], 'minios-src');
+            if (is_dir(__DIR__.'/../resources/js')) {
+                $this->publishes([
+                    __DIR__.'/../resources/js' => resource_path('js/vendor/minios'),
+                    __DIR__.'/../resources/css' => resource_path('css/vendor/minios'),
+                ], 'minios-src');
+            }
 
             $this->publishes([
                 __DIR__.'/../resources/lang' => $this->app->langPath('vendor/minios'),
