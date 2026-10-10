@@ -1,7 +1,7 @@
 <x-layouts::minios.auth :title="__('Confirm password')">
     <div class="flex w-full flex-col items-center text-center">
         {{-- Shield Lock Avatar Icon --}}
-        <div class="minios-auth-avatar relative flex size-24 items-center justify-center rounded-full bg-gradient-to-br from-rose-500 to-red-600 shadow-2xl ring-4 ring-white/10 mb-6" style="width: 96px; height: 96px; min-width: 96px; min-height: 96px; max-width: 96px; max-height: 96px; margin: 0 auto 1.5rem auto;">
+        <div class="relative flex size-24 items-center justify-center rounded-full bg-gradient-to-br from-rose-500 to-red-600 shadow-2xl ring-4 ring-white/10 mb-6">
             <span class="text-3xl font-bold uppercase tracking-wider text-white">
                 <flux:icon name="shield-exclamation" class="size-12 text-white" />
             </span>

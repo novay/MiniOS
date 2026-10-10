@@ -1,8 +1,8 @@
 <x-layouts::minios.auth :title="__('Forgot password')">
     <div class="flex w-full flex-col items-center text-center">
         {{-- Key Avatar Icon --}}
-        <div class="minios-auth-avatar relative flex size-24 items-center justify-center rounded-full shadow-2xl ring-4 ring-white/10 mb-6 overflow-hidden bg-white/5" style="width: 96px; height: 96px; min-width: 96px; min-height: 96px; max-width: 96px; max-height: 96px; margin: 0 auto 1.5rem auto;">
-            <img src="{{ asset('minios/images/logo.png') }}" alt="Logo MiniOS" class="size-full object-contain p-2" style="width: 100%; height: 100%; object-fit: contain; padding: 8px; display: block;" width="96" height="96">
+        <div class="relative flex size-24 items-center justify-center rounded-full shadow-2xl ring-4 ring-white/10 mb-6 overflow-hidden bg-white/5">
+            <img src="{{ asset('minios/images/logo.png') }}" alt="Logo MiniOS" class="size-full object-contain p-2" width="96" height="96">
         </div>
 
         {{-- Title & Subtitle --}}
