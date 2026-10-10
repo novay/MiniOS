@@ -3,11 +3,11 @@
         tabs: [
             {
                 id: 1,
-                title: 'Google',
-                inputUrl: 'https://google.com',
-                currentUrl: 'https://www.google.com/webhp?igu=1',
+                title: 'Start Page',
+                inputUrl: '',
+                currentUrl: '',
                 loading: false,
-                isStartPage: false
+                isStartPage: true
             }
         ],
         activeTabId: 1,
@@ -66,7 +66,7 @@
         addTab(url = '', title = 'Start Page') {
             const newId = this.nextTabId++;
             const isStart = !url;
-            const targetUrl = url ? this.formatUrl(url) : 'https://www.google.com/webhp?igu=1';
+            const targetUrl = url ? this.formatUrl(url) : '';
             this.tabs.push({
                 id: newId,
                 title: title,
@@ -91,16 +91,16 @@
         goHome() {
             const tab = this.currentTab;
             if (!tab) return;
-            tab.inputUrl = 'https://google.com';
-            tab.currentUrl = 'https://www.google.com/webhp?igu=1';
-            tab.title = 'Google';
-            tab.isStartPage = false;
-            tab.loading = true;
+            tab.inputUrl = '';
+            tab.currentUrl = '';
+            tab.title = 'Start Page';
+            tab.isStartPage = true;
+            tab.loading = false;
         },
 
         refresh() {
             const tab = this.currentTab;
-            if (!tab) return;
+            if (!tab || tab.isStartPage) return;
             tab.loading = true;
             const iframe = document.getElementById('iframe-tab-' + tab.id);
             if (iframe) {
@@ -110,7 +110,8 @@
 
         openExternal() {
             if (this.currentTab) {
-                window.open(this.currentTab.currentUrl, '_blank');
+                const target = this.currentTab.isStartPage ? 'https://google.com' : (this.currentTab.currentUrl || 'https://google.com');
+                window.open(target, '_blank');
             }
         },
 
@@ -284,8 +285,23 @@
                             <p class="text-xs text-neutral-400 mt-1">Cari atau pilih favorit di bawah untuk mulai menjelajah</p>
                         </div>
 
+                        {{-- Central Search Box on Start Page --}}
+                        <form @submit.prevent="navigate()" class="w-full max-w-md relative">
+                            <div class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 flex items-center text-neutral-400">
+                                <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                                </svg>
+                            </div>
+                            <input
+                                x-model="currentTab.inputUrl"
+                                type="text"
+                                placeholder="Cari dengan Google atau ketik URL..."
+                                class="w-full rounded-2xl bg-white/10 hover:bg-white/15 focus:bg-black/90 border border-white/15 py-2.5 pl-11 pr-4 text-xs text-white placeholder-neutral-400 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500 transition-all shadow-lg"
+                            />
+                        </form>
+
                         {{-- Favorites Grid --}}
-                        <div class="grid grid-cols-4 gap-4 w-full pt-4">
+                        <div class="grid grid-cols-4 gap-4 w-full pt-2">
                             <button
                                 @click="openBookmark('https://google.com', 'Google')"
                                 class="flex flex-col items-center gap-2 p-3 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 hover:scale-105 transition-all group"
@@ -323,9 +339,9 @@
 
                 {{-- Iframe Content --}}
                 <iframe
-                    x-show="!tab.isStartPage"
+                    x-show="!tab.isStartPage && tab.currentUrl"
                     :id="'iframe-tab-' + tab.id"
-                    :src="tab.currentUrl"
+                    :src="tab.currentUrl || 'about:blank'"
                     @load="handleLoaded(tab)"
                     class="h-full w-full border-none bg-white"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

@@ -90,7 +90,7 @@ export function createSystemUI() {
             this.applyTheme();
 
             if (window.Livewire) {
-                Livewire.dispatch('toggle-dark-mode', { theme: newTheme });
+                Livewire.dispatch('toggle-dark-mode');
             }
         },
 
