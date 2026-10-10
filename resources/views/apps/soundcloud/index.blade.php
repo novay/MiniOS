@@ -42,6 +42,7 @@
                     this.currentSounds = e.detail.tracks;
                     this.currentTrackIndex = 0;
                     this.currentPositionSec = 0;
+                    this.broadcastPlayback();
                 }
                 if (e.detail && e.detail.url) {
                     this.loadPlaylistUrl(e.detail.url);
@@ -52,6 +53,26 @@
             window.addEventListener('minios-sc-next', () => this.nextTrack(this.isPlaying));
             window.addEventListener('minios-sc-prev', () => this.prevTrack());
             window.addEventListener('minios-sc-toggle-list', () => { this.isTracklistVisible = !this.isTracklistVisible; });
+            window.addEventListener('minios-sc-request-state', () => this.broadcastPlayback());
+        },
+
+        broadcastPlayback() {
+            const cur = this.currentTrack;
+            window.dispatchEvent(new CustomEvent('minios-sc-playback', {
+                detail: {
+                    isPlaying: this.isPlaying,
+                    track: cur ? {
+                        title: cur.title || 'SoundCloud Track',
+                        artist: cur.artist || cur.uploader || 'SoundCloud',
+                        uploader: cur.uploader || cur.artist || 'SoundCloud',
+                        artwork: cur.artwork || 'https://i1.sndcdn.com/artworks-XKcM15C0Q7C6On4B-pgVVDw-t500x500.jpg',
+                        durationFormatted: cur.durationFormatted || '0:00',
+                        durationSec: this.currentDurationSec
+                    } : null,
+                    positionSec: this.currentPositionSec,
+                    durationSec: this.currentDurationSec
+                }
+            }));
         },
 
         generateWaveformBars() {
@@ -94,10 +115,12 @@
 
                 window.scWidget.bind(window.SC.Widget.Events.READY, () => {
                     this.fetchSounds();
+                    this.broadcastPlayback();
                 });
 
                 window.scWidget.bind(window.SC.Widget.Events.PLAY, () => {
                     this.isPlaying = true;
+                    this.broadcastPlayback();
                     try {
                         window.scWidget.getCurrentSound((sound) => {
                             if (sound && sound.title && this.currentSounds[this.currentTrackIndex]) {
@@ -116,6 +139,7 @@
                                 if (sound.artwork_url) {
                                     cur.artwork = sound.artwork_url.replace('-large', '-t500x500');
                                 }
+                                this.broadcastPlayback();
                             }
                         });
                     } catch (e) {}
@@ -123,11 +147,21 @@
 
                 window.scWidget.bind(window.SC.Widget.Events.PAUSE, () => {
                     this.isPlaying = false;
+                    this.broadcastPlayback();
                 });
 
                 window.scWidget.bind(window.SC.Widget.Events.PLAY_PROGRESS, (data) => {
                     if (data && typeof data.currentPosition === 'number') {
                         this.currentPositionSec = Math.floor(data.currentPosition / 1000);
+                        if (Math.abs(this.currentPositionSec - (this._lastProgressSec || 0)) >= 1) {
+                            this._lastProgressSec = this.currentPositionSec;
+                            window.dispatchEvent(new CustomEvent('minios-sc-progress', {
+                                detail: {
+                                    positionSec: this.currentPositionSec,
+                                    durationSec: this.currentDurationSec
+                                }
+                            }));
+                        }
                     }
                 });
 
@@ -166,6 +200,7 @@
                                 scUrl: s.permalink_url || (existing ? existing.scUrl : 'https://soundcloud.com')
                             };
                         });
+                        this.broadcastPlayback();
                     }
                 });
             } catch (err) {
@@ -187,6 +222,7 @@
                     }
                 } catch (e) {}
             }
+            this.broadcastPlayback();
         },
 
         togglePlay() {
@@ -202,6 +238,7 @@
             if (window.scWidget) {
                 try { window.scWidget.play(); } catch(e){}
             }
+            this.broadcastPlayback();
         },
 
         pause() {
@@ -209,6 +246,7 @@
             if (window.scWidget) {
                 try { window.scWidget.pause(); } catch(e){}
             }
+            this.broadcastPlayback();
         },
 
         prevTrack() {

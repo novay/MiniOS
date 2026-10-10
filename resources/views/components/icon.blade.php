@@ -6,12 +6,12 @@
 @switch($name)
 
     @case('browser')
-        <img {{ $attributes->merge(['class' => $class]) }} src="https://demo.pixelcave.com/freebies/45-windows-11-tailwind/assets/icons/edge.png">
+        <img src="{{ asset('minios/images/ic-safari.webp') }}" alt="" {{ $attributes->merge(['class' => $class]) }} />
     @break
 
 
     @case('files')
-        <img {{ $attributes->merge(['class' => $class]) }} src="https://demo.pixelcave.com/freebies/45-windows-11-tailwind/assets/icons/folder.png">
+        <img src="{{ asset('minios/images/ic-files.webp') }}" alt="" {{ $attributes->merge(['class' => $class]) }} />
     @break
 
     @case('calculator')
@@ -32,17 +32,9 @@
         <img src="{{ asset('minios/images/ic-settings.webp') }}" alt="" {{ $attributes->merge(['class' => $class]) }} />
     @break
 
+    @case('katalog')
     @case('control-panel')
-        <div {{ $attributes->merge(['class' => $class . ' flex items-center justify-center rounded-2xl bg-gradient-to-br from-slate-800 via-sky-900 to-indigo-950 shadow-md text-white p-1 border border-white/15']) }}>
-            <svg class="size-full p-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="3" width="7" height="7" rx="1.5" fill="#38bdf8" fill-opacity="0.9" stroke="#38bdf8" />
-                <rect x="14" y="3" width="7" height="7" rx="1.5" fill="#818cf8" fill-opacity="0.9" stroke="#818cf8" />
-                <rect x="3" y="14" width="7" height="7" rx="1.5" fill="#34d399" fill-opacity="0.9" stroke="#34d399" />
-                <circle cx="17.5" cy="17.5" r="3.5" fill="#f43f5e" fill-opacity="0.9" stroke="#f43f5e" />
-                <path d="M17.5 16v3" stroke="#fff" stroke-width="1.5" />
-                <path d="M16 17.5h3" stroke="#fff" stroke-width="1.5" />
-            </svg>
-        </div>
+        <img src="{{ asset('minios/images/ic-cp.webp') }}" alt="" {{ $attributes->merge(['class' => $class]) }} />
     @break 
 
     @case('preview')
@@ -51,7 +43,7 @@
     
     @case('editor')
     @case('textedit')
-        <img src="https://cdn.jim-nielsen.com/.netlify/images?url=/icongallery/macos/textedit-2025-11-14/1024.png&w=1024" alt="" {{ $attributes->merge(['class' => $class]) }}>
+        <img src="{{ asset('minios/images/ic-editor.webp') }}" alt="" {{ $attributes->merge(['class' => $class]) }} />
     @break
 
     @case('player')
@@ -66,21 +58,6 @@
     @case('minios')
     @case('logo')
         <img src="{{ asset('minios/images/logo.png') }}" alt="MiniOS" {{ $attributes->merge(['class' => $class]) }} />
-    @break
-
-    @case('windows')
-    @case('start')
-        <svg
-            {{ $attributes->merge(['class' => $class]) }}
-            viewBox="0 0 88 88"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-        >
-            <path d="M0 0H40V40H0V0Z" fill="#0078D4" />
-            <path d="M48 0H88V40H48V0Z" fill="#0078D4" />
-            <path d="M0 48H40V88H0V48Z" fill="#0078D4" />
-            <path d="M48 48H88V88H48V48Z" fill="#0078D4" />
-        </svg>
     @break
 
     @case('apps')

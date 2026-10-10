@@ -64,6 +64,7 @@ class MiniOS
         'calculator',
         'activity-monitor',
         'about',
+        'katalog',
         'control-panel',
         'preview',
         'editor',

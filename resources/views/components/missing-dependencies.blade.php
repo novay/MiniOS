@@ -225,7 +225,7 @@
                             {{ __('2. Want to install automatically via GUI?') }}
                         </div>
                         <div class="text-[11px] text-neutral-500 dark:text-neutral-400 leading-normal">
-                            {{ __('Open Control Panel > Installed Apps to run the installation directly from MiniOS.') }}
+                            {{ __('Open Katalog > Installed Apps to run the installation directly from MiniOS.') }}
                         </div>
                     </div>
                 </div>
@@ -235,9 +235,9 @@
                     type="button"
                     @click="
                         if (typeof openApplication === 'function') {
-                            openApplication('control-panel');
+                            openApplication('katalog');
                         }
-                        $dispatch('open-app', { id: 'control-panel', url: '/desktop/control-panel' });
+                        $dispatch('open-app', { id: 'katalog', url: '/desktop/katalog' });
                     "
                     class="shrink-0 inline-flex items-center justify-center gap-2 rounded-md px-3.5 py-2 text-xs font-medium text-white shadow-xs transition-all active:scale-[0.98] cursor-pointer"
                     style="background-color: var(--accent-color, {{ $accentHex }});"
@@ -247,7 +247,7 @@
                         <polyline points="15 3 21 3 21 9"></polyline>
                         <line x1="10" y1="14" x2="21" y2="3"></line>
                     </svg>
-                    <span>{{ __('Open Control Panel') }}</span>
+                    <span>{{ __('Open Katalog') }}</span>
                 </button>
             </div>
         </div>

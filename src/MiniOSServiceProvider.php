@@ -68,7 +68,7 @@ class MiniOSServiceProvider extends ServiceProvider
             Apps\CalculatorApp::class,
             Apps\ActivityMonitorApp::class,
             Apps\AboutApp::class,
-            Apps\ControlPanelApp::class,
+            Apps\KatalogApp::class,
             Apps\PreviewApp::class,
             Apps\EditorApp::class,
             Apps\PlayerApp::class,

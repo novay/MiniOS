@@ -2,11 +2,10 @@
 
 namespace Novay\MiniOS\Apps;
 
-use Novay\MiniOS\Contracts\DesktopApp;
-use Novay\MiniOS\Livewire\Apps\ControlPanel;
-use Novay\MiniOS\Support\WindowConfig;
-
-class ControlPanelApp implements DesktopApp
+/**
+ * @deprecated Use KatalogApp instead.
+ */
+class ControlPanelApp extends KatalogApp
 {
     public function id(): string
     {
@@ -15,12 +14,12 @@ class ControlPanelApp implements DesktopApp
 
     public function name(): string
     {
-        return 'Control Panel';
+        return 'Katalog';
     }
 
     public function icon(): string
     {
-        return 'control-panel';
+        return 'katalog';
     }
 
     public function entry(): string
@@ -34,22 +33,5 @@ class ControlPanelApp implements DesktopApp
             '/control-panel',
             '/desktop/control-panel',
         ];
-    }
-
-    public function isPinned(): bool
-    {
-        return true;
-    }
-
-    public function component(): ?string
-    {
-        return class_exists(ControlPanel::class) ? ControlPanel::class : 'apps.control-panel';
-    }
-
-    public function window(): WindowConfig
-    {
-        return WindowConfig::make()
-            ->size(980, 640)
-            ->min(640, 420);
     }
 }

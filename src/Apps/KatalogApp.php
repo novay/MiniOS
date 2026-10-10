@@ -3,39 +3,39 @@
 namespace Novay\MiniOS\Apps;
 
 use Novay\MiniOS\Contracts\DesktopApp;
-use Novay\MiniOS\Livewire\Apps\Soundcloud;
+use Novay\MiniOS\Livewire\Apps\Katalog;
 use Novay\MiniOS\Support\WindowConfig;
 
-class SoundcloudApp implements DesktopApp
+class KatalogApp implements DesktopApp
 {
     public function id(): string
     {
-        return 'soundcloud';
+        return 'katalog';
     }
 
     public function name(): string
     {
-        return 'SoundCloud';
+        return 'Katalog';
     }
 
     public function icon(): string
     {
-        return 'soundcloud';
+        return 'katalog';
     }
 
     public function entry(): string
     {
-        return '/soundcloud';
+        return '/desktop/katalog';
     }
 
     public function routes(): array
     {
-        return ['/soundcloud'];
-    }
-
-    public function version(): string
-    {
-        return '1.0.0';
+        return [
+            '/katalog',
+            '/desktop/katalog',
+            '/control-panel',
+            '/desktop/control-panel',
+        ];
     }
 
     public function isPinned(): bool
@@ -45,15 +45,13 @@ class SoundcloudApp implements DesktopApp
 
     public function component(): ?string
     {
-        return class_exists(Soundcloud::class) ? Soundcloud::class : 'apps.soundcloud';
+        return class_exists(Katalog::class) ? Katalog::class : 'apps.katalog';
     }
 
     public function window(): WindowConfig
     {
         return WindowConfig::make()
-            ->size(540, 580)
-            ->min(380, 320)
-            ->resizable(false)
-            ->maximizable(false);
+            ->size(980, 640)
+            ->min(640, 420);
     }
 }

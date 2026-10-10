@@ -59,6 +59,8 @@
     "2. Want to install automatically via GUI?": "2. Want to install automatically via GUI?",
     "Open Control Panel > Installed Apps to run the installation directly from MiniOS.": "Open Control Panel > Installed Apps to run the installation directly from MiniOS.",
     "Open Control Panel": "Open Control Panel",
+    "Open Katalog > Installed Apps to run the installation directly from MiniOS.": "Open Katalog > Installed Apps to run the installation directly from MiniOS.",
+    "Open Katalog": "Open Katalog",
     "After packages are installed in Laravel, refresh this window:": "After packages are installed in Laravel, refresh this window:",
     "Check Again & Refresh": "Check Again & Refresh",
 
