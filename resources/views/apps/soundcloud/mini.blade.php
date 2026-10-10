@@ -104,7 +104,7 @@
 >
     <div
         @click="handleOpenSoundcloud()"
-        class="group relative flex items-center gap-3 w-72 sm:w-80 p-2.5 rounded-2xl bg-white/90 dark:bg-[#18181b]/92 backdrop-blur-2xl border border-black/10 dark:border-white/10 shadow-[0_14px_38px_rgba(0,0,0,0.18)] dark:shadow-[0_20px_45px_rgba(0,0,0,0.6)] overflow-hidden cursor-pointer hover:border-black/20 dark:hover:border-white/20 hover:shadow-2xl transition-all duration-200"
+        class="group relative flex items-center gap-3 w-72 sm:w-80 p-2.5 rounded-lg bg-white/90 dark:bg-[#18181b]/92 backdrop-blur-2xl border border-black/10 dark:border-white/10 shadow-[0_14px_38px_rgba(0,0,0,0.18)] dark:shadow-[0_20px_45px_rgba(0,0,0,0.6)] overflow-hidden cursor-pointer hover:border-black/20 dark:hover:border-white/20 hover:shadow-2xl transition-all duration-200"
         title="{{ __('Kembali ke SoundCloud') }}"
     >
         {{-- Artwork / Cover --}}
@@ -175,7 +175,7 @@
                     </svg>
                 </template>
                 <template x-if="!scPlaying">
-                    <svg class="w-4 h-4 fill-current translate-x-0.5" viewBox="0 0 24 24">
+                    <svg class="w-4 h-4 fill-current translate-x-0.5 me-1" viewBox="0 0 24 24">
                         <path d="M8 5v14l11-7z"/>
                     </svg>
                 </template>

@@ -11,6 +11,9 @@
         totalBars: 70,
         waveBarHeights: [],
         tooltip: { visible: false, x: 0, text: '0:00' },
+        STORAGE_KEY: 'minios_sc_playback_state',
+        _isRestoring: false,
+        _needsInitialSeek: false,
 
         get currentTrack() {
             return this.currentSounds[this.currentTrackIndex] || {
@@ -33,15 +36,96 @@
             return Math.min(100, Math.max(0, (this.currentPositionSec / dur) * 100));
         },
 
+        savePlaybackState() {
+            try {
+                const state = {
+                    playlistUrl: {{ json_encode($playerUrl) }},
+                    trackIndex: this.currentTrackIndex,
+                    positionSec: this.currentPositionSec,
+                    updatedAt: Date.now()
+                };
+                localStorage.setItem(this.STORAGE_KEY, JSON.stringify(state));
+            } catch (e) {}
+        },
+
+        getSavedPlaybackState() {
+            try {
+                const raw = localStorage.getItem(this.STORAGE_KEY);
+                if (!raw) return null;
+                const parsed = JSON.parse(raw);
+                if (parsed.playlistUrl && parsed.playlistUrl !== {{ json_encode($playerUrl) }}) {
+                    return null;
+                }
+                return parsed;
+            } catch (e) {
+                return null;
+            }
+        },
+
+        restoreSavedPlayback() {
+            const saved = this.getSavedPlaybackState();
+            if (!saved) return;
+
+            if (typeof saved.trackIndex === 'number' && saved.trackIndex >= 0 && saved.trackIndex < this.currentSounds.length) {
+                this.currentTrackIndex = saved.trackIndex;
+            }
+
+            if (typeof saved.positionSec === 'number' && saved.positionSec >= 0) {
+                this.currentPositionSec = saved.positionSec;
+                this._needsInitialSeek = true;
+            }
+        },
+
+        applySavedPlaybackToWidget() {
+            if (!window.scWidget) return;
+
+            const saved = this.getSavedPlaybackState();
+            if (!saved) return;
+
+            const targetIndex = (typeof saved.trackIndex === 'number' && saved.trackIndex >= 0) ? saved.trackIndex : 0;
+            const targetSec = (typeof saved.positionSec === 'number' && saved.positionSec > 0) ? saved.positionSec : 0;
+
+            if (targetIndex === 0 && targetSec === 0) return;
+
+            this._isRestoring = true;
+
+            if (targetIndex > 0) {
+                try {
+                    window.scWidget.skip(targetIndex);
+                } catch (e) {}
+            }
+
+            setTimeout(() => {
+                try {
+                    window.scWidget.pause();
+                    this.isPlaying = false;
+                    if (targetSec > 0) {
+                        window.scWidget.seekTo(targetSec * 1000);
+                    }
+                    this.broadcastPlayback();
+                } catch (e) {}
+                setTimeout(() => {
+                    this._isRestoring = false;
+                }, 400);
+            }, targetIndex > 0 ? 500 : 200);
+        },
+
         init() {
             this.generateWaveformBars();
+            this.restoreSavedPlayback();
             this.loadSoundCloudWidgetApi();
 
+            window.addEventListener('beforeunload', () => {
+                this.savePlaybackState();
+            });
+
             window.addEventListener('soundcloud-load-url', (e) => {
+                this.currentTrackIndex = 0;
+                this.currentPositionSec = 0;
+                this._needsInitialSeek = false;
+                this.savePlaybackState();
                 if (e.detail && e.detail.tracks && e.detail.tracks.length > 0) {
                     this.currentSounds = e.detail.tracks;
-                    this.currentTrackIndex = 0;
-                    this.currentPositionSec = 0;
                     this.broadcastPlayback();
                 }
                 if (e.detail && e.detail.url) {
@@ -54,6 +138,8 @@
             window.addEventListener('minios-sc-prev', () => this.prevTrack());
             window.addEventListener('minios-sc-toggle-list', () => { this.isTracklistVisible = !this.isTracklistVisible; });
             window.addEventListener('minios-sc-request-state', () => this.broadcastPlayback());
+
+            this.broadcastPlayback();
         },
 
         broadcastPlayback() {
@@ -115,13 +201,26 @@
 
                 window.scWidget.bind(window.SC.Widget.Events.READY, () => {
                     this.fetchSounds();
+                    this.applySavedPlaybackToWidget();
                     this.broadcastPlayback();
                 });
 
                 window.scWidget.bind(window.SC.Widget.Events.PLAY, () => {
+                    if (this._isRestoring) {
+                        try { window.scWidget.pause(); } catch(e){}
+                        this.isPlaying = false;
+                        return;
+                    }
                     this.isPlaying = true;
+                    this._needsInitialSeek = false;
                     this.broadcastPlayback();
                     try {
+                        window.scWidget.getCurrentSoundIndex((idx) => {
+                            if (typeof idx === 'number' && idx >= 0 && idx < this.currentSounds.length) {
+                                this.currentTrackIndex = idx;
+                                this.savePlaybackState();
+                            }
+                        });
                         window.scWidget.getCurrentSound((sound) => {
                             if (sound && sound.title && this.currentSounds[this.currentTrackIndex]) {
                                 const cur = this.currentSounds[this.currentTrackIndex];
@@ -146,8 +245,11 @@
                 });
 
                 window.scWidget.bind(window.SC.Widget.Events.PAUSE, () => {
-                    this.isPlaying = false;
-                    this.broadcastPlayback();
+                    if (!this._isRestoring) {
+                        this.isPlaying = false;
+                        this.savePlaybackState();
+                        this.broadcastPlayback();
+                    }
                 });
 
                 window.scWidget.bind(window.SC.Widget.Events.PLAY_PROGRESS, (data) => {
@@ -161,6 +263,9 @@
                                     durationSec: this.currentDurationSec
                                 }
                             }));
+                            if (this.currentPositionSec % 2 === 0) {
+                                this.savePlaybackState();
+                            }
                         }
                     }
                 });
@@ -212,6 +317,9 @@
             if (index < 0 || index >= this.currentSounds.length) return;
             this.currentTrackIndex = index;
             this.currentPositionSec = 0;
+            this._needsInitialSeek = false;
+            this._isRestoring = false;
+            this.savePlaybackState();
 
             if (window.scWidget) {
                 try {
@@ -234,10 +342,18 @@
         },
 
         play() {
+            this._isRestoring = false;
             this.isPlaying = true;
             if (window.scWidget) {
-                try { window.scWidget.play(); } catch(e){}
+                try {
+                    if (this._needsInitialSeek && this.currentPositionSec > 0) {
+                        window.scWidget.seekTo(this.currentPositionSec * 1000);
+                        this._needsInitialSeek = false;
+                    }
+                    window.scWidget.play();
+                } catch(e){}
             }
+            this.savePlaybackState();
             this.broadcastPlayback();
         },
 
@@ -246,6 +362,7 @@
             if (window.scWidget) {
                 try { window.scWidget.pause(); } catch(e){}
             }
+            this.savePlaybackState();
             this.broadcastPlayback();
         },
 
@@ -266,6 +383,8 @@
         seek(percentage) {
             const targetSec = Math.floor(percentage * this.currentDurationSec);
             this.currentPositionSec = targetSec;
+            this._needsInitialSeek = false;
+            this.savePlaybackState();
             if (window.scWidget) {
                 try { window.scWidget.seekTo(targetSec * 1000); } catch(e){}
             }
