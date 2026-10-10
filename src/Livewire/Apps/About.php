@@ -173,9 +173,13 @@ class About extends Component
 
     public function render()
     {
-        $view = view()->exists('pages.minios.apps.about')
-            ? 'pages.minios.apps.about'
-            : 'minios::apps.about';
+        $view = view()->exists('pages.minios.apps.about.index')
+            ? 'pages.minios.apps.about.index'
+            : (view()->exists('pages.minios.apps.about')
+                ? 'pages.minios.apps.about'
+                : (view()->exists('minios::apps.about.index')
+                    ? 'minios::apps.about.index'
+                    : 'minios::apps.about'));
 
         return view($view, [
             'accent' => $this->accent,

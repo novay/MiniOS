@@ -45,7 +45,7 @@ class AboutApp implements DesktopApp
 
     public function component(): ?string
     {
-        return class_exists(About::class) ? About::class : 'apps.about';
+        return 'apps.about.index';
     }
 
     public function window(): WindowConfig
