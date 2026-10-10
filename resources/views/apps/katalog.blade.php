@@ -40,9 +40,6 @@
                 <x-minios.menubar.item @click="refresh()" icon="arrow-path" shortcut="⌘R">
                     {{ __('Muat Ulang') }}
                 </x-minios.menubar.item>
-                <x-minios.menubar.item @click="window.location.reload()" icon="arrow-path" shortcut="⇧⌘R">
-                    {{ __('Muat Ulang Halaman') }}
-                </x-minios.menubar.item>
                 <x-minios.menubar.separator />
                 <x-minios.menubar.item @click="toggleStatusbar()" icon="chart-bar" shortcut="⌘P">
                     <span x-text="statusbarVisible ? '{{ __('Disable Status Bar') }}' : '{{ __('Enable Status Bar') }}'"></span>
@@ -51,10 +48,6 @@
 
             {{-- Help --}}
             <x-minios.menubar.menu label="{{ __('Help') }}">
-                <x-minios.menubar.item @click="$dispatch('open-window', { id: 'docs' })" icon="book-open">
-                    {{ __('Dokumentasi Layout') }}
-                </x-minios.menubar.item>
-                <x-minios.menubar.separator />
                 <x-minios.menubar.item wire:click="openAboutModal" icon="information-circle" shortcut="⌘A">
                     {{ __('About Katalog v1.0.0') }}
                 </x-minios.menubar.item>

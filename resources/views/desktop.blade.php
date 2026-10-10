@@ -27,6 +27,26 @@
         }
     "
 
+    @update-window-url.window="
+        const appId = $event.detail?.id || $event.detail?.app;
+        const newUrl = $event.detail?.url;
+        if (appId && newUrl) {
+            const win = getWindow(appId);
+            if (win) {
+                win.url = newUrl;
+            }
+            if (activeWindow === appId) {
+                window.history.pushState({}, '', newUrl);
+                currentPath = normalizePath(newUrl);
+                currentUrl = newUrl;
+            }
+        }
+    "
+
+    @popstate.window="
+        $dispatch('desktop-route-changed', { path: window.location.pathname, url: window.location.href });
+    "
+
     @trash-updated.window="
         const c = $event.detail?.count ?? $event.detail?.[0]?.count ?? (typeof $event.detail === 'number' ? $event.detail : null);
         if (c !== null && c !== undefined) {
@@ -170,7 +190,11 @@
                                     ? substr($application['component'], 9)
                                     : $application['component'];
                             @endphp
-                            <livewire:dynamic-component :is="$livewireComp" :wire:key="'minios-app-'.$id" />
+                            @if ($id === 'katalog')
+                                <livewire:dynamic-component :is="$livewireComp" :wire:key="'minios-app-'.$id" :path="$desktopPath" />
+                            @else
+                                <livewire:dynamic-component :is="$livewireComp" :wire:key="'minios-app-'.$id" />
+                            @endif
                         @else
                             <x-dynamic-component :component="$application['component']" />
                         @endif

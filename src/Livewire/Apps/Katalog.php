@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Novay\MiniOS\Concerns\HasTranslations;
@@ -63,6 +64,55 @@ class Katalog extends Component
 
     public string $themeCategory = 'all';
 
+    public function mount(?string $path = null): void
+    {
+        $rawPath = $path ?? request()->route('desktopPath') ?? request()->path();
+        $target = trim(parse_url((string) $rawPath, PHP_URL_PATH) ?? '', '/');
+
+        if (str_ends_with($target, '/apps') || $target === 'apps') {
+            $this->activeTab = 'apps';
+        } elseif (str_ends_with($target, '/themes') || $target === 'themes') {
+            $this->activeTab = 'themes';
+        } elseif (str_ends_with($target, '/installed') || $target === 'installed') {
+            $this->activeTab = 'installed';
+        } elseif (str_ends_with($target, '/explore') || $target === 'explore' || str_ends_with($target, '/katalog') || $target === 'katalog') {
+            $this->activeTab = 'explore';
+        }
+    }
+
+    #[On('desktop-route-changed')]
+    public function onDesktopRouteChanged(?string $path = null, ?string $url = null): void
+    {
+        $target = $path ?? $url ?? request()->path();
+        if (! $target) {
+            return;
+        }
+
+        $target = trim(parse_url($target, PHP_URL_PATH) ?? '', '/');
+
+        if (str_ends_with($target, '/apps') || $target === 'apps') {
+            $this->activeTab = 'apps';
+        } elseif (str_ends_with($target, '/themes') || $target === 'themes') {
+            $this->activeTab = 'themes';
+        } elseif (str_ends_with($target, '/installed') || $target === 'installed') {
+            $this->activeTab = 'installed';
+        } elseif (str_ends_with($target, '/katalog') || $target === 'katalog' || str_ends_with($target, '/explore') || $target === 'explore') {
+            $this->activeTab = 'explore';
+        }
+    }
+
+    public function refresh(): void
+    {
+        $this->search = '';
+        $this->catalogSearch = '';
+        $this->catalogCategory = 'all';
+        $this->expandedApp = null;
+        $this->statusMessage = null;
+        $this->showUploadModal = false;
+        $this->showAboutModal = false;
+        $this->showComposerModal = false;
+    }
+
     public function toggleAppDetails(string $id): void
     {
         $this->expandedApp = ($this->expandedApp === $id) ? null : $id;
@@ -72,6 +122,15 @@ class Katalog extends Component
     {
         if (in_array($tab, ['all', 'system', 'custom', 'catalog', 'explore', 'apps', 'themes', 'installed'], true)) {
             $this->activeTab = $tab;
+
+            $routePath = match ($this->effectiveNav) {
+                'apps' => '/desktop/katalog/apps',
+                'themes' => '/desktop/katalog/themes',
+                'installed' => '/desktop/katalog/installed',
+                default => '/desktop/katalog',
+            };
+
+            $this->dispatch('update-window-url', id: 'katalog', url: $routePath);
         }
     }
 

@@ -32,7 +32,13 @@ class KatalogApp implements DesktopApp
     {
         return [
             '/katalog',
+            '/katalog/apps',
+            '/katalog/themes',
+            '/katalog/installed',
             '/desktop/katalog',
+            '/desktop/katalog/apps',
+            '/desktop/katalog/themes',
+            '/desktop/katalog/installed',
             '/control-panel',
             '/desktop/control-panel',
         ];

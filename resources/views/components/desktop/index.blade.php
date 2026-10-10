@@ -28,6 +28,9 @@
             if (this.isRefreshing) return;
             this.isRefreshing = true;
 
+            // Reset client-side menu search filter
+            this.menuSearch = '';
+
             const startTime = Date.now();
             const minLoadingTime = 550;
 
@@ -40,15 +43,33 @@
             };
 
             const wire = this.$wire;
-            if (wire && typeof wire.$refresh === 'function') {
-                try {
-                    const res = wire.$refresh();
-                    if (res && typeof res.then === 'function') {
-                        res.then(() => finish()).catch(() => finish());
-                    } else {
+            if (wire) {
+                if (typeof wire.refresh === 'function') {
+                    try {
+                        const res = wire.refresh();
+                        if (res && typeof res.then === 'function') {
+                            res.then(() => finish()).catch(() => finish());
+                        } else {
+                            finish();
+                        }
+                    } catch (err) {
                         finish();
                     }
-                } catch (err) {
+                    return;
+                }
+
+                if (typeof wire.$refresh === 'function') {
+                    try {
+                        const res = wire.$refresh();
+                        if (res && typeof res.then === 'function') {
+                            res.then(() => finish()).catch(() => finish());
+                        } else {
+                            finish();
+                        }
+                    } catch (err) {
+                        finish();
+                    }
+                } else {
                     finish();
                 }
             } else {
