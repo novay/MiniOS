@@ -23,7 +23,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @fluxAppearance
 </head>
-<body class="h-dvh w-screen overflow-hidden bg-white text-neutral-900 dark:bg-black dark:text-white font-sans antialiased">
+<body class="minios-desktop h-dvh w-screen overflow-hidden bg-white text-neutral-900 dark:bg-black dark:text-white font-sans antialiased">
     {{ $slot }}
 
     <script>
