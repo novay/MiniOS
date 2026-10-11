@@ -119,11 +119,11 @@
 >
     {{-- Leading Icon --}}
     @if (is_string($icon) && $icon !== '')
-        <div class="shrink-0 text-[var(--callout-icon)] {{ $inline ? 'sm:self-center pt-0.5 sm:pt-0' : 'pt-0.5' }}">
+        <div data-slot="icon" class="shrink-0 text-[var(--callout-icon)] {{ $inline ? 'sm:self-center pt-0.5 sm:pt-0' : 'pt-0.5' }}">
             <os:icon :name="$icon" class="size-5 shrink-0" />
         </div>
     @elseif ($icon)
-        <div class="shrink-0 text-[var(--callout-icon)] {{ $inline ? 'sm:self-center pt-0.5 sm:pt-0' : 'pt-0.5' }}">
+        <div data-slot="icon" class="shrink-0 text-[var(--callout-icon)] {{ $inline ? 'sm:self-center pt-0.5 sm:pt-0' : 'pt-0.5' }}">
             {{ $icon }}
         </div>
     @endif

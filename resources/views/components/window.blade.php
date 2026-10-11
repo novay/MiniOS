@@ -34,7 +34,7 @@
     :class="[
         getWindow(@js($id))?.maximized
             ? 'rounded-none'
-            : 'rounded-xl',
+            : 'rounded-lg',
 
         isWindowInteracting(@js($id))
             ? 'desktop-window-no-motion'
@@ -119,13 +119,13 @@
         <div
             class="
                 pointer-events-none
-
-                absolute
+                ms-1.5
+                {{-- absolute
                 left-1/2
 
                 max-w-[50%]
 
-                -translate-x-1/2
+                -translate-x-1/2 --}}
 
                 truncate
 

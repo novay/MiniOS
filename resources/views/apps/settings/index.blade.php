@@ -26,7 +26,7 @@
                     type="text"
                     wire:model.live.debounce.150ms="search"
                     placeholder="{{ $this->t('search_placeholder') }}"
-                    class="w-full rounded-md border border-neutral-300/80 dark:border-white/10 bg-white dark:bg-[#2b2b2b] py-1.5 pl-9 pr-7 text-sm text-neutral-900 dark:text-neutral-100 placeholder-neutral-400 dark:placeholder-neutral-500 shadow-2xs transition-all focus:outline-none focus:ring-2 {{ $accent['ring'] }}"
+                    class="w-full rounded-full border border-neutral-300/80 dark:border-white/10 bg-white dark:bg-[#2b2b2b] py-1.5 pl-9 pr-7 text-sm text-neutral-900 dark:text-neutral-100 placeholder-neutral-400 dark:placeholder-neutral-500 shadow-2xs transition-all focus:outline-none focus:ring-2 {{ $accent['ring'] }}"
                 />
                 @if ($search !== '')
                     <button
@@ -60,18 +60,17 @@
                 <button
                     type="button"
                     wire:click="setTab('{{ $navKey }}')"
-                    class="group relative flex items-center gap-3 rounded-md px-3 py-2 text-left font-medium transition-all {{ $isActive ? 'bg-white dark:bg-white/10 text-neutral-900 dark:text-white shadow-2xs' : 'text-neutral-600 dark:text-neutral-400 hover:bg-black/[0.04] dark:hover:bg-white/5 hover:text-neutral-900 dark:hover:text-white' }}"
+                    class="group text-xs tracking-tight relative flex items-center gap-2.5 rounded-sm px-2.5 py-1.5 text-left font-medium transition-all {{ $isActive ? 'bg-white dark:bg-white/10 text-neutral-900 dark:text-white shadow-2xs' : 'text-neutral-600 dark:text-neutral-400 hover:bg-black/[0.04] dark:hover:bg-white/5 hover:text-neutral-900 dark:hover:text-white' }}"
                 >
                     {{-- Windows 11 Active Left Accent Pill Indicator --}}
                     @if ($isActive)
                         <span class="absolute left-0 top-1/2 -translate-y-1/2 h-4 w-1 rounded-r-full" style="background-color: var(--accent-color, {{ $accent['hex'] }});"></span>
                     @endif
 
-                    <div class="flex size-6 items-center justify-center rounded-md {{ $navItem['color'] }} shadow-2xs shrink-0 transition-transform group-hover:scale-105">
-                        <flux:icon :name="$navItem['icon']" class="size-3.5" />
-                    </div>
+                    <flux:icon :name="$navItem['icon']" class="size-5 {{ $navItem['color'] }}" />
+
                     <div class="min-w-0 flex-1">
-                        <span class="truncate block {{ $isActive ? 'font-semibold text-neutral-900 dark:text-white' : '' }}">{{ $navItem['label'] }}</span>
+                        <span class="truncate block {{ $isActive ? 'text-neutral-900 dark:text-white' : '' }}">{{ $navItem['label'] }}</span>
                     </div>
                 </button>
             @empty
