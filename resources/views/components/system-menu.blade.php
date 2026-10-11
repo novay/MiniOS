@@ -4,27 +4,30 @@
     @click.outside="systemMenuOpen = false"
     @click.stop
     style="display: none;"
-    x-transition:enter="transition ease-out duration-100"
-    x-transition:enter-start="opacity-0 scale-95 -translate-y-1"
+    x-transition:enter="transition ease-out duration-150"
+    x-transition:enter-start="opacity-0 scale-95 translate-y-2"
     x-transition:enter-end="opacity-100 scale-100 translate-y-0"
-    x-transition:leave="transition ease-in duration-75"
+    x-transition:leave="transition ease-in duration-100"
     x-transition:leave-start="opacity-100 scale-100 translate-y-0"
-    x-transition:leave-end="opacity-0 scale-95 -translate-y-1"
+    x-transition:leave-end="opacity-0 scale-95 translate-y-2"
+    :class="{
+        'bottom-20 right-3 origin-bottom-right': (settings?.dock?.position ?? 'bottom') === 'bottom',
+        'top-3 left-20 origin-top-left': (settings?.dock?.position ?? 'bottom') === 'left',
+        'top-3 right-20 origin-top-right': (settings?.dock?.position ?? 'bottom') === 'right',
+    }"
+    :style="(settings?.dock?.position ?? 'bottom') === 'bottom' ? 'bottom: ' + (getDockPx() + 16) + 'px;' : ''"
     class="
         absolute
-        right-2
-        top-8
-        z-[70]
+        z-[9990]
         w-60
-        origin-top-right
         overflow-hidden
-        rounded-md
+        rounded-xl
         border
         border-black/10
         dark:border-white/10
-        bg-white/90
-        dark:bg-[#1e1e1e]/90
-        p-1.5
+        bg-white/95
+        dark:bg-[#1e1e1e]/95
+        p-2
         text-[13px]
         font-medium
         text-neutral-800
@@ -35,7 +38,7 @@
     "
 >
     {{-- Profile Info Header --}}
-    {{-- <div class="flex items-center gap-2.5 rounded border border-black/5 dark:border-white/5 bg-black/[0.03] dark:bg-white/[0.04] p-2">
+    <div class="flex items-center gap-2.5 rounded-lg border border-black/5 dark:border-white/5 bg-black/[0.03] dark:bg-white/[0.04] p-2 mb-1">
         <div class="flex size-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 font-bold text-xs text-white shadow-sm">
             {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 2)) }}
         </div>
@@ -49,7 +52,7 @@
         </div>
     </div>
 
-    <div class="my-1 h-px bg-neutral-200/80 dark:bg-white/10"></div> --}}
+    <div class="my-1 h-px bg-neutral-200/80 dark:bg-white/10"></div>
 
     {{-- System App Shortcuts --}}
     <div class="flex flex-col">

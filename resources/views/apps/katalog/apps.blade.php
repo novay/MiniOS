@@ -143,7 +143,7 @@
                             wire:target="installCatalogApp('{{ $catApp['id'] }}')"
                             style="background-color: var(--accent-color, {{ $accent['hex'] }});"
                             class="inline-flex items-center gap-1 rounded-lg px-3 py-1 text-xs font-semibold text-white shadow-2xs hover:brightness-110 active:scale-95 transition-all shrink-0"
-                        >
+                         @disabled(! $canInstallCatalog) title="Hanya administrator yang dapat memasang aplikasi">
                             <flux:icon name="arrow-down-tray" class="size-3" />
                             <span>{{ $this->t('btn_one_click_install') }}</span>
                         </button>

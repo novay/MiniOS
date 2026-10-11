@@ -7,11 +7,21 @@
     'badge' => null,
     'badgeColor' => null,
     'active' => false,
+    'navigateTo' => null,
+    'navIsCrud' => false,
 ])
 
 @php
     $finalIconColor = $attributes->get('icon:color') ?? $attributes->get('icon-color') ?? $iconColor ?? 'text-neutral-500';
     $searchTarget = strtolower($label . ' ' . ($description ?? ''));
+    // Previously the component rendered @click="hideTooltip()" AND forwarded
+    // a second @click from the caller. A duplicate HTML attribute causes
+    // browsers to ignore the caller's navigation/click handler.
+    $customClick = $attributes->get('@click') ?? $attributes->get('x-on:click');
+    $clickExpr = $navigateTo !== null
+        ? 'hideTooltip(); $dispatch("minios-menu-action", { action: "app.navigate", payload: { path: $el.dataset.miniosNavPath } })'
+        : ($customClick ? "hideTooltip(); {$customClick}" : 'hideTooltip()');
+    $navAttributes = $attributes->except(['@click', 'x-on:click', 'icon:color', 'icon-color']);
 @endphp
 
 <button
@@ -39,9 +49,13 @@
     @mouseleave="hideTooltip()"
     @focus="showTooltip()"
     @blur="hideTooltip()"
-    @click="hideTooltip()"
+    x-on:click="{{ $clickExpr }}"
+    @if($navigateTo !== null)
+        data-minios-nav-path="{{ $navigateTo }}"
+        data-minios-nav-crud="{{ $navIsCrud ? '1' : '0' }}"
+    @endif
     :class="sidebarCollapsed ? 'justify-center px-0 py-2.5' : 'px-3 py-2.5'"
-    {{ $attributes->except(['icon:color', 'icon-color'])->merge([
+    {{ $navAttributes->merge([
         'class' => 'group relative flex items-center gap-3 rounded-md text-left font-medium transition-all ' .
             ($active
                 ? 'bg-white dark:bg-white/10 text-neutral-900 dark:text-white shadow-2xs'

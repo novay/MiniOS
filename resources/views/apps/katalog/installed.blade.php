@@ -19,6 +19,7 @@
 
         {{-- Primary Action (Install ZIP Button) --}}
         <div class="flex items-center gap-2">
+            @if($canInstallZip)
             <button
                 type="button"
                 wire:click="openUploadModal"
@@ -28,6 +29,9 @@
                 <flux:icon name="arrow-up-tray" class="size-4" />
                 <span>{{ $this->t('btn_install_zip') }}</span>
             </button>
+            @else
+                <span class="text-xs text-neutral-500">Upload ZIP: administrator / opt-in saja</span>
+            @endif
         </div>
     </header>
 
@@ -166,7 +170,7 @@
                             </flux:button>
 
                             {{-- Uninstall Custom App --}}
-                            @if ($app['canUninstall'])
+                            @if ($app['canUninstall'] && $canManageApps)
                                 <button
                                     type="button"
                                     wire:click="confirmUninstall('{{ $app['id'] }}')"
@@ -355,6 +359,7 @@
                                                             <span>{{ $this->t('badge_uninstalled') }}</span>
                                                         </span>
 
+                                                        @if($canInstallComposer)
                                                         <button
                                                             type="button"
                                                             wire:click="openComposerModal('{{ $app['id'] }}', '{{ $pkg['name'] }}')"
@@ -363,6 +368,7 @@
                                                             <flux:icon name="bolt" class="size-2.5" />
                                                             <span>{{ $this->t('btn_install_gui') }}</span>
                                                         </button>
+                                                        @endif
                                                     @endif
                                                 </div>
                                             </div>

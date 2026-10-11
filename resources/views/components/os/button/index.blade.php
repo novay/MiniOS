@@ -100,9 +100,9 @@
 @endphp
 
 @if ($href)
-<a href="{{ $href }}" data-fluent-button="true" {{ $attributes->class($classes) }}>
+<a href="{{ $href }}" data-os-button="true" {{ $attributes->class($classes) }}>
 @else
-<button type="{{ $type }}" @disabled($disabled) data-fluent-button="true" {{ $attributes->class($classes) }}>
+<button type="{{ $type }}" @disabled($disabled) data-os-button="true" {{ $attributes->class($classes) }}>
 @endif
     {{-- Windows 11 ProgressRing Loading Spinner --}}
     @if ($loading)

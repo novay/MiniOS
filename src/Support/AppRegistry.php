@@ -4,6 +4,8 @@ namespace Novay\MiniOS\Support;
 
 use Composer\InstalledVersions;
 use Novay\MiniOS\Contracts\DesktopApp;
+use Novay\MiniOS\Services\AppDefinitionResolver;
+use Novay\MiniOS\Services\AppSidebarService;
 
 class AppRegistry
 {
@@ -62,6 +64,8 @@ class AppRegistry
     public function toArray(): array
     {
         $prefix = trim(config('minios.prefix', ''), '/');
+        $result = [];
+        $resolver = app(AppDefinitionResolver::class);
 
         foreach ($this->apps as $id => $app) {
             $requiredPackages = [];
@@ -78,17 +82,23 @@ class AppRegistry
                 }
             }
 
-            $entry = $this->formatRoute($app->entry(), $prefix);
-            $routes = array_map(fn ($r) => $this->formatRoute($r, $prefix), (array) $app->routes());
+            $definition = $resolver->resolve($app);
+            $entry = $this->formatRoute($definition['entry'], $prefix);
+            $ownedRoutes = (array) $definition['routes'];
+            if ($definition['layout']['sidebar_enabled'] ?? false) {
+                $ownedRoutes = array_merge($ownedRoutes, app(AppSidebarService::class)->routes($app));
+            }
+            $routes = array_values(array_unique(array_map(fn ($r) => $this->formatRoute($r, $prefix), $ownedRoutes)));
 
             $result[$id] = [
-                'name' => $app->name(),
-                'icon' => $app->icon(),
+                'name' => $definition['name'],
+                'icon' => $definition['icon'],
                 'entry' => $entry,
                 'routes' => $routes,
-                'pinned' => $app->isPinned(),
-                'component' => $app->component(),
-                'window' => $app->window()->toArray(),
+                'pinned' => $definition['pinned'],
+                'component' => $definition['component'],
+                'window' => $definition['window'],
+                'layout' => $definition['layout'],
                 'packages' => $requiredPackages,
                 'missing_packages' => $missingPackages,
             ];

@@ -15,6 +15,7 @@
                 <p class="text-xs text-neutral-600 dark:text-neutral-300 leading-relaxed">
                     {{ $this->t('uninstall_confirm_msg', ['name' => $appToUninstallDetails['name'] ?? $appToUninstall]) }}
                 </p>
+                <p class="mt-2 text-xs text-amber-700 dark:text-amber-400">Data database, migration, dan model tidak dihapus otomatis. Jika aplikasi diregistrasi manual di AppServiceProvider, hapus registrasinya sebelum deploy ulang.</p>
             </div>
 
             <div class="mt-6 flex items-center justify-end gap-2 border-t border-neutral-200/80 dark:border-white/5 pt-4">

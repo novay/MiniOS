@@ -155,7 +155,7 @@ export default function minios(applications = {}, userSettings = {}, basePath = 
 
             return {
                 width: Math.max(1, window.innerWidth - 64),
-                height: Math.max(1, window.innerHeight - 28),
+                height: Math.max(1, window.innerHeight),
             };
         },
     };

@@ -101,7 +101,6 @@
 
     $elementAttributes = $attributes->class($classes)->merge([
         'data-slot' => 'badge',
-        'data-flux-badge' => 'true',
         'data-os-badge' => 'true',
     ]);
 @endphp
@@ -109,7 +108,7 @@
 @if ($href)
     <a href="{{ $href }}" {{ $elementAttributes }}>
         @if (is_string($icon) && $icon !== '')
-            <flux:icon :name="$icon" :variant="$iconVariant" class="{{ $iconSizeClasses }} shrink-0" data-flux-badge-icon />
+            <flux:icon :name="$icon" :variant="$iconVariant" class="{{ $iconSizeClasses }} shrink-0" data-os-badge-icon />
         @elseif ($icon)
             {{ $icon }}
         @endif
@@ -117,7 +116,7 @@
         {{ $slot->isEmpty() ? $label : $slot }}
 
         @if (is_string($iconTrailing) && $iconTrailing !== '')
-            <flux:icon :name="$iconTrailing" :variant="$iconVariant" class="{{ $iconSizeClasses }} shrink-0" data-flux-badge-icon:trailing />
+            <flux:icon :name="$iconTrailing" :variant="$iconVariant" class="{{ $iconSizeClasses }} shrink-0" data-os-badge-icon:trailing />
         @elseif ($iconTrailing)
             {{ $iconTrailing }}
         @endif
@@ -125,7 +124,7 @@
 @elseif ($as === 'button')
     <button type="button" {{ $elementAttributes }}>
         @if (is_string($icon) && $icon !== '')
-            <flux:icon :name="$icon" :variant="$iconVariant" class="{{ $iconSizeClasses }} shrink-0" data-flux-badge-icon />
+            <flux:icon :name="$icon" :variant="$iconVariant" class="{{ $iconSizeClasses }} shrink-0" data-os-badge-icon />
         @elseif ($icon)
             {{ $icon }}
         @endif
@@ -133,7 +132,7 @@
         {{ $slot->isEmpty() ? $label : $slot }}
 
         @if (is_string($iconTrailing) && $iconTrailing !== '')
-            <flux:icon :name="$iconTrailing" :variant="$iconVariant" class="{{ $iconSizeClasses }} shrink-0" data-flux-badge-icon:trailing />
+            <flux:icon :name="$iconTrailing" :variant="$iconVariant" class="{{ $iconSizeClasses }} shrink-0" data-os-badge-icon:trailing />
         @elseif ($iconTrailing)
             {{ $iconTrailing }}
         @endif
@@ -141,7 +140,7 @@
 @else
     <div {{ $elementAttributes }}>
         @if (is_string($icon) && $icon !== '')
-            <flux:icon :name="$icon" :variant="$iconVariant" class="{{ $iconSizeClasses }} shrink-0" data-flux-badge-icon />
+            <flux:icon :name="$icon" :variant="$iconVariant" class="{{ $iconSizeClasses }} shrink-0" data-os-badge-icon />
         @elseif ($icon)
             {{ $icon }}
         @endif
@@ -149,7 +148,7 @@
         {{ $slot->isEmpty() ? $label : $slot }}
 
         @if (is_string($iconTrailing) && $iconTrailing !== '')
-            <flux:icon :name="$iconTrailing" :variant="$iconVariant" class="{{ $iconSizeClasses }} shrink-0" data-flux-badge-icon:trailing />
+            <flux:icon :name="$iconTrailing" :variant="$iconVariant" class="{{ $iconSizeClasses }} shrink-0" data-os-badge-icon:trailing />
         @elseif ($iconTrailing)
             {{ $iconTrailing }}
         @endif

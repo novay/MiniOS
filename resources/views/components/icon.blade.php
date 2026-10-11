@@ -226,13 +226,14 @@
     @break
 
     @default
-        @if (str_starts_with($name, 'http') || str_starts_with($name, '/') || str_ends_with($name, '.png') || str_ends_with($name, '.webp') || str_ends_with($name, '.svg'))
+        {{-- @if (str_starts_with($name, 'http') || str_starts_with($name, '/') || str_ends_with($name, '.png') || str_ends_with($name, '.webp') || str_ends_with($name, '.svg'))
             <img src="{{ $name }}" alt="" {{ $attributes->merge(['class' => $class]) }} />
         @else
             <div {{ $attributes->merge(['class' => $class . ' flex items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 shadow text-white p-1']) }}>
                 <flux:icon :name="$name" class="size-full" />
             </div>
-        @endif
+        @endif --}}
+        <img src="{{ asset('minios/images/ic-placeholder.png') }}" alt="" {{ $attributes->merge(['class' => $class]) }} />
     @break
 
 @endswitch

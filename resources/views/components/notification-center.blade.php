@@ -5,26 +5,29 @@
     @click.stop
     style="display: none;"
     x-transition:enter="transition ease-out duration-150"
-    x-transition:enter-start="opacity-0 scale-95 -translate-y-2"
+    x-transition:enter-start="opacity-0 scale-95 translate-y-2"
     x-transition:enter-end="opacity-100 scale-100 translate-y-0"
     x-transition:leave="transition ease-in duration-100"
     x-transition:leave-start="opacity-100 scale-100 translate-y-0"
-    x-transition:leave-end="opacity-0 scale-95 -translate-y-2"
+    x-transition:leave-end="opacity-0 scale-95 translate-y-2"
+    :class="{
+        'bottom-20 right-3 origin-bottom-right': (settings?.dock?.position ?? 'bottom') === 'bottom',
+        'top-3 left-20 origin-top-left': (settings?.dock?.position ?? 'bottom') === 'left',
+        'top-3 right-20 origin-top-right': (settings?.dock?.position ?? 'bottom') === 'right',
+    }"
+    :style="(settings?.dock?.position ?? 'bottom') === 'bottom' ? 'bottom: ' + (getDockPx() + 16) + 'px;' : ''"
     class="
         absolute
-        right-2
-        top-8
-        z-[70]
+        z-[9990]
         w-88
         max-w-[calc(100vw-1rem)]
-        origin-top-right
         overflow-hidden
-        rounded-xl
+        rounded-2xl
         border
         border-black/10
         dark:border-white/10
-        bg-white/90
-        dark:bg-[#1c1c1e]/90
+        bg-white/95
+        dark:bg-[#1c1c1e]/95
         text-[13px]
         font-medium
         text-neutral-800
@@ -34,7 +37,7 @@
         select-none
         flex
         flex-col
-        max-h-[calc(100vh-3.5rem)]
+        max-h-[calc(100vh-5rem)]
     "
 >
     {{-- Header --}}

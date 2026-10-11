@@ -24,6 +24,14 @@ class Browser extends Component
         return $map[$name] ?? $map['indigo'];
     }
 
+    /**
+     * Safe fallback handler for browser refresh requests.
+     */
+    public function refresh(): void
+    {
+        // No-op.
+    }
+
     public function render()
     {
         return view('minios::apps.browser.index', [

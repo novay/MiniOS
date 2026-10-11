@@ -3,6 +3,10 @@
     'shortcut' => null,
     'disabled' => false,
     'danger' => false,
+    // Typed action/payload for dynamic menus. Do not put @js inside a Blade
+    // component attribute; the attribute compiler can treat it as plain text.
+    'action' => null,
+    'payload' => [],
 ])
 
 @php
@@ -16,14 +20,27 @@
     }
 
     $customClick = $attributes->get('@click') ?? $attributes->get('x-on:click');
-    $clickExpr = $customClick ? "closeMenu(); {$customClick}" : "closeMenu()";
+    // Read dynamic menu actions from DOM data attributes so that no JavaScript
+    // is constructed inside an anonymous Blade component's attribute value.
+    // The custom event bubbles to the OWN desktop window, not to window/global.
+    $clickExpr = $action !== null
+        ? 'closeMenu(); $dispatch("minios-menu-action", { action: $el.dataset.miniosAction, payload: JSON.parse($el.dataset.miniosPayload || "{}") })'
+        : ($customClick ? "closeMenu(); {$customClick}" : 'closeMenu()');
+    $payloadJson = json_encode(
+        is_array($payload) ? $payload : [],
+        JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_THROW_ON_ERROR
+    );
     $mergedAttributes = $attributes->except(['@click', 'x-on:click'])->merge(['class' => $baseClass . $stateClass]);
 @endphp
 
 @if ($attributes->has('href'))
     <a
         {{ $mergedAttributes }}
-        @click="{{ $clickExpr }}"
+        @if($action !== null)
+            data-minios-action="{{ $action }}"
+            data-minios-payload="{{ $payloadJson }}"
+        @endif
+        x-on:click="{{ $clickExpr }}"
     >
         <div class="flex items-center gap-2 truncate">
             @if ($icon)
@@ -43,7 +60,11 @@
     <button
         type="button"
         {{ $mergedAttributes }}
-        @if(!$disabled) @click="{{ $clickExpr }}" @endif
+        @if($action !== null)
+            data-minios-action="{{ $action }}"
+            data-minios-payload="{{ $payloadJson }}"
+        @endif
+        @if(!$disabled) x-on:click="{{ $clickExpr }}" @endif
         @if($disabled) disabled @endif
     >
         <div class="flex items-center gap-2 truncate">

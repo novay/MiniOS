@@ -107,8 +107,7 @@
 
 <div
     {{ $attributes->class($classes) }}
-    data-fluent-callout="true"
-    data-flux-callout="true"
+    data-os-callout="true"
     @if ($dismissible)
         x-data="{ show: true }"
         x-show="show"
@@ -140,7 +139,9 @@
                     <os:callout.text>{{ $text }}</os:callout.text>
                 @endif
 
-                {{ $content ?? $slot }}
+                @if ($content || $slot->isNotEmpty())
+                    <div class="leading-relaxed">{{ $content ?? $slot }}</div>
+                @endif
             </div>
 
             @if ($actions)
@@ -159,7 +160,9 @@
                 <os:callout.text>{{ $text }}</os:callout.text>
             @endif
 
-            {{ $content ?? $slot }}
+            @if ($content || $slot->isNotEmpty())
+                <div class="leading-relaxed">{{ $content ?? $slot }}</div>
+            @endif
 
             @if ($actions)
                 <div class="flex items-center gap-2 pt-1.5" data-slot="actions">

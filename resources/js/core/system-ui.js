@@ -1,7 +1,10 @@
 export function createSystemUI() {
     return {
         clock: '',
+        clockTime: '',
+        clockDate: '',
         clockTimer: null,
+        isWallpaperDarkAtDock: true,
         activitiesOpen: false,
         applicationsOpen: false,
         systemMenuOpen: false,
@@ -12,6 +15,10 @@ export function createSystemUI() {
         get isDarkMode() {
             const theme = this.settings?.appearance?.theme || 'system';
             return theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        },
+
+        get isDockTextBright() {
+            return this.isDarkMode || this.isWallpaperDarkAtDock;
         },
 
         initClock() {
@@ -25,11 +32,13 @@ export function createSystemUI() {
         updateClock() {
             const now = new Date();
             const is12h = this.settings?.locale_time?.time_format === '12h';
-            const locale = (this.settings?.locale_time?.locale === 'id') ? 'id-ID' : 'en-US';
+            const rawLocale = this.settings?.locale_time?.locale || document.documentElement.lang || 'id';
+            const locale = (rawLocale === 'id' || rawLocale.startsWith('id')) ? 'id-ID' : 'en-US';
             const timeZone = this.settings?.locale_time?.timezone || undefined;
 
             let weekday = '';
             let time = '';
+            let date = '';
 
             try {
                 weekday = new Intl.DateTimeFormat(locale, {
@@ -43,12 +52,22 @@ export function createSystemUI() {
                     hour12: is12h,
                     timeZone,
                 }).format(now);
+
+                date = new Intl.DateTimeFormat(locale, {
+                    weekday: 'short',
+                    day: 'numeric',
+                    month: 'short',
+                    timeZone,
+                }).format(now);
             } catch (e) {
                 weekday = new Intl.DateTimeFormat('en-US', { weekday: 'short' }).format(now);
                 time = new Intl.DateTimeFormat('en-US', { hour: '2-digit', minute: '2-digit', hour12: is12h }).format(now);
+                date = new Intl.DateTimeFormat('en-US', { weekday: 'short', day: 'numeric', month: 'short' }).format(now);
             }
 
             this.clock = `${weekday} ${time}`;
+            this.clockTime = time;
+            this.clockDate = date;
         },
 
         initSettingsListener() {
@@ -158,6 +177,57 @@ export function createSystemUI() {
                 el.style.backgroundPosition = 'center';
                 el.style.backgroundRepeat = 'no-repeat';
             }
+            this.detectWallpaperLuminance();
+        },
+
+        detectWallpaperLuminance() {
+            const wallpaper = this.settings?.appearance?.wallpaper || 'wall-1';
+            const filename = wallpaper.endsWith('.webp') ? wallpaper : `${wallpaper}.webp`;
+            const imgUrl = `/minios/wallpapers/${filename}`;
+
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.src = imgUrl;
+
+            img.onload = () => {
+                try {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+                    if (!ctx) return;
+
+                    const sampleW = 60;
+                    const sampleH = 20;
+                    canvas.width = sampleW;
+                    canvas.height = sampleH;
+
+                    // Sample bagian bawah gambar tempat dock berada (15% terbawah)
+                    const sourceY = Math.floor(img.naturalHeight * 0.85);
+                    const sourceH = Math.max(1, img.naturalHeight - sourceY);
+
+                    ctx.drawImage(img, 0, sourceY, img.naturalWidth, sourceH, 0, 0, sampleW, sampleH);
+
+                    const imgData = ctx.getImageData(0, 0, sampleW, sampleH).data;
+                    let totalLuminance = 0;
+                    const totalPixels = imgData.length / 4;
+
+                    for (let i = 0; i < imgData.length; i += 4) {
+                        const r = imgData[i];
+                        const g = imgData[i + 1];
+                        const b = imgData[i + 2];
+                        totalLuminance += (0.299 * r + 0.587 * g + 0.114 * b);
+                    }
+
+                    const avgLuminance = totalLuminance / totalPixels;
+                    // Ambang batas: < 145 berarti area bawah wallpaper gelap
+                    this.isWallpaperDarkAtDock = avgLuminance < 145;
+                } catch (e) {
+                    this.isWallpaperDarkAtDock = true;
+                }
+            };
+
+            img.onerror = () => {
+                this.isWallpaperDarkAtDock = true;
+            };
         },
 
         toggleAboutModal() {

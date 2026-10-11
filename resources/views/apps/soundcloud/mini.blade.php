@@ -97,18 +97,18 @@
     style="display: none;"
     class="fixed z-[9500] select-none pointer-events-auto"
     :class="{
-        'bottom-16 sm:bottom-20 left-4 sm:left-6': (settings?.dock?.position ?? 'bottom') === 'bottom',
+        'bottom-16 sm:bottom-18 left-3 sm:left-3': (settings?.dock?.position ?? 'bottom') === 'bottom',
         'bottom-6 left-20': (settings?.dock?.position ?? 'bottom') === 'left',
         'bottom-6 left-4 sm:left-6': (settings?.dock?.position ?? 'bottom') === 'right',
     }"
 >
     <div
         @click="handleOpenSoundcloud()"
-        class="group relative flex items-center gap-3 w-72 sm:w-80 p-2.5 rounded-lg bg-white/90 dark:bg-[#18181b]/92 backdrop-blur-2xl border border-black/10 dark:border-white/10 shadow-[0_14px_38px_rgba(0,0,0,0.18)] dark:shadow-[0_20px_45px_rgba(0,0,0,0.6)] overflow-hidden cursor-pointer hover:border-black/20 dark:hover:border-white/20 hover:shadow-2xl transition-all duration-200"
+        class="group relative flex items-center gap-3 w-72 sm:w-80 p-2 rounded-lg bg-white/90 dark:bg-[#18181b]/92 backdrop-blur-2xl border border-black/10 dark:border-white/10 shadow-[0_14px_38px_rgba(0,0,0,0.18)] dark:shadow-[0_20px_45px_rgba(0,0,0,0.6)] overflow-hidden cursor-pointer hover:border-black/20 dark:hover:border-white/20 hover:shadow-2xl transition-all duration-200"
         title="{{ __('Kembali ke SoundCloud') }}"
     >
         {{-- Artwork / Cover --}}
-        <div class="relative shrink-0 w-12 h-12 rounded-xl overflow-hidden bg-neutral-200 dark:bg-neutral-800 shadow-sm">
+        <div class="relative shrink-0 w-12 h-12 rounded-md overflow-hidden bg-neutral-200 dark:bg-neutral-800 shadow-sm">
             <img
                 :src="scTrack?.artwork || 'https://i1.sndcdn.com/artworks-XKcM15C0Q7C6On4B-pgVVDw-t500x500.jpg'"
                 :alt="scTrack?.title || 'SoundCloud'"
@@ -157,7 +157,7 @@
                 class="p-1.5 rounded-full text-zinc-600 dark:text-zinc-300 hover:text-black dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10 active:scale-90 transition"
                 title="{{ __('Previous') }}"
             >
-                <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+                <svg class="w-4.5 h-4.5 fill-current" viewBox="0 0 24 24">
                     <path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/>
                 </svg>
             </button>
@@ -170,12 +170,12 @@
                 :title="scPlaying ? '{{ __('Pause') }}' : '{{ __('Play') }}'"
             >
                 <template x-if="scPlaying">
-                    <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                    <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
                         <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
                     </svg>
                 </template>
                 <template x-if="!scPlaying">
-                    <svg class="w-4 h-4 fill-current translate-x-0.5 me-1" viewBox="0 0 24 24">
+                    <svg class="w-5 h-5 fill-current translate-x-0.5 me-1" viewBox="0 0 24 24">
                         <path d="M8 5v14l11-7z"/>
                     </svg>
                 </template>
@@ -188,7 +188,7 @@
                 class="p-1.5 rounded-full text-zinc-600 dark:text-zinc-300 hover:text-black dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10 active:scale-90 transition"
                 title="{{ __('Next') }}"
             >
-                <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+                <svg class="w-4.5 h-4.5 fill-current" viewBox="0 0 24 24">
                     <path d="m6 18 8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
                 </svg>
             </button>

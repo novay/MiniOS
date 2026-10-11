@@ -114,6 +114,14 @@ class Desktop extends Component
         return array_merge($configApps, $registeredApps);
     }
 
+    /**
+     * Safe fallback handler for desktop refresh requests.
+     */
+    public function refresh(): void
+    {
+        // No-op.
+    }
+
     public function render()
     {
         $view = view()->exists('pages.minios.desktop')

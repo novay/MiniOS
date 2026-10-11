@@ -121,33 +121,39 @@ class UninstallCommand extends Command
     {
         $this->comment('Handling database and migration files...');
 
-        // 1. Remove published migration files
-        $migrationFiles = File::glob(database_path('migrations/*_create_os_settings_table.php'));
-        foreach ($migrationFiles as $file) {
-            File::delete($file);
-            $this->line('  <info>✓</info> Deleted migration: '.basename($file));
+        // 1. Remove package-owned published migration files.
+        foreach (['*_create_os_settings_table.php', '*_create_minios_app_management_tables.php', '*_create_minios_app_menu_states_table.php', '*_create_minios_app_sidebar_states_table.php'] as $pattern) {
+            foreach (File::glob(database_path("migrations/{$pattern}")) as $file) {
+                File::delete($file);
+                $this->line('  <info>✓</info> Deleted migration: '.basename($file));
+            }
         }
 
-        // 2. Drop table if requested
+        // 2. Never delete application data unless explicitly confirmed/requested.
         $dropTables = $this->option('drop-tables');
         if (! $dropTables && ! $this->option('force')) {
-            $dropTables = $this->confirm('Do you also want to drop the MiniOS database table (`settings`)?', false);
+            $dropTables = $this->confirm('Do you also want to drop MiniOS data tables (`settings`, app definitions, menus, and sidebar)?', false);
         }
 
         if ($dropTables) {
             try {
-                if (Schema::hasTable('settings')) {
-                    Schema::dropIfExists('settings');
-                    $this->line('  <info>✓</info> Dropped `settings` database table.');
+                foreach (['minios_app_sidebar_items', 'minios_app_sidebar_states', 'minios_app_menus', 'minios_app_menu_states', 'minios_app_definitions', 'settings'] as $table) {
+                    if (Schema::hasTable($table)) {
+                        Schema::dropIfExists($table);
+                        $this->line("  <info>✓</info> Dropped `{$table}` database table.");
+                    }
                 }
 
                 if (Schema::hasTable('migrations')) {
                     DB::table('migrations')
                         ->where('migration', 'like', '%create_os_settings_table%')
+                        ->orWhere('migration', 'like', '%create_minios_app_management_tables%')
+                        ->orWhere('migration', 'like', '%create_minios_app_menu_states_table%')
+                        ->orWhere('migration', 'like', '%create_minios_app_sidebar_states_table%')
                         ->delete();
                 }
             } catch (\Throwable $e) {
-                $this->warn('  <comment>!</comment> Failed to drop settings table: '.$e->getMessage());
+                $this->warn('  <comment>!</comment> Failed to drop MiniOS tables: '.$e->getMessage());
             }
         }
     }

@@ -190,6 +190,13 @@ class AppCatalogService
         $kebab = $catalog['id'];
         $appDir = app_path("MiniOS/{$studly}");
 
+        // Never overwrite a manually created app, even if it is not in runtime registry.
+        $viewPath = resource_path("views/apps/{$kebab}.blade.php");
+        if (File::exists($appDir) || File::exists(app_path("Apps/{$studly}")) || File::exists($viewPath) ||
+            File::exists(resource_path("views/apps/{$kebab}"))) {
+            throw new \RuntimeException('Source aplikasi sudah ada, instalasi katalog dibatalkan untuk mencegah overwrite.');
+        }
+
         // 1. Ensure directory structure
         File::ensureDirectoryExists($appDir);
         File::ensureDirectoryExists("{$appDir}/Livewire");

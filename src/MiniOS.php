@@ -70,6 +70,7 @@ class MiniOS
         'editor',
         'player',
         'soundcloud',
+        'window-manager',
     ];
 
     /**
@@ -154,6 +155,72 @@ class MiniOS
             : route('minios.assets.js');
 
         return '<script src="'.$url.'" defer></script>';
+    }
+
+    /**
+     * Get the HTML script & style tags for OS appearance (dark mode) handling.
+     */
+    public static function appearance(array $options = []): string
+    {
+        $nonce = isset($options['nonce']) ? ' nonce="'.$options['nonce'].'"' : '';
+
+        return <<<HTML
+<style{$nonce}>
+    :root.dark {
+        color-scheme: dark;
+    }
+</style>
+<script{$nonce}>
+    window.OS = {
+        applyAppearance (appearance) {
+            let applyDark = () => document.documentElement.classList.add('dark');
+            let applyLight = () => document.documentElement.classList.remove('dark');
+
+            if (appearance === 'system') {
+                let media = window.matchMedia('(prefers-color-scheme: dark)');
+                window.localStorage.removeItem('os.appearance');
+                media.matches ? applyDark() : applyLight();
+            } else if (appearance === 'dark') {
+                window.localStorage.setItem('os.appearance', 'dark');
+                applyDark();
+            } else if (appearance === 'light') {
+                window.localStorage.setItem('os.appearance', 'light');
+                applyLight();
+            }
+        }
+    };
+
+    window.OS.applyAppearance(window.localStorage.getItem('os.appearance') || 'system');
+</script>
+HTML;
+    }
+
+    /**
+     * Get the HTML script tag to load OS UI component scripts.
+     */
+    public static function osScripts(array $options = []): string
+    {
+        $nonce = isset($options['nonce']) ? ' nonce="'.$options['nonce'].'"' : '';
+        $published = public_path('vendor/minios/ui.min.js');
+        $url = file_exists($published)
+            ? asset('vendor/minios/ui.min.js')
+            : asset('vendor/minios/ui.js');
+
+        return '<script src="'.$url.'" data-navigate-once'.$nonce.' defer></script>';
+    }
+
+    /**
+     * Get the HTML link tag to load OS UI component CSS.
+     */
+    public static function osStyles(array $options = []): string
+    {
+        $nonce = isset($options['nonce']) ? ' nonce="'.$options['nonce'].'"' : '';
+        $published = public_path('vendor/minios/ui.css');
+        $url = file_exists($published)
+            ? asset('vendor/minios/ui.css')
+            : asset('vendor/minios/ui.css');
+
+        return '<link rel="stylesheet" href="'.$url.'"'.$nonce.'>';
     }
 
     /**

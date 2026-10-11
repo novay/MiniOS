@@ -39,7 +39,7 @@
                         type="button"
                         wire:click="installCatalogApp('notes')"
                         class="inline-flex items-center gap-1.5 rounded-xl bg-white/15 px-3.5 py-2 text-xs font-semibold text-white backdrop-blur-md transition-all hover:bg-white/25 active:scale-95"
-                    >
+                     @disabled(! $canInstallCatalog) title="Hanya administrator yang dapat memasang aplikasi">
                         <flux:icon name="arrow-down-tray" class="size-3.5" />
                         <span>{{ __('Pasang Sticky Notes') }}</span>
                     </button>
@@ -137,7 +137,7 @@
                                 wire:click="installCatalogApp('{{ $chart['id'] }}')"
                                 style="background-color: var(--accent-color, {{ $accent['hex'] }});"
                                 class="inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold text-white shadow-2xs hover:brightness-110 active:scale-95 transition-all"
-                            >
+                             @disabled(! $canInstallCatalog) title="Hanya administrator yang dapat memasang aplikasi">
                                 <span>{{ __('Pasang') }}</span>
                             </button>
                         @endif
@@ -193,7 +193,7 @@
                         type="button"
                         wire:click="installCatalogApp('notes')"
                         class="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 text-xs font-semibold shadow-2xs active:scale-95 transition-all"
-                    >
+                     @disabled(! $canInstallCatalog) title="Hanya administrator yang dapat memasang aplikasi">
                         <flux:icon name="arrow-down-tray" class="size-3.5" />
                         <span>{{ __('Pasang 1-Klik') }}</span>
                     </button>
@@ -229,7 +229,7 @@
                         type="button"
                         wire:click="installCatalogApp('paint')"
                         class="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 text-xs font-semibold shadow-2xs active:scale-95 transition-all"
-                    >
+                     @disabled(! $canInstallCatalog) title="Hanya administrator yang dapat memasang aplikasi">
                         <flux:icon name="arrow-down-tray" class="size-3.5" />
                         <span>{{ __('Pasang 1-Klik') }}</span>
                     </button>

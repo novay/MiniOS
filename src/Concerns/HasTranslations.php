@@ -208,4 +208,13 @@ trait HasTranslations
     {
         static::$translationsCache = [];
     }
+
+    /**
+     * Safe fallback handler for client-side or menu-driven refresh requests.
+     * Prevents Livewire BadMethodCallException when RPC 'refresh' is invoked.
+     */
+    public function refresh(): void
+    {
+        // No-op. Livewire automatically triggers component re-render on action dispatch.
+    }
 }

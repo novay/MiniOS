@@ -166,9 +166,7 @@
 
     $elementAttributes = $attributes->class($classes)->merge([
         'data-slot' => 'avatar',
-        'data-flux-avatar' => 'true',
         'data-os-avatar' => 'true',
-        'data-fluent-persona' => 'true',
         'data-size' => $size,
     ]);
 

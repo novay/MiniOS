@@ -21,7 +21,7 @@ function e() {
 				type: "desktop",
 				appId: null,
 				x: Math.max(8, t),
-				y: Math.max(36, n)
+				y: Math.max(8, n)
 			};
 		},
 		openDockContextMenu(e, t) {
@@ -32,7 +32,7 @@ function e() {
 				type: "dock",
 				appId: t,
 				x: Math.max(8, r),
-				y: Math.max(36, i)
+				y: Math.max(8, i)
 			};
 		},
 		openLauncherContextMenu(e, t) {
@@ -43,7 +43,7 @@ function e() {
 				type: "launcher",
 				appId: t,
 				x: Math.max(8, n),
-				y: Math.max(36, r)
+				y: Math.max(8, r)
 			};
 		},
 		openTrashContextMenu(e) {
@@ -54,7 +54,7 @@ function e() {
 				type: "trash",
 				appId: null,
 				x: Math.max(8, t),
-				y: Math.max(36, n)
+				y: Math.max(8, n)
 			};
 		},
 		closeContextMenu() {
@@ -236,13 +236,17 @@ function e() {
 		shouldHideDock() {
 			return this.dockHovered || this.applicationsOpen || this.activitiesOpen || this.dockDrag?.active || this.dockDrop ? !1 : this.settings?.dock?.autohide ? !0 : this.shouldExpandWorkspace() && !this.dockRevealOverride;
 		},
-		getWorkspaceStyles() {
-			let e = this.settings?.dock?.size || "medium", t = typeof e == "number" ? e : {
+		getDockPx() {
+			let e = this.settings?.dock?.size || "medium";
+			return typeof e == "number" ? e : {
 				small: 44,
 				medium: 56,
 				large: 68
-			}[e] || parseInt(e, 10) || 56, n = this.settings?.dock?.position || "bottom", r = this.shouldHideDock(), i = "0px", a = "0px", o = "0px";
-			return r || (n === "left" ? i = `${t}px` : n === "right" ? a = `${t}px` : n === "bottom" && (o = `${t}px`)), `left: ${i}; right: ${a}; bottom: ${o}; top: 28px; z-index: 0; isolation: isolate;`;
+			}[e] || parseInt(e, 10) || 56;
+		},
+		getWorkspaceStyles() {
+			let e = this.getDockPx(), t = this.settings?.dock?.position || "bottom", n = this.shouldHideDock(), r = "0px", i = "0px", a = "0px";
+			return n || (t === "left" ? r = `${e}px` : t === "right" ? i = `${e}px` : t === "bottom" && (a = `${e}px`)), `left: ${r}; right: ${i}; bottom: ${a}; top: 0px; z-index: 0; isolation: isolate;`;
 		},
 		async animateWindowToDock(e) {
 			let t = document.querySelector(`[data-window-id="${e}"]`);
@@ -809,7 +813,10 @@ function i() {
 function a() {
 	return {
 		clock: "",
+		clockTime: "",
+		clockDate: "",
 		clockTimer: null,
+		isWallpaperDarkAtDock: !0,
 		activitiesOpen: !1,
 		applicationsOpen: !1,
 		systemMenuOpen: !1,
@@ -820,31 +827,43 @@ function a() {
 			let e = this.settings?.appearance?.theme || "system";
 			return e === "dark" || e === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches;
 		},
+		get isDockTextBright() {
+			return this.isDarkMode || this.isWallpaperDarkAtDock;
+		},
 		initClock() {
 			this.updateClock(), this.clockTimer = setInterval(() => {
 				this.updateClock();
 			}, 1e3);
 		},
 		updateClock() {
-			let e = /* @__PURE__ */ new Date(), t = this.settings?.locale_time?.time_format === "12h", n = this.settings?.locale_time?.locale === "id" ? "id-ID" : "en-US", r = this.settings?.locale_time?.timezone || void 0, i = "", a = "";
+			let e = /* @__PURE__ */ new Date(), t = this.settings?.locale_time?.time_format === "12h", n = this.settings?.locale_time?.locale || document.documentElement.lang || "id", r = n === "id" || n.startsWith("id") ? "id-ID" : "en-US", i = this.settings?.locale_time?.timezone || void 0, a = "", o = "", s = "";
 			try {
-				i = new Intl.DateTimeFormat(n, {
+				a = new Intl.DateTimeFormat(r, {
 					weekday: "short",
-					timeZone: r
-				}).format(e), a = new Intl.DateTimeFormat(n, {
+					timeZone: i
+				}).format(e), o = new Intl.DateTimeFormat(r, {
 					hour: "2-digit",
 					minute: "2-digit",
 					hour12: t,
-					timeZone: r
+					timeZone: i
+				}).format(e), s = new Intl.DateTimeFormat(r, {
+					weekday: "short",
+					day: "numeric",
+					month: "short",
+					timeZone: i
 				}).format(e);
 			} catch {
-				i = new Intl.DateTimeFormat("en-US", { weekday: "short" }).format(e), a = new Intl.DateTimeFormat("en-US", {
+				a = new Intl.DateTimeFormat("en-US", { weekday: "short" }).format(e), o = new Intl.DateTimeFormat("en-US", {
 					hour: "2-digit",
 					minute: "2-digit",
 					hour12: t
+				}).format(e), s = new Intl.DateTimeFormat("en-US", {
+					weekday: "short",
+					day: "numeric",
+					month: "short"
 				}).format(e);
 			}
-			this.clock = `${i} ${a}`;
+			this.clock = `${a} ${o}`, this.clockTime = o, this.clockDate = s;
 		},
 		initSettingsListener() {
 			this.applyTheme(), window.Livewire && (Livewire.on("os-setting-updated", (e) => {
@@ -893,6 +912,30 @@ function a() {
 				let n = e.endsWith(".webp") ? e : `${e}.webp`;
 				t.style.backgroundImage = `url('/minios/wallpapers/${n}')`, t.style.backgroundSize = "cover", t.style.backgroundPosition = "center", t.style.backgroundRepeat = "no-repeat";
 			}
+			this.detectWallpaperLuminance();
+		},
+		detectWallpaperLuminance() {
+			let e = this.settings?.appearance?.wallpaper || "wall-1", t = `/minios/wallpapers/${e.endsWith(".webp") ? e : `${e}.webp`}`, n = new Image();
+			n.crossOrigin = "anonymous", n.src = t, n.onload = () => {
+				try {
+					let e = document.createElement("canvas"), t = e.getContext("2d", { willReadFrequently: !0 });
+					if (!t) return;
+					e.width = 60, e.height = 20;
+					let r = Math.floor(n.naturalHeight * .85), i = Math.max(1, n.naturalHeight - r);
+					t.drawImage(n, 0, r, n.naturalWidth, i, 0, 0, 60, 20);
+					let a = t.getImageData(0, 0, 60, 20).data, o = 0, s = a.length / 4;
+					for (let e = 0; e < a.length; e += 4) {
+						let t = a[e], n = a[e + 1], r = a[e + 2];
+						o += .299 * t + .587 * n + .114 * r;
+					}
+					let c = o / s;
+					this.isWallpaperDarkAtDock = c < 145;
+				} catch {
+					this.isWallpaperDarkAtDock = !0;
+				}
+			}, n.onerror = () => {
+				this.isWallpaperDarkAtDock = !0;
+			};
 		},
 		toggleAboutModal() {
 			let e = !this.aboutOpen;
@@ -1233,16 +1276,132 @@ function c(c = {}, l = {}, u = "/") {
 			}
 			return {
 				width: Math.max(1, window.innerWidth - 64),
-				height: Math.max(1, window.innerHeight - 28)
+				height: Math.max(1, window.innerHeight)
 			};
 		}
 	}, a(), t(), i(), e(), r(), n(), s());
 }
 //#endregion
-//#region packages/novay/minios/resources/js/bundle.js
-typeof window < "u" && (window.minios = c, window.Alpine ? window.Alpine.data("minios", c) : document.addEventListener("alpine:init", () => {
-	window.Alpine.data("minios", c);
-}));
-var l = c;
+//#region packages/novay/minios/resources/js/ui/alpine/index.js
+function l(e) {
+	let t = e || window.Alpine;
+	if (!t || t._os_registered) return;
+	t._os_registered = !0;
+	let n = window.OS?.applyAppearance;
+	n ||= (e) => {
+		let t = () => document.documentElement.classList.add("dark"), n = () => document.documentElement.classList.remove("dark");
+		if (e === "system") {
+			let e = window.matchMedia("(prefers-color-scheme: dark)");
+			window.localStorage.removeItem("os.appearance"), e.matches ? t() : n();
+		} else e === "dark" ? (window.localStorage.setItem("os.appearance", "dark"), t()) : e === "light" && (window.localStorage.setItem("os.appearance", "light"), n());
+	};
+	let r = t.reactive({
+		toast(...e) {
+			let t = {
+				slots: {},
+				dataset: {}
+			};
+			typeof e[0] == "string" && (t.slots.text = e.shift()), typeof e[0] == "string" && (t.slots.heading = t.slots.text, t.slots.text = e.shift());
+			let n = e.shift() || {};
+			n.text && (t.slots.text = n.text), n.heading && (t.slots.heading = n.heading), n.variant && (t.dataset.variant = n.variant), n.position && (t.dataset.position = n.position), n.link && (t.link = n.link), n.action && (t.action = n.action), n.duration !== void 0 && (t.duration = n.duration), document.dispatchEvent(new CustomEvent("toast-show", { detail: t }));
+		},
+		modal(e) {
+			return {
+				show() {
+					document.dispatchEvent(new CustomEvent("modal-show", { detail: { name: e } }));
+				},
+				close() {
+					document.dispatchEvent(new CustomEvent("modal-close", { detail: { name: e } }));
+				}
+			};
+		},
+		modals() {
+			return { close() {
+				document.dispatchEvent(new CustomEvent("modal-close", { detail: {} }));
+			} };
+		},
+		appearance: window.localStorage.getItem("os.appearance") || "system",
+		systemAppearanceChanged: 1,
+		get dark() {
+			return JSON.stringify(r.systemAppearanceChanged), r.appearance === "system" ? window.matchMedia("(prefers-color-scheme: dark)").matches : r.appearance === "dark";
+		},
+		set dark(e) {
+			e !== this.dark && (e ? r.appearance = "dark" : r.appearance = "light");
+		},
+		applyAppearance(e) {
+			n(e);
+		}
+	});
+	window.OS = r, t.magic("os", () => r), t.effect(() => {
+		n(r.appearance);
+	}), document.addEventListener("livewire:navigating", (e) => {
+		e.detail.onSwap(() => {
+			n(r.appearance);
+		});
+	}), window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
+		r.systemAppearanceChanged++, n(r.appearance);
+	}), t.data("osInputClearable", () => ({ clear() {
+		let e = this.$el.closest("[data-os-input]")?.querySelector("input");
+		e && (e.value = "", e.dispatchEvent(new Event("input", { bubbles: !1 })), e.dispatchEvent(new Event("change", { bubbles: !1 })), e.dispatchEvent(new CustomEvent("clear", { bubbles: !1 })), e.focus());
+	} })), t.data("osInputViewable", () => ({
+		open: !1,
+		toggle() {
+			this.open = !this.open;
+			let e = this.$el.closest("[data-os-input]")?.querySelector("input");
+			e && e.setAttribute("type", this.open ? "text" : "password");
+		},
+		init() {
+			let e = this.$el.closest("[data-os-input]")?.querySelector("input");
+			e && new MutationObserver(() => {
+				let t = this.open ? "text" : "password";
+				e.getAttribute("type") !== t && e.setAttribute("type", t);
+			}).observe(e, {
+				attributes: !0,
+				attributeFilter: ["type"]
+			});
+		}
+	})), t.data("osInputCopyable", () => ({
+		copied: !1,
+		copy() {
+			this.copied = !this.copied;
+			let e = this.$el.closest("[data-os-input]")?.querySelector("input");
+			e && (navigator.clipboard && navigator.clipboard.writeText(e.value), e.dispatchEvent(new CustomEvent("copy", { bubbles: !1 })), setTimeout(() => this.copied = !1, 2e3));
+		}
+	})), t.data("osInputFile", (e) => ({
+		updateLabel(t) {
+			this.$refs.name.textContent = t.target.files[1] ? t.target.files.length + " " + e.files : t.target.files[0]?.name || e.noFile;
+		},
+		init() {
+			Object.defineProperty(this.$refs.input, "value", {
+				...Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value"),
+				set(e) {
+					Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value").set.call(this, e), e || this.dispatchEvent(new Event("change", { bubbles: !0 }));
+				}
+			});
+		}
+	})), t.data("osModal", (e, t) => ({
+		handleShow(n) {
+			n.detail.name === e && (t && n.detail.scope === t ? this.$el.showModal() : n.detail.scope || this.$el.showModal());
+		},
+		handleClose(n) {
+			n.detail.name ? n.detail.name === e && (t && n.detail.scope === t ? this.$el.close() : n.detail.scope || this.$el.close()) : this.$el.close();
+		}
+	})), t.data("osCommandInputClearable", () => ({ clear() {
+		let e = this.$el.closest("[data-os-command-input]")?.querySelector("input");
+		e && (e.value = "", e.dispatchEvent(new Event("input", { bubbles: !1 })), e.dispatchEvent(new CustomEvent("clear", { bubbles: !1 })), e.focus());
+	} })), t.data("osSelectSearchClearable", () => ({ clear() {
+		let e = this.$el.closest("[data-os-select-search]")?.querySelector("input");
+		e && (e.value = "", e.dispatchEvent(new Event("input", { bubbles: !1 })), e.dispatchEvent(new CustomEvent("clear", { bubbles: !1 })), e.focus());
+	} })), t.data("osPillboxSearchClearable", () => ({ clear() {
+		let e = this.$el.closest("[data-os-pillbox-search]")?.querySelector("input");
+		e && (e.value = "", e.dispatchEvent(new Event("input", { bubbles: !1 })), e.dispatchEvent(new CustomEvent("clear", { bubbles: !1 })), e.focus());
+	} }));
+}
 //#endregion
-export { l as default };
+//#region packages/novay/minios/resources/js/bundle.js
+typeof window < "u" && (window.Alpine ? l(window.Alpine) : document.addEventListener("alpine:init", () => l(window.Alpine))), typeof window < "u" && (window.minios = c, window.Alpine ? (window.Alpine.data("minios", c), l(window.Alpine)) : document.addEventListener("alpine:init", () => {
+	window.Alpine.data("minios", c), l(window.Alpine);
+}));
+var u = c;
+//#endregion
+export { u as default, c as minios, l as setupAlpineOS };

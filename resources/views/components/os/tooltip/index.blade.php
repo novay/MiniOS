@@ -19,7 +19,7 @@ if (($wireModel = $attributes->wire('model')) && $wireModel->directive && ! $wir
 @endphp
 
 @if ($toggleable)
-    <ui-dropdown position="{{ $position }} {{ $align }}" {{ $attributes }} data-flux-tooltip data-fluent-tooltip>
+    <ui-dropdown position="{{ $position }} {{ $align }}" {{ $attributes }} data-os-tooltip>
         {{ $slot }}
 
         @if ($content !== null)
@@ -27,7 +27,7 @@ if (($wireModel = $attributes->wire('model')) && $wireModel->directive && ! $wir
         @endif
     </ui-dropdown>
 @else
-    <ui-tooltip position="{{ $position }} {{ $align }}" {{ $attributes }} data-flux-tooltip data-fluent-tooltip @if ($interactive) interactive @endif>
+    <ui-tooltip position="{{ $position }} {{ $align }}" {{ $attributes }} data-os-tooltip @if ($interactive) interactive @endif>
         {{ $slot }}
 
         @if ($content !== null)

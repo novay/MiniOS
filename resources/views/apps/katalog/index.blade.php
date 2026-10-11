@@ -6,10 +6,12 @@
         <x-minios.menubar>
             {{-- File --}}
             <x-minios.menubar.menu label="{{ __('File') }}">
+@if($canInstallZip)
                 <x-minios.menubar.item wire:click="openUploadModal" icon="arrow-up-tray" shortcut="⌘O">
                     {{ $this->t('btn_install_zip') }}
                 </x-minios.menubar.item>
                 <x-minios.menubar.separator />
+                @endif
                 <x-minios.menubar.item @click="$dispatch('close-window', { id: 'katalog' })" icon="x-mark" shortcut="⌥W">
                     {{ __('Tutup Jendela') }}
                 </x-minios.menubar.item>
@@ -189,6 +191,7 @@
 
         {{-- Sidebar Footer Quick Action & Storage --}}
         <div class="mt-auto pt-3 border-t border-neutral-200/70 dark:border-white/5 space-y-2">
+            @if($canInstallZip)
             <button
                 x-data="{
                     tooltipHover: false,
@@ -237,6 +240,7 @@
                     </div>
                 </template>
             </button>
+            @endif
 
             <div x-show="!sidebarCollapsed" class="flex items-center justify-between text-[11px] text-neutral-400 dark:text-neutral-500 px-1 font-medium">
                 <span>{{ $this->t('storage_size', ['size' => $stats['storage']]) }}</span>

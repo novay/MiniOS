@@ -87,6 +87,14 @@ Perintah ini bakal minta konfirmasi terlebih dahulu, lalu otomatis membersihkan 
 
 <br/>
 
+## Built-in Window Manager App (Phases 1–2)
+
+MiniOS kini menyertakan **Window Manager** bawaan untuk mengatur manifest aplikasi melalui Livewire: nama, ikon, entry/routes, komponen, ukuran jendela, resize/maximize, dock, dan opsi menubar/sidebar/statusbar. Konfigurasi disimpan sebagai override global sehingga `{AppName}App.php` tetap menjadi default. Akses administrator **harus** diberikan lewat Laravel Gate `minios.manage-apps` (default ditolak).
+
+Upgrade lalu jalankan `php artisan migrate`, dan baca [Panduan Window Manager Phase 1](docs/window-manager-phase1.md). Fase 2 telah menambahkan Dynamic AppShell dan Menubar Builder: menu File/View/Window/Help default, builder CRUD menu, permissions, submenu, serta action registry. Sidebar Builder dan CRUD Generator tetap direncanakan pada Fase 3. Lihat [Panduan Window Manager Phase 2](docs/window-manager-phase2.md).
+
+---
+
 ##  Bikin Kustom Aplikasi di MiniOS
 
 Ada 3 opsi, pilih yang paling cocok sama gaya lu:
@@ -253,3 +261,12 @@ MiniOS adalah software open-source berlisensi [MIT License](LICENSE). Bebas lu p
 ## 👤 Pembuat
 
 Dibuat dengan kopi dan cinta oleh **[Novianto Rahmadi](https://github.com/novay)** ([novay@btekno.id](mailto:novay@btekno.id)). Kalo ngebantu kerjaan lu, jangan lupa lempar ⭐ Star di GitHub ya cuy!
+
+### Window Manager — Sidebar & CRUD (Phase 3)
+
+The built-in Window Manager now includes a **Sidebar & CRUD** tab for managed apps. You can create Default/CRUD navigation entries, assign per-item Laravel Gate permissions, and generate four Livewire components plus four Blade placeholder views without overwriting existing files. See [docs/window-manager-phase3.md](docs/window-manager-phase3.md) for installation, routing, and security details.
+
+
+### Window Manager — Fase 4
+
+Built-in Window Manager supports dynamic AppShell, menubar/sidebar CRUD scaffolding, and custom Blade statusbar at `resources/views/apps/{app-id}/customs/statusbar.blade.php`. See [`docs/window-manager-phase4.md`](docs/window-manager-phase4.md) for usage, Katalog security settings, uninstall behavior and smoke tests. Katalog code installation via web now needs `minios.manage-apps`; ZIP and Composer actions are opt-in and disabled by default.

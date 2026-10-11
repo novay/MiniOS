@@ -48,7 +48,7 @@ export function createDockManager() {
                 type: 'desktop',
                 appId: null,
                 x: Math.max(8, x),
-                y: Math.max(36, y),
+                y: Math.max(8, y),
             };
         },
 
@@ -86,7 +86,7 @@ export function createDockManager() {
                 type: 'dock',
                 appId: appId,
                 x: Math.max(8, x),
-                y: Math.max(36, y),
+                y: Math.max(8, y),
             };
         },
 
@@ -112,7 +112,7 @@ export function createDockManager() {
                 type: 'launcher',
                 appId: appId,
                 x: Math.max(8, x),
-                y: Math.max(36, y),
+                y: Math.max(8, y),
             };
         },
 
@@ -137,7 +137,7 @@ export function createDockManager() {
                 type: 'trash',
                 appId: null,
                 x: Math.max(8, x),
-                y: Math.max(36, y),
+                y: Math.max(8, y),
             };
         },
 
@@ -576,10 +576,14 @@ export function createDockManager() {
             );
         },
 
-        getWorkspaceStyles() {
+        getDockPx() {
             const rawSize = this.settings?.dock?.size || 'medium';
             const sizeMap = { small: 44, medium: 56, large: 68 };
-            const size = typeof rawSize === 'number' ? rawSize : (sizeMap[rawSize] || parseInt(rawSize, 10) || 56);
+            return typeof rawSize === 'number' ? rawSize : (sizeMap[rawSize] || parseInt(rawSize, 10) || 56);
+        },
+
+        getWorkspaceStyles() {
+            const size = this.getDockPx();
 
             const pos = this.settings?.dock?.position || 'bottom';
             const hidden = this.shouldHideDock();
@@ -587,7 +591,7 @@ export function createDockManager() {
             let left = '0px';
             let right = '0px';
             let bottom = '0px';
-            let top = '28px';
+            let top = '0px';
 
             if (!hidden) {
                 if (pos === 'left') {

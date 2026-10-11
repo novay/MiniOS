@@ -243,11 +243,13 @@ class InstallCommand extends Command
                 '',
                 $content
             );
-            $content = preg_replace('/import\s+minios\s+from\s+[\'"]@minios(?:\/minios)?[\'"];?\s*/', '', $content);
+            $content = preg_replace('/import\s+minios(?:\s*,\s*\{[^}]*\})?\s+from\s+[\'"]@minios(?:\/minios)?[\'"];?\s*/', '', $content);
+            $content = preg_replace('/window\.Alpine\s*=\s*Alpine;\s*/', '', $content);
             $content = preg_replace('/Alpine\.data\([\'"]minios[\'"],\s*minios\);\s*/', '', $content);
+            $content = preg_replace('/setupAlpineOS\([^)]*\);\s*/', '', $content);
             $content = preg_replace('/Livewire\.start\(\);?\s*/', '', $content);
 
-            $cleanBlock = "\nimport {\n    Livewire,\n    Alpine,\n} from '../../vendor/livewire/livewire/dist/livewire.esm';\nimport minios from '@minios/minios';\n\nAlpine.data('minios', minios);\n\nLivewire.start();\n";
+            $cleanBlock = "\nimport {\n    Livewire,\n    Alpine,\n} from '../../vendor/livewire/livewire/dist/livewire.esm';\nimport minios, { setupAlpineOS } from '@minios/minios';\n\nwindow.Alpine = Alpine;\nAlpine.data('minios', minios);\nsetupAlpineOS(Alpine);\n\nLivewire.start();\n";
             $content = rtrim($content)."\n".$cleanBlock;
 
             File::put($jsPath, $content);
@@ -263,10 +265,10 @@ class InstallCommand extends Command
         }
 
         if (str_contains($content, 'Livewire.start()')) {
-            $replacement = "import minios from '@minios/minios';\n\nAlpine.data('minios', minios);\n\nLivewire.start()";
+            $replacement = "window.Alpine = Alpine;\n\nimport minios, { setupAlpineOS } from '@minios/minios';\n\nAlpine.data('minios', minios);\nsetupAlpineOS(Alpine);\n\nLivewire.start()";
             $content = str_replace('Livewire.start()', $replacement, $content);
         } else {
-            $registration = "\nimport {\n    Livewire,\n    Alpine,\n} from '../../vendor/livewire/livewire/dist/livewire.esm';\nimport minios from '@minios/minios';\n\nAlpine.data('minios', minios);\n\nLivewire.start();\n";
+            $registration = "\nimport {\n    Livewire,\n    Alpine,\n} from '../../vendor/livewire/livewire/dist/livewire.esm';\nimport minios, { setupAlpineOS } from '@minios/minios';\n\nwindow.Alpine = Alpine;\nAlpine.data('minios', minios);\nsetupAlpineOS(Alpine);\n\nLivewire.start();\n";
             $content = rtrim($content)."\n".$registration;
         }
 

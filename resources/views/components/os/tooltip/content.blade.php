@@ -14,7 +14,7 @@ $classes = [
 ];
 @endphp
 
-<div popover="manual" {{ $attributes->class($classes) }} data-flux-tooltip-content data-fluent-tooltip-content="true">
+<div popover="manual" {{ $attributes->class($classes) }} data-os-tooltip-content-content="true">
     {{ $slot }}
 
     @if ($kbd)

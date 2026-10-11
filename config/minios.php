@@ -16,6 +16,15 @@ return [
 
     'prefix' => env('MINIOS_PREFIX', ''),
 
+    // Web-based PHP/Blade generator. Disabled by default outside local development.
+    'allow_web_scaffolding' => env('MINIOS_ALLOW_WEB_SCAFFOLDING', env('APP_ENV') === 'local'),
+
+    // Katalog can be browsed by normal users, but mutations need minios.manage-apps.
+    // Executable code installation from the web is opt-in only.
+    'allow_web_catalog_install' => env('MINIOS_ALLOW_WEB_CATALOG_INSTALL', env('APP_ENV') === 'local'),
+    'allow_web_zip_install' => env('MINIOS_ALLOW_WEB_ZIP_INSTALL', false),
+    'allow_web_composer' => env('MINIOS_ALLOW_WEB_COMPOSER', false),
+
     'apps' => [
         // \App\MiniOS\Todo\TodoApp::class,
     ],

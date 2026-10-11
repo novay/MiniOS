@@ -4,11 +4,12 @@ namespace Novay\MiniOS\Livewire\Apps;
 
 use Composer\InstalledVersions;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Livewire\Attributes\Locked;
 use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -16,6 +17,7 @@ use Novay\MiniOS\Concerns\HasTranslations;
 use Novay\MiniOS\Contracts\DesktopApp;
 use Novay\MiniOS\Facades\MiniOS;
 use Novay\MiniOS\Services\AppCatalogService;
+use Novay\MiniOS\Services\AppLifecycleService;
 use ReflectionClass;
 use ZipArchive;
 
@@ -38,6 +40,7 @@ class Katalog extends Component
 
     public bool $showAboutModal = false;
 
+    #[Locked]
     public ?string $appToUninstall = null;
 
     public ?array $appToUninstallDetails = null;
@@ -48,12 +51,15 @@ class Katalog extends Component
 
     public ?string $expandedApp = null;
 
+    #[Locked]
     public bool $showComposerModal = false;
 
+    #[Locked]
     public ?string $composerAppId = null;
 
     public ?string $composerAppName = null;
 
+    #[Locked]
     public ?string $composerPackage = null;
 
     public string $composerCommand = '';
@@ -300,6 +306,7 @@ class Katalog extends Component
      */
     public function installCatalogApp(string $catalogId): void
     {
+        $this->authorizeMutation('allow_web_catalog_install');
         /** @var AppCatalogService $service */
         $service = app(AppCatalogService::class);
 
@@ -314,6 +321,15 @@ class Katalog extends Component
         }
     }
 
+    /** Mutating code or filesystem through Katalog requires developer authorization. */
+    private function authorizeMutation(?string $feature = null): void
+    {
+        Gate::authorize('minios.manage-apps');
+        if ($feature !== null && ! config('minios.'.$feature, false)) {
+            abort(403, 'Fitur instalasi web belum diaktifkan administrator.');
+        }
+    }
+
     public function dismissStatus(): void
     {
         $this->statusMessage = null;
@@ -321,6 +337,7 @@ class Katalog extends Component
 
     public function openUploadModal(): void
     {
+        $this->authorizeMutation('allow_web_zip_install');
         $this->uploadFile = null;
         $this->showUploadModal = true;
     }
@@ -346,6 +363,7 @@ class Katalog extends Component
      */
     public function installZip(): void
     {
+        $this->authorizeMutation('allow_web_zip_install');
         $this->validate([
             'uploadFile' => 'required|file|mimes:zip|max:51200',
         ], [
@@ -364,14 +382,31 @@ class Katalog extends Component
             return;
         }
 
-        // 1. Zip-Slip Security Check and Manifest Search
+        // Reject malformed archives before writing any PHP or Blade file.
+        // ZIP installation executes application code; allow only reviewed archives.
+        if ($zip->numFiles > 500) {
+            $zip->close();
+            abort(422, 'Arsip berisi terlalu banyak file.');
+        }
         $manifestEntry = null;
+        $expandedBytes = 0;
 
         for ($i = 0; $i < $zip->numFiles; $i++) {
             $stat = $zip->statIndex($i);
             $entryName = $stat['name'];
 
-            if (str_contains($entryName, '..') || str_starts_with($entryName, '/') || str_starts_with($entryName, '\\')) {
+            $parts = explode('/', str_replace('\\', '/', $entryName));
+            $expandedBytes += (int) ($stat['size'] ?? 0);
+            if ($expandedBytes > 50 * 1024 * 1024) {
+                $zip->close();
+                abort(422, 'Total file setelah ekstraksi terlalu besar.');
+            }
+            $mode = ($stat['external_attributes'] ?? 0) >> 16;
+            $isLink = (($mode & 0170000) === 0120000);
+            if ($isLink || strlen($entryName) > 260 || str_contains($entryName, '\\') ||
+                in_array('..', $parts, true) || in_array('.', $parts, true) ||
+                str_starts_with($entryName, '/') || str_starts_with($entryName, '\\') ||
+                preg_match('~^[a-zA-Z]:~', $entryName)) {
                 $zip->close();
                 $this->statusType = 'error';
                 $this->statusMessage = $this->trans('err_zip_slip');
@@ -406,7 +441,8 @@ class Katalog extends Component
 
         preg_match('/class\s+([A-Za-z0-9_]+App)/', $manifestContent, $classMatches);
         $manifestClassName = $classMatches[1] ?? basename($manifestEntry, '.php');
-        $studlyName = Str::studly(str_replace(['App', 'app'], '', $manifestClassName));
+        abort_unless((bool) preg_match('/^[A-Za-z][A-Za-z0-9]{0,50}App$/D', $manifestClassName), 422);
+        $studlyName = Str::studly(substr($manifestClassName, 0, -3));
         $kebabName = Str::kebab($studlyName);
 
         // Prevent overwriting core system apps
@@ -428,8 +464,12 @@ class Katalog extends Component
 
         // 4. Target directories (prefer app/MiniOS)
         $targetDir = app_path("MiniOS/{$studlyName}");
+        if (File::exists($targetDir) || File::exists(resource_path("views/apps/{$kebabName}")) ||
+            File::exists(resource_path("views/apps/{$kebabName}.blade.php"))) {
+            $zip->close();
+            abort(409, 'Aplikasi atau view sudah ada. Instalasi tidak boleh menimpanya.');
+        }
         File::ensureDirectoryExists($targetDir);
-        $hasMigrations = false;
 
         // 5. Extract files
         for ($i = 0; $i < $zip->numFiles; $i++) {
@@ -441,15 +481,27 @@ class Katalog extends Component
             }
 
             $relative = $entryName;
-            if ($prefix !== '' && str_starts_with($relative, $prefix)) {
+            // Entries outside manifest directory must never install into the app.
+            if ($prefix !== '' && ! str_starts_with($relative, $prefix)) {
+                continue;
+            }
+            if ($prefix !== '') {
                 $relative = substr($relative, strlen($prefix));
             }
-
             $relative = ltrim($relative, '/');
             if (empty($relative)) {
                 continue;
             }
+            if (! preg_match('~^[A-Za-z0-9_./-]+$~D', $relative) ||
+                preg_match('~(?:^|/)(?:\.env|\.git|vendor)(?:/|$)~', $relative)) {
+                $zip->close();
+                abort(422, 'Berkas ZIP mengandung nama tidak diizinkan.');
+            }
 
+            if (($stat['size'] ?? 0) > 2 * 1024 * 1024) {
+                $zip->close();
+                abort(422, 'File ZIP terlalu besar.');
+            }
             $content = $zip->getFromIndex($i);
             if ($content === false) {
                 continue;
@@ -463,60 +515,43 @@ class Katalog extends Component
             if (! $isExternalAsset) {
                 $destFile = "{$targetDir}/{$relative}";
                 File::ensureDirectoryExists(dirname($destFile));
+                if (File::exists($destFile) || is_link($destFile)) {
+                    abort(409);
+                }
                 File::put($destFile, $content);
             }
 
             // Mirror views to resources/views/apps if packaged under views/
             if (preg_match('#^(resources/)?views/(.+)$#', $relative, $viewMatch)) {
                 $viewSub = $viewMatch[2];
-                if ($viewSub === "{$kebabName}.blade.php" || $viewSub === "apps/{$kebabName}.blade.php") {
-                    $viewDest = resource_path("views/apps/{$kebabName}.blade.php");
-                } elseif ($viewSub === 'index.blade.php' && ! File::exists(resource_path("views/apps/{$kebabName}.blade.php"))) {
-                    $viewDest = resource_path("views/apps/{$kebabName}.blade.php");
-                } elseif (str_starts_with($viewSub, 'tabs/') || str_starts_with($viewSub, 'apps/')) {
-                    $viewDest = resource_path('views/'.(str_starts_with($viewSub, 'apps/') ? $viewSub : "apps/{$viewSub}"));
-                } else {
-                    $viewDest = resource_path("views/apps/{$kebabName}/{$viewSub}");
+                if (str_starts_with($viewSub, 'apps/')) {
+                    $viewSub = substr($viewSub, 5);
+                    // An archive may only contain views for its own app.
+                    if (! str_starts_with($viewSub, $kebabName.'/') && $viewSub !== $kebabName.'.blade.php') {
+                        $zip->close();
+                        abort(422, 'Views milik aplikasi lain tidak boleh ditulis.');
+                    }
+                    $viewSub = str_starts_with($viewSub, $kebabName.'/')
+                        ? substr($viewSub, strlen($kebabName) + 1) : $viewSub;
+                }
+                $viewDest = in_array($viewSub, [$kebabName.'.blade.php', 'index.blade.php'], true)
+                    ? resource_path('views/apps/'.$kebabName.'.blade.php')
+                    : resource_path('views/apps/'.$kebabName.'/'.$viewSub);
+                if (File::exists($viewDest) || is_link($viewDest)) {
+                    $zip->close();
+                    abort(409, 'File view sudah ada dan tidak akan ditimpa.');
                 }
                 File::ensureDirectoryExists(dirname($viewDest));
                 File::put($viewDest, $content);
             }
 
-            // Mirror models if packaged under Models/ or app/Models/
-            if (preg_match('#^(app/)?Models/(.+)$#i', $relative, $modelMatch)) {
-                $modelDest = app_path("Models/{$studlyName}/{$modelMatch[2]}");
-                File::ensureDirectoryExists(dirname($modelDest));
-                File::put($modelDest, $content);
-            }
-
-            // Mirror migrations if packaged under migrations/ or database/migrations/
-            if (preg_match('#^(database/)?migrations/(.+)$#', $relative, $migMatch)) {
-                $migDest = database_path("migrations/{$migMatch[2]}");
-                File::ensureDirectoryExists(dirname($migDest));
-                File::put($migDest, $content);
-                $hasMigrations = true;
-            }
-
-            // Mirror config if packaged under config/
-            if (preg_match('#^config/(.+)$#', $relative, $cfgMatch)) {
-                $cfgDest = config_path($cfgMatch[1]);
-                if (! File::exists($cfgDest)) {
-                    File::ensureDirectoryExists(dirname($cfgDest));
-                    File::put($cfgDest, $content);
-                }
-            }
+            // External models, migrations and config are NOT installed by the web
+            // importer. Review and deploy those files manually via CI/CD.
         }
 
         $zip->close();
 
-        // Run migrations if any were included in the package
-        if ($hasMigrations) {
-            try {
-                Artisan::call('migrate', ['--force' => true]);
-            } catch (\Throwable $e) {
-                // Keep installation going even if already migrated
-            }
-        }
+        // Imported archives never run database migrations during HTTP requests.
 
         // 6. Require and register the newly installed app
         $manifestPath = "{$targetDir}/{$manifestClassName}.php";
@@ -571,7 +606,14 @@ class Katalog extends Component
      */
     public function openComposerModal(string $appId, string $package): void
     {
+        $this->authorizeMutation('allow_web_composer');
+        abort_unless((bool) preg_match('~^[a-z0-9_.-]+/[a-z0-9_.-]+$~D', $package), 422);
+        abort_unless((bool) MiniOS::getApplication($appId), 404);
         $app = MiniOS::getApplication($appId);
+        $reflection = new ReflectionClass($app);
+        $ownDir = dirname($reflection->getFileName() ?: '');
+        $knownPackages = array_column($this->inspectAppPackages($app, $ownDir), 'name');
+        abort_unless(in_array($package, $knownPackages, true), 403, 'Dependensi tidak ditemukan di manifest aplikasi.');
         $appName = $app ? $app->name() : $appId;
 
         $this->composerAppId = $appId;
@@ -602,6 +644,10 @@ class Katalog extends Component
      */
     public function runComposerInstall(): void
     {
+        $this->authorizeMutation('allow_web_composer');
+        abort_unless((bool) preg_match('~^[a-z0-9_.-]+/[a-z0-9_.-]+$~D', (string) $this->composerPackage), 422);
+        abort_unless((bool) MiniOS::getApplication((string) $this->composerAppId), 404);
+        abort_unless($this->showComposerModal, 403);
         if (! $this->composerPackage) {
             return;
         }
@@ -687,6 +733,7 @@ class Katalog extends Component
      */
     public function confirmUninstall(string $id): void
     {
+        $this->authorizeMutation();
         if (MiniOS::isCoreApp($id)) {
             $this->statusType = 'error';
             $this->statusMessage = $this->trans('err_core_app_uninstall');
@@ -722,6 +769,7 @@ class Katalog extends Component
      */
     public function uninstallApp(): void
     {
+        $this->authorizeMutation();
         $id = $this->appToUninstall;
         if (! $id || MiniOS::isCoreApp($id)) {
             $this->statusType = 'error';
@@ -750,8 +798,11 @@ class Katalog extends Component
         $appsRoot = realpath(app_path('Apps'));
         $realAppDir = realpath($appDir);
 
-        $isSafe = ($realAppDir && $miniosRoot && str_starts_with($realAppDir, $miniosRoot))
-            || ($realAppDir && $appsRoot && str_starts_with($realAppDir, $appsRoot));
+        // Exact immediate subdirectories only: /app/MiniOS/Todo, never /app/MiniOSOther.
+        $isSafe = $realAppDir && (
+            ($miniosRoot && dirname($realAppDir) === $miniosRoot) ||
+            ($appsRoot && dirname($realAppDir) === $appsRoot)
+        ) && is_file($manifestFile) && ! is_link($appDir);
 
         if (! $isSafe) {
             $this->statusType = 'error';
@@ -761,40 +812,31 @@ class Katalog extends Component
             return;
         }
 
-        // 1. Delete app directory
-        File::deleteDirectory($realAppDir);
+        // Clear metadata first so database failures cannot occur AFTER source is removed.
+        // File deletion cannot share an SQL transaction; advise taking a backup first.
+        app(AppLifecycleService::class)->forgetConfiguration($id);
+
+        // 1. Delete app directory. Never delete a sibling or ancestor directory.
+        abort_unless(File::deleteDirectory($realAppDir), 500, 'Direktori aplikasi tidak dapat dihapus.');
 
         // 2. Delete associated views if any
-        $kebab = Str::kebab($appName);
-        $viewPaths = [
-            resource_path("views/apps/{$kebab}.blade.php"),
-            resource_path("views/apps/{$id}.blade.php"),
-        ];
+        $kebab = $id;
+        $viewPaths = [resource_path("views/apps/{$kebab}.blade.php")];
         foreach ($viewPaths as $vp) {
             if (File::exists($vp)) {
                 File::delete($vp);
             }
         }
 
-        $viewDirs = [
-            resource_path("views/apps/{$kebab}"),
-            resource_path("views/apps/{$id}"),
-        ];
+        $viewDirs = [resource_path("views/apps/{$kebab}")];
         foreach ($viewDirs as $vd) {
             if (File::isDirectory($vd)) {
                 File::deleteDirectory($vd);
             }
         }
 
-        // 3. Rollback & delete associated migrations if any
-        $studly = Str::studly(str_replace(['App', 'app'], '', $appName));
-        $this->rollbackAndCleanMigrations($realAppDir, $studly, $kebab);
-
-        // 4. Delete associated models if any
-        $modelsDir = app_path("Models/{$studly}");
-        if (File::isDirectory($modelsDir)) {
-            File::deleteDirectory($modelsDir);
-        }
+        // Do NOT rollback migrations or delete app/Models automatically: those can
+        // contain production data and developer-owned code. Handle manually.
 
         // 5. Remove from Dock pinned settings if pinned
         $pinned = os_setting()->get('dock.pinned_apps', []);
@@ -802,8 +844,8 @@ class Katalog extends Component
             os_setting()->set('dock.pinned_apps', array_values(array_diff($pinned, [$id])));
         }
 
-        // 5. Clean up AppServiceProvider if hardcoded
-        $this->cleanAppServiceProvider($appName, get_class($app));
+        // No regex-based mutations of AppServiceProvider; notify developer to
+        // remove explicit registrations or dependencies manually if applicable.
 
         // 6. Unregister from runtime
         MiniOS::unregister($id);
@@ -1364,6 +1406,10 @@ class Katalog extends Component
     public function render()
     {
         return view('minios::apps.katalog.index', [
+            'canManageApps' => Gate::allows('minios.manage-apps'),
+            'canInstallZip' => Gate::allows('minios.manage-apps') && config('minios.allow_web_zip_install', false),
+            'canInstallCatalog' => Gate::allows('minios.manage-apps') && config('minios.allow_web_catalog_install', false),
+            'canInstallComposer' => Gate::allows('minios.manage-apps') && config('minios.allow_web_composer', false),
             'applications' => $this->applications,
             'catalogApps' => $this->catalogApps,
             'stats' => $this->stats,
