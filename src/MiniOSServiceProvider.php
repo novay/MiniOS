@@ -14,6 +14,7 @@ use Novay\MiniOS\Contracts\DesktopApp;
 use Novay\MiniOS\Services\SettingService;
 use Novay\MiniOS\Services\TrashService;
 use Novay\MiniOS\Support\AppRegistry;
+use Novay\MiniOS\Support\OsTagCompiler;
 use PlatformCommunity\Flysystem\BunnyCDN\BunnyCDNAdapter;
 use PlatformCommunity\Flysystem\BunnyCDN\BunnyCDNClient;
 
@@ -239,6 +240,22 @@ class MiniOSServiceProvider extends ServiceProvider
         });
 
         Blade::anonymousComponentPath(__DIR__.'/../resources/views/components', 'minios');
+
+        if (is_dir(resource_path('views/vendor/minios/components/os'))) {
+            Blade::anonymousComponentPath(resource_path('views/vendor/minios/components/os'), 'os');
+        }
+
+        Blade::anonymousComponentPath(__DIR__.'/../resources/views/components/os', 'os');
+
+        $osCompiler = new OsTagCompiler(
+            $this->app->make('blade.compiler')->getClassComponentAliases(),
+            $this->app->make('blade.compiler')->getClassComponentNamespaces(),
+            $this->app->make('blade.compiler')
+        );
+
+        $this->app->make('blade.compiler')->precompiler(function ($in) use ($osCompiler) {
+            return $osCompiler->compile($in);
+        });
 
         $componentsDir = __DIR__.'/../resources/views/components';
         if (is_dir($componentsDir)) {
