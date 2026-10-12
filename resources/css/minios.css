@@ -290,3 +290,42 @@ html.dark.no-blur .desktop-topbar {
 .minios-desktop-statusbar {
     grid-area: statusbar !important;
 }
+
+/*
+|--------------------------------------------------------------------------
+| Popover & Tooltip Default States
+|--------------------------------------------------------------------------
+*/
+:where([popover]:not(:popover-open)),
+:where([popover]:not(.\:popover-open)),
+ui-tooltip [popover]:not(:popover-open):not(.\:popover-open),
+[data-os-tooltip] [popover]:not(:popover-open):not(.\:popover-open) {
+    display: none !important;
+}
+
+ui-tooltip [popover]:is(:popover-open, .\:popover-open),
+[data-os-tooltip] [popover]:is(:popover-open, .\:popover-open) {
+    display: inline-flex !important;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Checkbox Indicator States
+|--------------------------------------------------------------------------
+*/
+ui-checkbox[data-checked]:not([data-indeterminate]) [data-os-checkbox-indicator] > svg:first-child,
+ui-checkbox[data-checked]:not([data-indeterminate]) [data-flux-checkbox-indicator] > svg:first-child {
+    display: block !important;
+}
+
+ui-checkbox[data-indeterminate] [data-os-checkbox-indicator] > svg:last-child,
+ui-checkbox[data-indeterminate] [data-flux-checkbox-indicator] > svg:last-child {
+    display: block !important;
+}
+
+ui-checkbox[data-checked] [data-os-checkbox-indicator],
+ui-checkbox[data-indeterminate] [data-os-checkbox-indicator] {
+    background-color: var(--color-accent, #0067c0) !important;
+    border-color: transparent !important;
+}
+

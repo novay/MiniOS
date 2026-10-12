@@ -95,9 +95,11 @@ export function setupAlpineOS(AlpineInstance) {
   });
 
   document.addEventListener("livewire:navigating", (e) => {
-    e.detail.onSwap(() => {
-      applyAppearance(os.appearance);
-    });
+    if (typeof e?.detail?.onSwap === 'function') {
+      e.detail.onSwap(() => {
+        applyAppearance(os.appearance);
+      });
+    }
   });
 
   let media = window.matchMedia("(prefers-color-scheme: dark)");

@@ -2126,7 +2126,7 @@
   }
 
   // js/selected.js
-  var UISelected = class extends UIElement {
+  var UISelected = globalThis.UISelected = class extends UIElement {
     boot() {
       this.querySelectorAll("[data-appended]").forEach((el) => el.remove());
       if (!this.querySelector("template")) {
@@ -2331,7 +2331,7 @@
       };
     }
   };
-  var UISelectedRemove = class extends UIElement {
+  var UISelectedRemove = globalThis.UISelectedRemove = class extends UIElement {
     boot() {
       this.addEventListener("click", (e) => {
         e.stopPropagation();
@@ -2839,4 +2839,23 @@
       return this.el.getAttribute("tabindex") === "0";
     }
   };
+
+  globalThis.Mixin = Mixin;
+  globalThis.MixinGroup = MixinGroup;
+  globalThis.Controllable = Controllable;
+  globalThis.Dialogable = Dialogable;
+  globalThis.Closeable = Closeable;
+  globalThis.ActivatableGroup = ActivatableGroup;
+  globalThis.Activatable = Activatable;
+  globalThis.FilterableGroup = FilterableGroup;
+  globalThis.Filterable = Filterable;
+  globalThis.Popoverable = Popoverable;
+  globalThis.Disableable = Disableable;
+  globalThis.Anchorable = Anchorable;
+  globalThis.SelectableGroup = SelectableGroup;
+  globalThis.Selectable = Selectable;
+  globalThis.Submittable = Submittable;
+  globalThis.Disclosable = Disclosable;
+  globalThis.FocusableGroup = FocusableGroup;
+  globalThis.Focusable = Focusable;
 

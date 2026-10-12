@@ -1,6 +1,6 @@
   // js/utils.js
   var styleSheet;
-  function inject(callback) {
+  var inject = globalThis.inject = function inject(callback) {
     let styles = callback({
       css: (strings, ...values) => `@layer base { ${strings.raw[0] + values.join("")} }`
     });
@@ -133,10 +133,10 @@
       return bailed;
     }
   };
-  function element(name, type) {
+  var element = globalThis.element = function element(name, type) {
     customElements.define(`ui-${name}`, type);
-  }
-  function on(target, event, handler, options = {}) {
+  };
+  var on = globalThis.on = function on(target, event, handler, options = {}) {
     target.addEventListener(event, handler, options);
     return {
       off: () => target.removeEventListener(event, handler),
@@ -672,4 +672,15 @@
       });
     }
   };
+
+  globalThis.detangle = detangle;
+  globalThis.walker = walker;
+  globalThis.setAttribute2 = setAttribute2;
+  globalThis.removeAttribute = removeAttribute;
+  globalThis.closest = closest;
+  globalThis.dispenseId = dispenseId;
+  globalThis.isRTL = isRTL;
+  globalThis.isSafari = isSafari;
+  globalThis.isIOS = isIOS;
+  globalThis.Observable = Observable;
 

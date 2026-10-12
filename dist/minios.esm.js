@@ -1335,7 +1335,7 @@ function l(e) {
 	window.OS = r, t.magic("os", () => r), t.effect(() => {
 		n(r.appearance);
 	}), document.addEventListener("livewire:navigating", (e) => {
-		e.detail.onSwap(() => {
+		typeof e?.detail?.onSwap == "function" && e.detail.onSwap(() => {
 			n(r.appearance);
 		});
 	}), window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {

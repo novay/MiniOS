@@ -2562,7 +2562,7 @@ element("date-picker", UIDatePicker);
 element("date-picker-select", UIDatePickerSelect);
 element("selected-date", UISelectedDate);
 element("date-picker-trigger", UIDatePickerTrigger);
-inject(({ css }) => css`
+(typeof inject === 'function' ? inject : (globalThis.inject || function() {}))(({ css }) => css`
 /* For Chrome, Safari, Edge */
 ui-date-picker input[type="date"]::-webkit-calendar-picker-indicator {
   display: none;

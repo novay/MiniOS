@@ -210,126 +210,126 @@
                 </button>
             @endif
 
-            {{-- Action Buttons if Item Selected --}}
-            @if ($selectedPath)
-                @if ($this->isInTrash || ! $this->isSystemProtected)
-                    <div class="h-3.5 w-px bg-neutral-300/80 dark:bg-white/10 mx-1"></div>
-                @endif
+            {{-- Action Buttons (Always Visible, Compact Icon-Only with Tooltip) --}}
+            <div class="h-3.5 w-px bg-neutral-300/80 dark:bg-white/10 mx-1"></div>
 
-                @if (! $this->isInTrash)
-                    {{-- Unduh File --}}
+            <div class="flex items-center gap-1">
+                @php
+                    $canDownload = $selectedPath && ! $this->isInTrash;
+                    $canRename = $selectedPath && ! $this->isInTrash && ! $this->isSystemProtected;
+                    $canMore = $selectedPath && ! $this->isInTrash && ! $this->isSystemProtected;
+                    $canDelete = $selectedPath && (! $this->isSystemProtected || $this->isInTrash);
+                @endphp
+
+                {{-- Unduh File --}}
+                <button
+                    type="button"
+                    @if ($canDownload)
+                        wire:click="downloadFile('{{ $selectedPath }}')"
+                    @endif
+                    @disabled(! $canDownload)
+                    title="{{ $this->t('btn_download') }}"
+                    class="flex size-7 items-center justify-center rounded-md border border-neutral-300/80 dark:border-white/10 bg-white dark:bg-[#2b2b2b] text-neutral-700 dark:text-neutral-200 shadow-2xs transition-all active:scale-95 disabled:active:scale-100 {{ $canDownload ? 'hover:bg-neutral-50 dark:hover:bg-[#333333] cursor-pointer' : 'opacity-35 cursor-not-allowed hover:bg-white dark:hover:bg-[#2b2b2b]' }}"
+                >
+                    <flux:icon name="arrow-down-tray" class="size-3.5 text-neutral-500 dark:text-neutral-400" />
+                </button>
+
+                {{-- Ganti Nama --}}
+                <button
+                    type="button"
+                    @if ($canRename)
+                        wire:click="openRenameModal('{{ $selectedPath }}')"
+                    @endif
+                    @disabled(! $canRename)
+                    title="{{ $this->t('btn_rename') }}"
+                    class="flex size-7 items-center justify-center rounded-md border border-neutral-300/80 dark:border-white/10 bg-white dark:bg-[#2b2b2b] text-neutral-700 dark:text-neutral-200 shadow-2xs transition-all active:scale-95 disabled:active:scale-100 {{ $canRename ? 'hover:bg-neutral-50 dark:hover:bg-[#333333] cursor-pointer' : 'opacity-35 cursor-not-allowed hover:bg-white dark:hover:bg-[#2b2b2b]' }}"
+                >
+                    <flux:icon name="pencil-square" class="size-3.5 text-neutral-500 dark:text-neutral-400" />
+                </button>
+
+                {{-- Dropdown More (Salin, Potong, Pindahkan) --}}
+                <div class="relative" x-data="{ showMoreMenu: false }" @click.outside="showMoreMenu = false">
                     <button
                         type="button"
-                        wire:click="downloadFile('{{ $selectedPath }}')"
-                        title="{{ $this->t('btn_download') }}"
-                        class="flex items-center gap-1.5 rounded-md border border-neutral-300/80 dark:border-white/10 bg-white dark:bg-[#2b2b2b] px-2.5 py-1 text-xs font-medium text-neutral-700 dark:text-neutral-200 shadow-2xs hover:bg-neutral-50 dark:hover:bg-[#333333] transition-all"
+                        @if ($canMore)
+                            @click="showMoreMenu = !showMoreMenu"
+                        @endif
+                        @disabled(! $canMore)
+                        title="{{ $this->t('btn_more') }}"
+                        class="flex size-7 items-center justify-center rounded-md border border-neutral-300/80 dark:border-white/10 bg-white dark:bg-[#2b2b2b] text-neutral-700 dark:text-neutral-200 shadow-2xs transition-all active:scale-95 disabled:active:scale-100 {{ $canMore ? 'hover:bg-neutral-50 dark:hover:bg-[#333333] cursor-pointer' : 'opacity-35 cursor-not-allowed hover:bg-white dark:hover:bg-[#2b2b2b]' }}"
                     >
-                        <flux:icon name="arrow-down-tray" class="size-3.5 text-neutral-500 dark:text-neutral-400" />
-                        <span class="hidden sm:inline">{{ $this->t('btn_download') }}</span>
+                        <flux:icon name="ellipsis-horizontal" class="size-3.5 text-neutral-500 dark:text-neutral-400" />
                     </button>
 
-                    @if (! $this->isSystemProtected)
-                        {{-- Ganti Nama --}}
-                        <button
-                            type="button"
-                            wire:click="openRenameModal('{{ $selectedPath }}')"
-                            title="{{ $this->t('btn_rename') }}"
-                            class="flex items-center gap-1.5 rounded-md border border-neutral-300/80 dark:border-white/10 bg-white dark:bg-[#2b2b2b] px-2.5 py-1 text-xs font-medium text-neutral-700 dark:text-neutral-200 shadow-2xs hover:bg-neutral-50 dark:hover:bg-[#333333] transition-all"
+                    @if ($canMore)
+                        <div
+                            x-show="showMoreMenu"
+                            x-transition:enter="transition ease-out duration-100"
+                            x-transition:enter-start="opacity-0 scale-95"
+                            x-transition:enter-end="opacity-100 scale-100"
+                            x-transition:leave="transition ease-in duration-75"
+                            x-transition:leave-start="opacity-100 scale-100"
+                            x-transition:leave-end="opacity-0 scale-95"
+                            class="absolute left-0 top-full mt-1.5 w-44 rounded-xl border border-neutral-200/90 dark:border-white/10 bg-white/95 dark:bg-[#242427]/95 p-1 shadow-xl backdrop-blur-xl z-50 select-none"
+                            style="display: none;"
                         >
-                            <flux:icon name="pencil-square" class="size-3.5 text-neutral-500 dark:text-neutral-400" />
-                            <span class="hidden sm:inline">{{ $this->t('btn_rename') }}</span>
-                        </button>
-
-                        {{-- Dropdown More (Salin, Potong, Pindahkan) --}}
-                        <div class="relative" x-data="{ showMoreMenu: false }" @click.outside="showMoreMenu = false">
+                            {{-- Salin (Copy) --}}
                             <button
                                 type="button"
-                                @click="showMoreMenu = !showMoreMenu"
-                                title="{{ $this->t('btn_more') }}"
-                                class="flex items-center gap-1.5 rounded-md border border-neutral-300/80 dark:border-white/10 bg-white dark:bg-[#2b2b2b] px-2.5 py-1 text-xs font-medium text-neutral-700 dark:text-neutral-200 shadow-2xs hover:bg-neutral-50 dark:hover:bg-[#333333] transition-all"
+                                wire:click="copyItem"
+                                @click="showMoreMenu = false"
+                                class="flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 text-left text-xs text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-white/10 transition-colors"
                             >
-                                <flux:icon name="ellipsis-horizontal" class="size-3.5 text-neutral-500 dark:text-neutral-400" />
-                                <span class="hidden sm:inline">{{ $this->t('btn_more') }}</span>
-                                <flux:icon name="chevron-down" class="size-3 opacity-75 hidden sm:inline" />
+                                <div class="flex items-center gap-2">
+                                    <flux:icon name="document-duplicate" class="size-4 text-neutral-500 dark:text-neutral-400" />
+                                    <span>{{ $this->t('btn_copy') }}</span>
+                                </div>
+                                <span class="text-[10px] text-neutral-400 font-mono">⌘C</span>
                             </button>
 
-                            <div
-                                x-show="showMoreMenu"
-                                x-transition:enter="transition ease-out duration-100"
-                                x-transition:enter-start="opacity-0 scale-95"
-                                x-transition:enter-end="opacity-100 scale-100"
-                                x-transition:leave="transition ease-in duration-75"
-                                x-transition:leave-start="opacity-100 scale-100"
-                                x-transition:leave-end="opacity-0 scale-95"
-                                class="absolute left-0 top-full mt-1.5 w-44 rounded-xl border border-neutral-200/90 dark:border-white/10 bg-white/95 dark:bg-[#242427]/95 p-1 shadow-xl backdrop-blur-xl z-50 select-none"
-                                style="display: none;"
+                            {{-- Potong (Cut) --}}
+                            <button
+                                type="button"
+                                wire:click="cutItem"
+                                @click="showMoreMenu = false"
+                                class="flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 text-left text-xs text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-white/10 transition-colors"
                             >
-                                {{-- Salin (Copy) --}}
-                                <button
-                                    type="button"
-                                    wire:click="copyItem"
-                                    @click="showMoreMenu = false"
-                                    class="flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 text-left text-xs text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-white/10 transition-colors"
-                                >
-                                    <div class="flex items-center gap-2">
-                                        <flux:icon name="document-duplicate" class="size-4 text-neutral-500 dark:text-neutral-400" />
-                                        <span>{{ $this->t('btn_copy') }}</span>
-                                    </div>
-                                    <span class="text-[10px] text-neutral-400 font-mono">⌘C</span>
-                                </button>
+                                <div class="flex items-center gap-2">
+                                    <flux:icon name="scissors" class="size-4 text-neutral-500 dark:text-neutral-400" />
+                                    <span>{{ $this->t('btn_cut') }}</span>
+                                </div>
+                                <span class="text-[10px] text-neutral-400 font-mono">⌘X</span>
+                            </button>
 
-                                {{-- Potong (Cut) --}}
-                                <button
-                                    type="button"
-                                    wire:click="cutItem"
-                                    @click="showMoreMenu = false"
-                                    class="flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 text-left text-xs text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-white/10 transition-colors"
-                                >
-                                    <div class="flex items-center gap-2">
-                                        <flux:icon name="scissors" class="size-4 text-neutral-500 dark:text-neutral-400" />
-                                        <span>{{ $this->t('btn_cut') }}</span>
-                                    </div>
-                                    <span class="text-[10px] text-neutral-400 font-mono">⌘X</span>
-                                </button>
+                            <div class="my-1 border-t border-neutral-200/80 dark:border-white/10"></div>
 
-                                <div class="my-1 border-t border-neutral-200/80 dark:border-white/10"></div>
-
-                                {{-- Pindahkan (Move) --}}
-                                <button
-                                    type="button"
-                                    wire:click="openMoveModal"
-                                    @click="showMoreMenu = false"
-                                    class="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-xs text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-white/10 transition-colors"
-                                >
-                                    <flux:icon name="folder-arrow-down" class="size-4 text-indigo-500 dark:text-indigo-400" />
-                                    <span>{{ $this->t('btn_move') }}</span>
-                                </button>
-                            </div>
+                            {{-- Pindahkan (Move) --}}
+                            <button
+                                type="button"
+                                wire:click="openMoveModal"
+                                @click="showMoreMenu = false"
+                                class="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-xs text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-white/10 transition-colors"
+                            >
+                                <flux:icon name="folder-arrow-down" class="size-4 text-indigo-500 dark:text-indigo-400" />
+                                <span>{{ $this->t('btn_move') }}</span>
+                            </button>
                         </div>
                     @endif
-                @endif
+                </div>
 
                 {{-- Hapus (Hapus Permanen jika di Trash) --}}
                 <button
                     type="button"
-                    wire:click="openDeleteModal('{{ $selectedPath }}', false)"
+                    @if ($canDelete)
+                        wire:click="openDeleteModal('{{ $selectedPath }}', false)"
+                    @endif
+                    @disabled(! $canDelete)
                     title="{{ $this->isInTrash ? __('Hapus Permanen') : $this->t('btn_delete') }}"
-                    class="flex items-center gap-1.5 rounded-md border border-rose-300/80 dark:border-rose-500/20 bg-rose-50/50 dark:bg-rose-500/10 px-2.5 py-1 text-xs font-medium text-rose-600 dark:text-rose-400 shadow-2xs hover:bg-rose-100 dark:hover:bg-rose-500/20 transition-all"
+                    class="flex size-7 items-center justify-center rounded-md border shadow-2xs transition-all active:scale-95 disabled:active:scale-100 {{ $canDelete ? 'border-rose-300/80 dark:border-rose-500/20 bg-rose-50/50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-500/20 cursor-pointer' : 'border-neutral-300/80 dark:border-white/10 bg-white dark:bg-[#2b2b2b] text-neutral-400 dark:text-neutral-500 opacity-35 cursor-not-allowed hover:bg-white dark:hover:bg-[#2b2b2b]' }}"
                 >
-                    <flux:icon name="trash" class="size-3.5 text-rose-500" />
-                    <span class="hidden sm:inline">{{ $this->isInTrash ? __('Hapus Permanen') : $this->t('btn_delete') }}</span>
+                    <flux:icon name="trash" class="size-3.5 {{ $canDelete ? 'text-rose-500' : 'text-neutral-400 dark:text-neutral-500' }}" />
                 </button>
-
-                {{-- Batal Seleksi --}}
-                <button
-                    type="button"
-                    @click="$dispatch('close-details'); setTimeout(() => $wire.set('selectedPath', null), 180)"
-                    title="{{ $this->t('btn_clear_selection') }}"
-                    class="text-neutral-400 hover:text-neutral-700 dark:hover:text-white p-1"
-                >
-                    <flux:icon name="x-mark" class="size-3.5" />
-                </button>
-            @endif
+            </div>
 
             {{-- Tombol Tempel (Paste) jika ada di Clipboard --}}
             @if ($clipboardPath && ! $this->isInTrash)
@@ -356,9 +356,7 @@
             @endif
 
             {{-- Divider --}}
-            @if ($this->isInTrash || ! $this->isSystemProtected || $selectedPath)
-                <div class="h-3.5 w-px bg-neutral-300/80 dark:bg-white/10 mx-1"></div>
-            @endif
+            <div class="h-3.5 w-px bg-neutral-300/80 dark:bg-white/10 mx-1"></div>
 
             {{-- Tampilan View Mode Toggle --}}
             <div class="flex items-center rounded-md border border-neutral-300/70 dark:border-white/10 bg-white/80 dark:bg-[#202020]/80 p-0.5 shadow-2xs">

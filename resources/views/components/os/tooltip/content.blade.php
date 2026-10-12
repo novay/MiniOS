@@ -4,17 +4,18 @@
 
 @php
 $classes = [
-    'relative z-50 inline-flex items-center gap-1.5 m-0 px-2.5 py-1.5',
+    'z-50 items-center gap-1.5 m-0 px-2.5 py-1.5',
     'rounded-md',
     'text-xs font-normal leading-normal select-none',
     'bg-[#fbfbfb]/95 text-neutral-800 border border-black/[0.08] border-b-black/[0.14] shadow-[0_4px_14px_rgba(0,0,0,0.10),0_1px_2px_rgba(0,0,0,0.06)]',
     'dark:bg-[#2c2c2c]/95 dark:text-neutral-100 dark:border-white/[0.10] dark:border-b-white/[0.06] dark:shadow-[0_8px_24px_rgba(0,0,0,0.5),0_1px_3px_rgba(0,0,0,0.3)]',
     'backdrop-blur-md',
     'transition-opacity duration-150 ease-out',
+    'hidden [:popover-open]:inline-flex [.\\:popover-open]:inline-flex',
 ];
 @endphp
 
-<div popover="manual" {{ $attributes->class($classes) }} data-os-tooltip-content-content="true">
+<div popover="manual" {{ $attributes->class($classes) }} data-os-tooltip-content="true">
     {{ $slot }}
 
     @if ($kbd)

@@ -1,4 +1,16 @@
   // js/checkbox.js
+  const Disableable = globalThis.Disableable;
+  const SelectableGroup = globalThis.SelectableGroup;
+  const Selectable = globalThis.Selectable;
+  const Controllable = globalThis.Controllable;
+  const Submittable = globalThis.Submittable;
+  const detangle = globalThis.detangle;
+  const walker = globalThis.walker;
+  const setAttribute2 = globalThis.setAttribute2;
+  const removeAttribute = globalThis.removeAttribute;
+  const on = globalThis.on;
+  const element = globalThis.element;
+
   var UICheckboxGroup = class _UICheckboxGroup extends UIControl {
     boot() {
       this._disableable = new Disableable(this);
@@ -142,8 +154,15 @@
           this._submittable.update(this._selectable.isSelected());
         });
       }
+      this._selectable.onInitAndChange(() => {
+        this.updateIndicator();
+      });
+      queueMicrotask(() => {
+        this.updateIndicator();
+      });
       this._detangled = detangle();
       this._selectable.onChange(this._detangled(() => {
+        this.updateIndicator();
         this.dispatchEvent(new Event("input", { bubbles: true, cancelable: true }));
         this.dispatchEvent(new Event("change", { bubbles: true, cancelable: true }));
       }));
@@ -176,7 +195,35 @@
           e.stopPropagation();
         }
       }));
-      respondToLabelClick(button);
+    }
+    mount() {
+      respondToLabelClick(this);
+      this.updateIndicator();
+    }
+    updateIndicator() {
+      let isChecked = this._selectable?.isSelected();
+      let isIndet = this.isIndeterminate;
+      let indicator = this.querySelector("[data-os-checkbox-indicator], [data-flux-checkbox-indicator]");
+      if (indicator) {
+        let checkSvg = indicator.querySelector(".os-checkbox-check, svg:first-child");
+        let dashSvg = indicator.querySelector(".os-checkbox-dash, svg:last-child");
+        if (isChecked && !isIndet) {
+          indicator.style.setProperty("background-color", "var(--color-accent, #0067c0)", "important");
+          indicator.style.setProperty("border-color", "transparent", "important");
+          if (checkSvg) checkSvg.style.display = "block";
+          if (dashSvg) dashSvg.style.display = "none";
+        } else if (isIndet) {
+          indicator.style.setProperty("background-color", "var(--color-accent, #0067c0)", "important");
+          indicator.style.setProperty("border-color", "transparent", "important");
+          if (checkSvg) checkSvg.style.display = "none";
+          if (dashSvg) dashSvg.style.display = "block";
+        } else {
+          indicator.style.removeProperty("background-color");
+          indicator.style.removeProperty("border-color");
+          if (checkSvg) checkSvg.style.display = "none";
+          if (dashSvg) dashSvg.style.display = "none";
+        }
+      }
     }
     get value() {
       return this._selectable?.getValue();
@@ -195,6 +242,7 @@
       let groupDetangled = this.closest("ui-checkbox-group")?._detangled || ((i) => i);
       this._detangled(groupDetangled(() => {
         value3 ? this._selectable.select() : this._selectable.deselect();
+        this.updateIndicator();
       }))();
     }
     get indeterminate() {
@@ -207,15 +255,20 @@
       } else {
         removeAttribute(this, "data-indeterminate");
       }
+      this.updateIndicator();
     }
   };
   element("checkbox-group", UICheckboxGroup);
   element("checkbox", UICheckbox);
   function respondToLabelClick(el) {
-    el.closest("label")?.addEventListener("click", (e) => {
-      if (!el.contains(e.target)) {
-        el._selectable.press();
-      }
-    });
+    let label = el.closest("label");
+    if (label && !label.__osCheckboxBound) {
+      label.__osCheckboxBound = true;
+      label.addEventListener("click", (e) => {
+        if (!el.contains(e.target)) {
+          el._selectable.press();
+        }
+      });
+    }
   }
 

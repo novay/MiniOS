@@ -1,5 +1,5 @@
   // js/element.js
-  var UIElement = class extends HTMLElement {
+  var UIElement = globalThis.UIElement = class extends HTMLElement {
     wasDisconnected = false;
     onUnmounts = [];
     constructor() {
@@ -66,7 +66,9 @@
       return this.__root;
     }
   };
-  var UIControl = class extends UIElement {
+  var UIControl = globalThis.UIControl = class extends UIElement {
     //
   };
+
+  export { UIElement, UIControl };
 

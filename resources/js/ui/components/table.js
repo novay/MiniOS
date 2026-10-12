@@ -15,14 +15,14 @@
     }
     updateAttributes() {
       if (this.scrollLeft > 12) {
-        setAttribute2(this, "data-scrolled-right", "");
+        this.setAttribute("data-scrolled-right", "");
       } else {
-        removeAttribute(this, "data-scrolled-right");
+        this.removeAttribute("data-scrolled-right");
       }
       if (this.scrollWidth - this.clientWidth - this.scrollLeft > 12) {
-        setAttribute2(this, "data-scrolled-left", "");
+        this.setAttribute("data-scrolled-left", "");
       } else {
-        removeAttribute(this, "data-scrolled-left");
+        this.removeAttribute("data-scrolled-left");
       }
     }
   };
